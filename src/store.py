@@ -25,13 +25,21 @@ class TripStore:
 
     @staticmethod
     async def _put(session, plan: TripPlan, owner_id: str):
+        payload = plan.model_dump(mode="json", exclude={"packed_items"})
         await session.execute(insert(TripRecord).values(
             id=plan.id, owner_id=owner_id, created_at=plan.created_at,
-            payload=plan.model_dump(mode="json"),
+            payload={**payload, "packed_items": []},
         ).on_conflict_do_nothing(index_elements=["id"]))
-        owner = await session.scalar(select(TripRecord.owner_id).where(TripRecord.id == plan.id))
-        if owner != owner_id:
+        row = await session.scalar(select(TripRecord).where(
+            TripRecord.id == plan.id).with_for_update())
+        if row.owner_id != owner_id:
             raise ValueError("Trip ID belongs to a different owner")
+        existing = TripPlan.model_validate(row.payload).model_dump(
+            mode="json", exclude={"packed_items"})
+        if existing != payload:
+            # Any change to the plan invalidates the previous checklist.
+            row.payload = {**payload, "packed_items": []}
+            row.created_at = plan.created_at
 
     async def put(self, plan: TripPlan, owner_id: str | None = None):
         async with self.sessions.begin() as session:
@@ -42,6 +50,24 @@ class TripStore:
             row = await session.scalar(select(TripRecord).where(
                 TripRecord.id == trip_id, TripRecord.owner_id == (owner_id or "internal")))
             return TripPlan.model_validate(row.payload) if row else None
+
+    async def set_packed(self, trip_id: UUID, owner_id: str, item_index: int, checked: bool) -> TripPlan | None:
+        async with self.sessions.begin() as session:
+            row = await session.scalar(select(TripRecord).where(
+                TripRecord.id == trip_id, TripRecord.owner_id == owner_id).with_for_update())
+            if row is None:
+                return None
+            plan = TripPlan.model_validate(row.payload)
+            if not 0 <= item_index < len(plan.packing_list):
+                raise ServiceError("storage", "Пункт чеклиста не найден", status_code=422)
+            packed = set(plan.packed_items)
+            if checked:
+                packed.add(item_index)
+            else:
+                packed.discard(item_index)
+            plan.packed_items = sorted(packed)
+            row.payload = plan.model_dump(mode="json")
+            return plan
 
     async def list(self, owner_id: str, limit: int = 20, cursor: UUID | None = None) -> TripPage:
         async with self.sessions() as session:

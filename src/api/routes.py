@@ -14,6 +14,7 @@ from src.models import (
     HealthResponse,
     JobState,
     OriginCity,
+    PackingUpdate,
     TransportOptions,
     TripJobCreated,
     TripJobStatus,
@@ -222,6 +223,18 @@ async def get_trip(
     trip_id: UUID, container: ContainerDep, identity: IdentityDep
 ) -> TripPlan:
     trip = await container.store.get(trip_id, owner_id=identity.owner_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Поездка не найдена")
+    return trip
+
+
+@router.patch("/trips/{trip_id}/packing", response_model=TripPlan, tags=["trips"])
+async def update_packing(
+    trip_id: UUID, payload: PackingUpdate, container: ContainerDep, identity: IdentityDep
+) -> TripPlan:
+    trip = await container.store.set_packed(
+        trip_id, identity.owner_id, payload.item_index, payload.checked
+    )
     if trip is None:
         raise HTTPException(status_code=404, detail="Поездка не найдена")
     return trip

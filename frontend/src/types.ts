@@ -123,6 +123,7 @@ export interface TripPlan {
   } | null;
   weather_advice: string;
   packing_list: string[];
+  packed_items: number[];
   warnings: string[];
   notes: string[];
   sources: { name: string; url: string }[];

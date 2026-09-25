@@ -11,7 +11,7 @@ import {
   softLavenderIconStyles,
   textButtonStyles,
 } from "../ui-styles";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowLeft,
@@ -31,7 +31,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { TransportOption, TripPlan } from "../types";
-import { dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
+import { api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
 import { AccommodationCard } from "./AccommodationCard";
 import { Notice } from "./UI";
 
@@ -45,16 +45,39 @@ export function TripResult({
   plan,
   onBack,
   onEdit,
+  initData,
+  onPlanChange,
 }: {
   plan: TripPlan;
   onBack: () => void;
   onEdit: () => void;
+  initData: string;
+  onPlanChange: (plan: TripPlan) => void;
 }) {
   const [tab, setTab] = useState<Tab>("program");
   const [dayIndex, setDayIndex] = useState(0);
   const [message, setMessage] = useState("");
   const [manualCopy, setManualCopy] = useState(false);
-  const [packed, setPacked] = useState<string[]>([]);
+  const packed = plan.packed_items ?? [];
+  const [savingPacking, setSavingPacking] = useState(false);
+  const packingLock = useRef(false);
+  const togglePacked = async (itemIndex: number) => {
+    if (packingLock.current) return;
+    packingLock.current = true;
+    setSavingPacking(true);
+    try {
+      const saved = await api<TripPlan>(`/trips/${plan.id}/packing`, initData, {
+        method: "PATCH",
+        body: JSON.stringify({ item_index: itemIndex, checked: !packed.includes(itemIndex) }),
+      });
+      onPlanChange(saved);
+    } catch (error) {
+      setMessage((error as Error).message);
+    } finally {
+      packingLock.current = false;
+      setSavingPacking(false);
+    }
+  };
   const [checksOpen, setChecksOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const weather =
@@ -391,32 +414,27 @@ export function TripResult({
                       </div>
                     </div>
                     <div data-ui="packing-list" className={packingListStyles}>
-                      {plan.packing_list.map((item) => (
+                      {plan.packing_list.map((item, itemIndex) => (
                         <label
-                          key={item}
-                          data-ui={packed.includes(item) ? "packed" : ""}
+                          key={itemIndex}
+                          data-ui={packed.includes(itemIndex) ? "packed" : ""}
                           className={
-                            packed.includes(item)
+                            packed.includes(itemIndex)
                               ? "[[data-ui~=packing-list]_label&]:text-[#a9b0bf] [[data-ui~=packing-list]_label&]:[text-decoration:line-through]"
                               : ""
                           }
                         >
                           <input
                             type="checkbox"
-                            checked={packed.includes(item)}
-                            onChange={() =>
-                              setPacked(
-                                packed.includes(item)
-                                  ? packed.filter((value) => value !== item)
-                                  : [...packed, item],
-                              )
-                            }
+                            checked={packed.includes(itemIndex)}
+                            disabled={savingPacking}
+                            onChange={() => void togglePacked(itemIndex)}
                           />
                           <span
                             data-ui="packing-checkbox"
                             className={packingCheckboxStyles}
                           >
-                            {packed.includes(item) && <Check size={13} />}
+                            {packed.includes(itemIndex) && <Check size={13} />}
                           </span>
                           {item}
                         </label>

@@ -487,7 +487,7 @@ export default function App() {
                         <span data-ui="eyebrow" className={eyebrowStyles}>
                           ВАШ СЛЕДУЮЩИЙ ХОРОШИЙ ДЕНЬ
                         </span>
-                        <h1>
+                        <h1 className="mb-4">
                           Сменим
                           <br
                             data-ui="mobile-break"
@@ -768,6 +768,11 @@ export default function App() {
                 {screen === "result" && trip && (
                   <TripResult
                     {...trip}
+                    key={trip.plan.id}
+                    initData={initData.current}
+                    onPlanChange={(plan) => setTrip((current) =>
+                      current?.plan.id === plan.id ? { plan } : current
+                    )}
                     onBack={() => navigate("home")}
                     onEdit={() => {
                       setStep(0);
@@ -780,7 +785,7 @@ export default function App() {
                     <span data-ui="eyebrow" className={eyebrowStyles}>
                       ЕЩЁ ОДИН ПОВОД ВЫБРАТЬСЯ
                     </span>
-                    <h1>Мои поездки</h1>
+                    <h1 className="mb-4">Мои поездки</h1>
                     {jobId && (
                       <button
                         data-ui="active-job"
@@ -817,7 +822,7 @@ export default function App() {
                     <span data-ui="eyebrow" className={eyebrowStyles}>
                       ПРИЯТНО ПОЗНАКОМИТЬСЯ
                     </span>
-                    <h1>
+                    <h1 className="mb-4">
                       {identity.mode === "max"
                         ? `${identity.user.first_name}, поехали?`
                         : "Большие открытия рядом."}

@@ -287,11 +287,17 @@ class TripPlan(BaseModel):
     budget: BudgetSummary
     weather_advice: str
     packing_list: list[str]
+    packed_items: list[int] = Field(default_factory=list)
     notes: list[str]
     map_url: HttpUrl | None = None
     share_text: str
     warnings: list[str] = Field(default_factory=list)
     sources: list[dict[str, str]]
+
+
+class PackingUpdate(BaseModel):
+    item_index: int = Field(ge=0, strict=True)
+    checked: bool = Field(strict=True)
 
 
 class HealthResponse(BaseModel):

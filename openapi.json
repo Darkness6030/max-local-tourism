@@ -367,6 +367,64 @@
         }
       }
     },
+    "/api/v1/trips/{trip_id}/packing": {
+      "patch": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Update Packing",
+        "operationId": "update_packing_api_v1_trips__trip_id__packing_patch",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackingUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/trips/{trip_id}/share": {
       "get": {
         "tags": [
@@ -1328,6 +1386,25 @@
         ],
         "title": "Pace"
       },
+      "PackingUpdate": {
+        "properties": {
+          "item_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Item Index"
+          },
+          "checked": {
+            "type": "boolean",
+            "title": "Checked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_index",
+          "checked"
+        ],
+        "title": "PackingUpdate"
+      },
       "ProgressEvent": {
         "properties": {
           "progress": {
@@ -1955,6 +2032,13 @@
             },
             "type": "array",
             "title": "Packing List"
+          },
+          "packed_items": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Packed Items"
           },
           "notes": {
             "items": {
