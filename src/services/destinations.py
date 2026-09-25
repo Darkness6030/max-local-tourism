@@ -50,23 +50,25 @@ def city_key(name: str) -> str:
     return re.sub(r"^(?:город\s+|г\.\s*)", "", value)
 
 
-def choose_destination(
-    candidates: DestinationCandidates, origin: str, recent: list[str]
-) -> DestinationSuggestion:
+def choose_destination(candidates: DestinationCandidates, origin: str, recent: list[str]) -> DestinationSuggestion:
     unique = {}
     for candidate in candidates.candidates:
         key = city_key(candidate.name)
-        if key != city_key(origin) and (
-            key not in unique or candidate.fit_score > unique[key].fit_score
-        ):
+        if key != city_key(origin) and (key not in unique or candidate.fit_score > unique[key].fit_score):
             unique[key] = candidate
+
     if not unique:
         raise ServiceError("gigachat", "Не удалось подобрать новое направление. Уточните пожелания.")
+
     best_score = max(item.fit_score for item in unique.values())
-    suitable = [item for item in unique.values()
-                if item.fit_score >= best_score - DESTINATION_SCORE_TOLERANCE]
+    suitable = [
+        item for item in unique.values()
+        if item.fit_score >= best_score - DESTINATION_SCORE_TOLERANCE
+    ]
+
     visited = {city_key(name) for name in recent}
     fresh = [item for item in suitable if city_key(item.name) not in visited]
+
     # A clearly better match wins even when it was visited before.
     selected = random.choice(fresh or suitable)
     return DestinationSuggestion.model_validate(selected.model_dump(exclude={"fit_score"}))
