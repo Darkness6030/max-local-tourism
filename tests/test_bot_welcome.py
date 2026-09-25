@@ -87,7 +87,7 @@ async def test_webhook_auth_and_dispatch(monkeypatch):
             assert response.status_code == 403
         handler.assert_not_awaited()
         headers = {"X-Max-Bot-Api-Secret": "test-secret"}
-        for event in ([], {"message": []}, {"message": {"body": []}}):
+        for event in ([], "event", 42):
             assert (
                 await client.post("/api/v1/bot/webhook", json=event, headers=headers)
             ).status_code == 400
@@ -100,6 +100,33 @@ async def test_webhook_auth_and_dispatch(monkeypatch):
         assert (
             await client.post("/api/v1/bot/webhook", json=started(), headers=headers)
         ).status_code == 503
+
+
+@pytest.mark.asyncio
+async def test_webhook_sdk_validation(monkeypatch):
+    app = FastAPI()
+    app.include_router(bot.router)
+    monkeypatch.setattr(bot, "get_settings", settings)
+    send = AsyncMock()
+    monkeypatch.setattr(welcome, "send_welcome", send)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        headers = {"X-Max-Bot-Api-Secret": "test-secret"}
+        for message in ([], {"body": []}):
+            response = await client.post(
+                "/api/v1/bot/webhook",
+                json={"update_type": "message_created", "message": message},
+                headers=headers,
+            )
+            assert response.status_code == 400
+        response = await client.post(
+            "/api/v1/bot/webhook",
+            json={"update_type": "bot_stopped"},
+            headers=headers,
+        )
+        assert response.status_code == 200
+        send.assert_not_awaited()
 
 
 @pytest.mark.asyncio
