@@ -33,6 +33,7 @@ async def bot_webhook(request: Request):
         update = json.loads(body)
     except (ValueError, TypeError):
         raise HTTPException(400, "Некорректное событие") from None
+
     if not isinstance(update, dict):
         raise HTTPException(400, "Некорректное событие")
 

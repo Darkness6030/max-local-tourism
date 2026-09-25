@@ -30,26 +30,30 @@ def welcome_recipient(update: dict, username: str) -> int | None:
     if kind == "bot_started":
         event = BotStarted.model_validate(update)
         user = event.user
-        if event.timestamp < 0 or user.is_bot:
+        if event.timestamp < 0:
             return None
     elif kind == "message_created":
         event = MessageCreated.model_validate(update)
         message = event.message
         user = message.sender
-        if not user or message.recipient.chat_type != ChatType.DIALOG or user.is_bot:
+        if not user or message.recipient.chat_type != ChatType.DIALOG:
             return None
+
         words = (message.body.text or "").split()
         if not words or words[0].lower() not in {
             "/start",
             f"/start@{username.lower()}",
         }:
             return None
+
         if not message.body.mid:
             return None
     else:
         return None
-    if user.user_id <= 0:
+
+    if user.is_bot or user.user_id <= 0:
         return None
+
     return user.user_id
 
 
@@ -60,6 +64,7 @@ async def send_welcome(settings: Settings, user_id: int) -> None:
             text=WELCOME_TEXT,
             attachments=[welcome_keyboard(settings.max_bot_username)],
         )
+
         if not result or not result.message.body.mid:
             raise ServiceError(
                 "max", "Не удалось отправить приветствие", status_code=503

@@ -70,6 +70,7 @@ class TripPlanner:
     ) -> TripPlan:
         report = progress or _noop_progress
         await report(5, "Определяем точки маршрута")
+
         destination_suggestion: DestinationSuggestion | None = None
         if request.destination:
             origin, destination = await asyncio.gather(
@@ -108,10 +109,10 @@ class TripPlanner:
             return_exceptions=True,
         )
 
-        if isinstance(weather_result, BaseException):
-            if isinstance(weather_result, ServiceError):
-                raise weather_result
+        if isinstance(weather_result, ServiceError):
+            raise weather_result
 
+        if isinstance(weather_result, BaseException):
             raise ServiceError(
                 "weather", "Не удалось получить погоду", details=str(weather_result)
             )
@@ -292,9 +293,8 @@ async def _with_heartbeat(
             done, _ = await asyncio.wait({task}, timeout=3)
             if done:
                 break
-            next_progress = min(progress + 3, 88)
-            if next_progress > progress:
-                progress = next_progress
+            if progress < 88:
+                progress = min(progress + 3, 88)
                 await report(progress, "ИИ составляет программу и бюджет")
         return await task
     except asyncio.CancelledError:
@@ -311,13 +311,11 @@ def _plan_map_url(
 ) -> str | None:
     if by_car:
         return build_yandex_map_url(origin, destination, by_car=True)
-    if transport and transport.outbound:
-        return (
-            str(transport.outbound[0].map_url)
-            if transport.outbound[0].map_url
-            else None
-        )
-    return None
+    if not transport or not transport.outbound:
+        return None
+
+    url = transport.outbound[0].map_url
+    return str(url) if url else None
 
 
 def _share_text(
@@ -327,10 +325,9 @@ def _share_text(
     destination: GeoPoint,
     map_url: str | None,
 ) -> str:
-    date_label = request.start_date.strftime("%d.%m.%Y")
     lines = [
         f"🧭 {generated.title}",
-        f"📍 {destination.title} · {date_label} · {request.days} дн.",
+        f"📍 {destination.title} · {request.start_date:%d.%m.%Y} · {request.days} дн.",
         generated.summary,
     ]
     for day in generated.itinerary:

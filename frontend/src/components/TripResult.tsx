@@ -68,10 +68,12 @@ export function TripResult({
   const publishPacking = () => {
     const { confirmed, pending } = packing.current;
     const items = new Set(confirmed.packed_items ?? []);
+
     pending.forEach((checked, index) => {
       if (checked) items.add(index);
       else items.delete(index);
     });
+
     onPlanChange({ ...confirmed, packed_items: [...items].sort((a, b) => a - b) });
   };
   const togglePacked = async (itemIndex: number) => {
@@ -80,7 +82,9 @@ export function TripResult({
       ?? (state.confirmed.packed_items ?? []).includes(itemIndex);
     state.pending.set(itemIndex, !checked);
     publishPacking();
+
     if (state.saving) return;
+
     state.saving = true;
     // Serialize writes; later clicks remain visible while a response is in flight.
     while (state.pending.size) {
@@ -93,15 +97,19 @@ export function TripResult({
       } catch (error) {
         setMessage((error as Error).message);
       }
+
       if (state.pending.get(index) === value) state.pending.delete(index);
       publishPacking();
     }
+
     state.saving = false;
   };
   const [checksOpen, setChecksOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const weather =
     plan.weather.days[Math.min(dayIndex, plan.weather.days.length - 1)];
+  const budgetItems = plan.budget.items.map((item) => budgetItemCopy(item, plan));
+
   const external = (url: string) => {
     try {
       Promise.resolve(openExternal(url)).catch(() =>
@@ -679,7 +687,7 @@ export function TripResult({
                       "mt-[24px] [&_>_div]:flex [&_>_div]:justify-between [&_>_div]:[align-items:start] [&_>_div]:gap-[20px] [&_>_div]:py-[16px] [&_>_div]:px-0 [&_>_div]:[border-bottom:1px_solid_var(--line)] [&_strong]:block [&_strong]:text-[11px] [&_strong]:[font-weight:650] mobile:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px] [&_small]:text-[11px] [&_small]:leading-[1.7] [&_small]:text-[#a1a9ba] [&_small]:block [&_small]:mt-[5px] mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px] [&_b]:text-[12px] [&_b]:whitespace-nowrap mobile:[&_b]:text-[11px]"
                     }
                   >
-                    {plan.budget.items.map((entry) => ({ ...entry, ...budgetItemCopy(entry, plan) })).map((item, i) => (
+                    {budgetItems.map((item, i) => (
                       <div key={i}>
                         <span>
                           <strong>{item.category}</strong>

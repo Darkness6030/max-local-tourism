@@ -66,21 +66,11 @@ def build_budget(
             fetched_at=catalog.fetched_at,
         )
 
-        items.append(
-            BudgetItem(
-                category="lodging",
-                amount_rub=lodging_total,
-            )
-        )
+        items.append(BudgetItem(category="lodging", amount_rub=lodging_total))
 
     subtotal = sum(item.amount_rub for item in items)
     reserve = ceil(subtotal * BUDGET_RESERVE_PERCENT / 100)
-    items.append(
-        BudgetItem(
-            category="reserve",
-            amount_rub=reserve,
-        )
-    )
+    items.append(BudgetItem(category="reserve", amount_rub=reserve))
 
     total = subtotal + reserve
     return BudgetSummary(

@@ -52,9 +52,11 @@ def city_key(name: str) -> str:
 
 def choose_destination(candidates: DestinationCandidates, origin: str, recent: list[str]) -> DestinationSuggestion:
     unique = {}
+    origin_key = city_key(origin)
+
     for candidate in candidates.candidates:
         key = city_key(candidate.name)
-        if key != city_key(origin) and (key not in unique or candidate.fit_score > unique[key].fit_score):
+        if key != origin_key and (key not in unique or candidate.fit_score > unique[key].fit_score):
             unique[key] = candidate
 
     if not unique:

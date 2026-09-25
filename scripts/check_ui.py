@@ -98,6 +98,17 @@ def main():
             route.fulfill(json={"items": items, "total": len(items), "next_cursor": None})
 
         context.route("**/api/v1/trips", history)
+        def packing(route):
+            update = route.request.post_data_json
+            packed = set(plan["packed_items"])
+            if update["checked"]:
+                packed.add(update["item_index"])
+            else:
+                packed.discard(update["item_index"])
+            plan["packed_items"] = sorted(packed)
+            route.fulfill(json=plan)
+
+        context.route(f"**/api/v1/trips/{plan['id']}/packing", packing)
         context.route(f"**/api/v1/trips/{plan['id']}", lambda r: r.fulfill(json=plan))
         context.route("**/api/v1/trips/jobs", submit)
         context.route("**/api/v1/trips/jobs/test-job", status)
@@ -274,7 +285,7 @@ def main():
         page.locator("#share-trip").click()
         assert page.evaluate("window.WebApp.calls.some(x => x.text?.startsWith('ИИ:'))")
         page.locator("#copy-trip").click()
-        expect(page.get_by_role("status")).to_be_visible()
+        expect(page.locator("[data-ui~=result-page] > [data-ui~=notice]")).to_be_visible()
         page.get_by_role("tab", name="Программа").click()
         expect(page.get_by_role("checkbox").first).to_be_checked()
         page.set_viewport_size({"width": 320, "height": 650})
