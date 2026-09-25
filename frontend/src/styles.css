@@ -1,0 +1,256 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Keep the existing browser defaults; intentionally do not import Preflight. */
+@theme inline {
+  --color-brand: var(--blue);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+}
+
+/* Exact existing breakpoints, in their original cascade order. */
+@custom-variant desktop-fit (@media (max-width: 1200px));
+@custom-variant tablet (@media (max-width: 900px));
+@custom-variant mobile (@media (max-width: 700px));
+@custom-variant narrow (@media (max-width: 360px));
+@custom-variant reduce-motion (@media (prefers-reduced-motion: reduce));
+@custom-variant mobile-type (@media (max-width: 700px));
+@custom-variant narrow-type (@media (max-width: 360px));
+@custom-variant mobile-copy (@media (max-width: 700px));
+@custom-variant desktop-result (@media (min-width: 701px));
+@custom-variant mobile-spacing (@media (max-width: 700px));
+@custom-variant narrow-spacing (@media (max-width: 360px));
+@custom-variant phone-heading (@media (min-width: 361px) and (max-width: 700px));
+@custom-variant phone-stack (@media (max-width: 500px));
+@custom-variant short (@media (max-height: 700px));
+@custom-variant short-mobile (@media (max-height: 700px) and (max-width: 700px));
+@custom-variant short-narrow (@media (max-height: 700px) and (max-width: 360px));
+@custom-variant preset-tablet (@media (max-width: 900px));
+@custom-variant preset-mobile (@media (max-width: 700px));
+@custom-variant preset-short (@media (max-height: 700px));
+@custom-variant loading-narrow (@media (max-width: 360px));
+@custom-variant reduce-loading (@media (prefers-reduced-motion: reduce));
+
+@layer base {
+  :root {
+    font-family:
+      "Manrope Variable",
+      Manrope,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    color: #202638;
+    background: #f8f9fc;
+    font-synthesis: none;
+    font-weight: 500;
+    --blue: #3d5af4;
+    --blue-dark: #3049d7;
+    --ink: #202638;
+    --muted: #7c8293;
+    --line: #e9ebf2;
+    --paper: #fff;
+    --lavender: #f0eeff;
+    --radius: 24px;
+    color-scheme: light;
+    font-optical-sizing: auto;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+  }
+  button {
+    font: inherit;
+  }
+  input {
+    font: inherit;
+  }
+  select {
+    font: inherit;
+  }
+  textarea {
+    font: inherit;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    cursor: pointer;
+    color: inherit;
+  }
+  button:disabled {
+    cursor: wait;
+    opacity: 0.5;
+  }
+  button {
+    touch-action: manipulation;
+  }
+  a {
+    touch-action: manipulation;
+  }
+  button:focus-visible {
+    outline: 3px solid #a3b1ff;
+    outline-offset: 4px;
+  }
+  a:focus-visible {
+    outline: 3px solid #a3b1ff;
+    outline-offset: 4px;
+  }
+  summary:focus-visible {
+    outline: 3px solid #a3b1ff;
+    outline-offset: 4px;
+  }
+  input:focus {
+    outline: 2px solid #a3b1ff;
+    outline-offset: 2px;
+  }
+  select:focus {
+    outline: 2px solid #a3b1ff;
+    outline-offset: 2px;
+  }
+  textarea:focus {
+    outline: 2px solid #a3b1ff;
+    outline-offset: 2px;
+  }
+  button {
+    border: 0;
+  }
+  h1 {
+    margin: 0;
+  }
+  h2 {
+    margin: 0;
+  }
+  h3 {
+    margin: 0;
+  }
+  p {
+    margin: 0;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+  }
+  svg {
+    flex-shrink: 0;
+  }
+  a {
+    color: var(--blue);
+  }
+  button {
+    min-height: 44px;
+  }
+  input {
+    min-height: 44px;
+  }
+  select {
+    min-height: 44px;
+  }
+  textarea {
+    min-height: 44px;
+  }
+  summary {
+    min-height: 44px;
+  }
+  h1:focus {
+    outline: none;
+  }
+  input {
+    min-width: 0;
+  }
+  select {
+    min-width: 0;
+  }
+  textarea {
+    min-width: 0;
+  }
+  ::selection {
+    background: #dbe1ff;
+  }
+  progress {
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    margin: 14px 0 18px;
+    background: #e7ebf6;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  progress::-webkit-progress-bar {
+    background: #e7ebf6;
+  }
+  progress::-webkit-progress-value {
+    background: var(--blue);
+    border-radius: 8px;
+    transition: width 0.5s;
+  }
+  progress::-moz-progress-bar {
+    background: var(--blue);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *::before {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Keyframes are shared by Tailwind animation utilities and Motion. */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes compass-turn {
+  0%,
+  100% {
+    transform: rotate(-15deg);
+  }
+  40% {
+    transform: rotate(60deg);
+  }
+  70% {
+    transform: rotate(15deg);
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}

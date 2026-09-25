@@ -1,0 +1,30 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.ruff_cache/
+frontend/node_modules/
+frontend/*.tsbuildinfo
+src/static/
+tmp/
+data/
+.env.*
+!.env.example
+# Материалы задания конфиденциальны (§11.3).
+docs/*.pdf
+docs/PLAN.md
+docs/RULES.md
+
+# Local files and credentials
+.DS_Store
+*.pem
+*.key
+*.p12
+*.pfx
+*.dump
+*.sqlite*
+*.db

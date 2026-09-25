@@ -1,0 +1,2342 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MAX.Локальный Туризм API",
+    "description": "Backend-MVP персонального ИИ-планировщика поездок выходного дня: ИИ, Яндекс Расписания, geopy/Nominatim и погодные API.",
+    "version": "0.3.0"
+  },
+  "paths": {
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "MAX"
+        ],
+        "summary": "Auth Me",
+        "operationId": "auth_me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cities/validate": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Validate City",
+        "operationId": "validate_city_api_v1_cities_validate_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "origin",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OriginCity"
+            }
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "title": "Destination"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Validate City Api V1 Cities Validate Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trips/generate": {
+      "post": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Generate Trip",
+        "operationId": "generate_trip_api_v1_trips_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trips/jobs": {
+      "post": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Create Trip Job",
+        "operationId": "create_trip_job_api_v1_trips_jobs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripJobCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    },
+    "/api/v1/trips/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Get Trip Job",
+        "operationId": "get_trip_job_api_v1_trips_jobs__job_id__get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripJobStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trips": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "List Trips",
+        "operationId": "list_trips_api_v1_trips_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trips/{trip_id}": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Get Trip",
+        "operationId": "get_trip_api_v1_trips__trip_id__get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trips/{trip_id}/share": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Share Trip",
+        "operationId": "share_trip_api_v1_trips__trip_id__share_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Share Trip Api V1 Trips  Trip Id  Share Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/app-config": {
+      "get": {
+        "tags": [
+          "miniapp"
+        ],
+        "summary": "App Config",
+        "operationId": "app_config_api_v1_app_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response App Config Api V1 App Config Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/examples/trip-request": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Example Request",
+        "operationId": "example_request_api_v1_examples_trip_request_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/geocode": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Geocode",
+        "operationId": "geocode_api_v1_geocode_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "title": "Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoPoint"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Weather",
+        "operationId": "weather_api_v1_weather_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "place",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "title": "Place"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 3,
+              "minimum": 1,
+              "default": 1,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherForecast"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transport": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Transport",
+        "operationId": "transport_api_v1_transport_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from_place",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "title": "From Place"
+            }
+          },
+          {
+            "name": "to_place",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "title": "To Place"
+            }
+          },
+          {
+            "name": "travel_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Travel Date"
+            }
+          },
+          {
+            "name": "departure_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "time",
+              "default": "07:00:00",
+              "title": "Departure After"
+            }
+          },
+          {
+            "name": "return_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "time",
+              "default": "17:00:00",
+              "title": "Return After"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransportOptions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/destinations/suggest": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Suggest Destination",
+        "operationId": "suggest_destination_api_v1_destinations_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationSuggestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Accommodation": {
+        "properties": {
+          "check_in": {
+            "type": "string",
+            "format": "date",
+            "title": "Check In"
+          },
+          "check_out": {
+            "type": "string",
+            "format": "date",
+            "title": "Check Out"
+          },
+          "nights": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Nights"
+          },
+          "rooms": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Rooms"
+          },
+          "estimated_room_night_rub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Estimated Room Night Rub"
+          },
+          "estimated_total_rub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Estimated Total Rub"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "found",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Status"
+          },
+          "hotels": {
+            "items": {
+              "$ref": "#/components/schemas/Hotel"
+            },
+            "type": "array",
+            "title": "Hotels"
+          },
+          "search_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Search Url"
+          },
+          "fetched_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fetched At"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Ориентир на проживание, не тариф конкретного отеля. Цены и свободные номера на ваши даты уточняйте у гостиницы."
+          }
+        },
+        "type": "object",
+        "required": [
+          "check_in",
+          "check_out",
+          "nights",
+          "rooms",
+          "estimated_room_night_rub",
+          "estimated_total_rub",
+          "status",
+          "search_url"
+        ],
+        "title": "Accommodation"
+      },
+      "BudgetItem": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "amount_rub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Amount Rub"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "amount_rub"
+        ],
+        "title": "BudgetItem"
+      },
+      "BudgetSummary": {
+        "properties": {
+          "limit_rub": {
+            "type": "integer",
+            "title": "Limit Rub"
+          },
+          "estimated_total_rub": {
+            "type": "integer",
+            "title": "Estimated Total Rub"
+          },
+          "per_person_rub": {
+            "type": "integer",
+            "title": "Per Person Rub"
+          },
+          "within_budget": {
+            "type": "boolean",
+            "title": "Within Budget"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BudgetItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Оценка создана ИИ; цены мест и билетов нужно проверить перед поездкой."
+          }
+        },
+        "type": "object",
+        "required": [
+          "limit_rub",
+          "estimated_total_rub",
+          "per_person_rub",
+          "within_budget",
+          "items"
+        ],
+        "title": "BudgetSummary"
+      },
+      "CityPhoto": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Url"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Source Url"
+          },
+          "article_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Article Url"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "license": {
+            "type": "string",
+            "title": "License"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "source_url",
+          "article_url",
+          "author",
+          "license"
+        ],
+        "title": "CityPhoto"
+      },
+      "Coordinates": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "title": "Coordinates"
+      },
+      "DestinationSuggestion": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "region": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Region"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 10,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "region",
+          "reason"
+        ],
+        "title": "DestinationSuggestion"
+      },
+      "ErrorBody": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error"
+          },
+          "service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorBody"
+      },
+      "GeoPoint": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "OpenStreetMap Nominatim via geopy"
+          },
+          "wikipedia_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wikipedia Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "query",
+          "title",
+          "address"
+        ],
+        "title": "GeoPoint"
+      },
+      "GroupType": {
+        "type": "string",
+        "enum": [
+          "solo",
+          "couple",
+          "friends",
+          "family"
+        ],
+        "title": "GroupType"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "integrations": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Integrations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "integrations"
+        ],
+        "title": "HealthResponse"
+      },
+      "Hotel": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "hotel",
+              "guest_house"
+            ],
+            "title": "Kind"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "distance_km": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Distance Km"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "map_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Map Url"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Source Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "id",
+          "name",
+          "kind",
+          "distance_km",
+          "map_url",
+          "source_url"
+        ],
+        "title": "Hotel"
+      },
+      "Identity": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "max",
+              "local"
+            ],
+            "title": "Mode"
+          },
+          "user": {
+            "$ref": "#/components/schemas/MaxUser"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "user"
+        ],
+        "title": "Identity"
+      },
+      "ItineraryDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineItem"
+            },
+            "type": "array",
+            "maxItems": 12,
+            "minItems": 2,
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "title",
+          "items"
+        ],
+        "title": "ItineraryDay"
+      },
+      "JobState": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "failed"
+        ],
+        "title": "JobState"
+      },
+      "MaxUser": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Id"
+          },
+          "first_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "first_name"
+        ],
+        "title": "MaxUser"
+      },
+      "OriginCity": {
+        "type": "string",
+        "enum": [
+          "Москва",
+          "Санкт-Петербург"
+        ],
+        "title": "OriginCity"
+      },
+      "Pace": {
+        "type": "string",
+        "enum": [
+          "relaxed",
+          "balanced",
+          "intensive"
+        ],
+        "title": "Pace"
+      },
+      "ProgressEvent": {
+        "properties": {
+          "progress": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Progress"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "progress",
+          "message"
+        ],
+        "title": "ProgressEvent"
+      },
+      "SettlementRef": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title"
+        ],
+        "title": "SettlementRef"
+      },
+      "TimelineItem": {
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+            "title": "End Time"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Title"
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Place"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 800,
+            "minLength": 5,
+            "title": "Description"
+          },
+          "indoor": {
+            "type": "boolean",
+            "title": "Indoor"
+          },
+          "estimated_cost_rub": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Estimated Cost Rub",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "end_time",
+          "title",
+          "place",
+          "description",
+          "indoor"
+        ],
+        "title": "TimelineItem"
+      },
+      "TransportOption": {
+        "properties": {
+          "departure": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Departure"
+          },
+          "arrival": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Arrival"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Duration Minutes"
+          },
+          "from_station": {
+            "type": "string",
+            "title": "From Station"
+          },
+          "to_station": {
+            "type": "string",
+            "title": "To Station"
+          },
+          "from_station_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Station Code"
+          },
+          "to_station_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Station Code"
+          },
+          "from_station_coordinates": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "to_station_coordinates": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport_type": {
+            "type": "string",
+            "title": "Transport Type"
+          },
+          "vehicle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle"
+          },
+          "route_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Number"
+          },
+          "route_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Title"
+          },
+          "carrier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carrier"
+          },
+          "has_transfers": {
+            "type": "boolean",
+            "title": "Has Transfers",
+            "default": false
+          },
+          "price_rub": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Rub"
+          },
+          "buy_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Buy Url"
+          },
+          "map_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "departure",
+          "arrival",
+          "duration_minutes",
+          "from_station",
+          "to_station",
+          "transport_type",
+          "buy_url"
+        ],
+        "title": "TransportOption"
+      },
+      "TransportOptions": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/SettlementRef"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/SettlementRef"
+          },
+          "outbound": {
+            "items": {
+              "$ref": "#/components/schemas/TransportOption"
+            },
+            "type": "array",
+            "title": "Outbound"
+          },
+          "return_trip": {
+            "items": {
+              "$ref": "#/components/schemas/TransportOption"
+            },
+            "type": "array",
+            "title": "Return Trip"
+          },
+          "source_name": {
+            "type": "string",
+            "title": "Source Name",
+            "default": "Яндекс Расписания"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Source Url",
+            "default": "https://rasp.yandex.ru/"
+          }
+        },
+        "type": "object",
+        "required": [
+          "origin",
+          "destination",
+          "outbound",
+          "return_trip"
+        ],
+        "title": "TransportOptions"
+      },
+      "TripJobCreated": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobState",
+            "default": "queued"
+          },
+          "status_url": {
+            "type": "string",
+            "title": "Status Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status_url"
+        ],
+        "title": "TripJobCreated"
+      },
+      "TripJobStatus": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobState"
+          },
+          "progress": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Progress"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TripPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "progress",
+          "message",
+          "events"
+        ],
+        "title": "TripJobStatus"
+      },
+      "TripPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TripSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "TripPage"
+      },
+      "TripParameters": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/OriginCity",
+            "default": "Москва"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination",
+            "description": "Если не задано, направление предложит ИИ.",
+            "examples": [
+              "Коломна"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "days": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "default": 1
+          },
+          "budget_rub": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 1000.0,
+            "title": "Budget Rub",
+            "default": 12000
+          },
+          "travelers": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Travelers",
+            "default": 2
+          },
+          "group_type": {
+            "$ref": "#/components/schemas/GroupType",
+            "default": "couple"
+          },
+          "children_ages": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Children Ages"
+          },
+          "preferences": {
+            "type": "string",
+            "maxLength": 1500,
+            "minLength": 3,
+            "title": "Preferences",
+            "description": "Интересы и пожелания пользователя в свободной форме.",
+            "default": "История, архитектура, местная кухня; без слишком раннего подъёма."
+          },
+          "pace": {
+            "$ref": "#/components/schemas/Pace",
+            "default": "balanced"
+          },
+          "has_car": {
+            "type": "boolean",
+            "title": "Has Car",
+            "default": false
+          },
+          "departure_after": {
+            "type": "string",
+            "format": "time",
+            "title": "Departure After",
+            "default": "07:00:00"
+          },
+          "return_after": {
+            "type": "string",
+            "format": "time",
+            "title": "Return After",
+            "default": "17:00:00"
+          },
+          "max_travel_minutes": {
+            "type": "integer",
+            "maximum": 720.0,
+            "minimum": 30.0,
+            "title": "Max Travel Minutes",
+            "default": 240
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "TripParameters",
+        "description": "Saved request snapshot: historical dates remain readable."
+      },
+      "TripPlan": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "request": {
+            "$ref": "#/components/schemas/TripParameters"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "destination_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Reason"
+          },
+          "destination_photo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CityPhoto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accommodation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Accommodation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "origin": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "weather": {
+            "$ref": "#/components/schemas/WeatherForecast"
+          },
+          "transport": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TransportOptions"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "itinerary": {
+            "items": {
+              "$ref": "#/components/schemas/ItineraryDay"
+            },
+            "type": "array",
+            "title": "Itinerary"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/BudgetSummary"
+          },
+          "weather_advice": {
+            "type": "string",
+            "title": "Weather Advice"
+          },
+          "packing_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Packing List"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "map_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2083,
+                "minLength": 1,
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map Url"
+          },
+          "share_text": {
+            "type": "string",
+            "title": "Share Text"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "request",
+          "title",
+          "summary",
+          "origin",
+          "destination",
+          "weather",
+          "transport",
+          "itinerary",
+          "budget",
+          "weather_advice",
+          "packing_list",
+          "notes",
+          "share_text",
+          "sources"
+        ],
+        "title": "TripPlan"
+      },
+      "TripRequest": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/OriginCity",
+            "default": "Москва"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination",
+            "description": "Если не задано, направление предложит ИИ.",
+            "examples": [
+              "Коломна"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "days": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "default": 1
+          },
+          "budget_rub": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 1000.0,
+            "title": "Budget Rub",
+            "default": 12000
+          },
+          "travelers": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Travelers",
+            "default": 2
+          },
+          "group_type": {
+            "$ref": "#/components/schemas/GroupType",
+            "default": "couple"
+          },
+          "children_ages": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Children Ages"
+          },
+          "preferences": {
+            "type": "string",
+            "maxLength": 1500,
+            "minLength": 3,
+            "title": "Preferences",
+            "description": "Интересы и пожелания пользователя в свободной форме.",
+            "default": "История, архитектура, местная кухня; без слишком раннего подъёма."
+          },
+          "pace": {
+            "$ref": "#/components/schemas/Pace",
+            "default": "balanced"
+          },
+          "has_car": {
+            "type": "boolean",
+            "title": "Has Car",
+            "default": false
+          },
+          "departure_after": {
+            "type": "string",
+            "format": "time",
+            "title": "Departure After",
+            "default": "07:00:00"
+          },
+          "return_after": {
+            "type": "string",
+            "format": "time",
+            "title": "Return After",
+            "default": "17:00:00"
+          },
+          "max_travel_minutes": {
+            "type": "integer",
+            "maximum": 720.0,
+            "minimum": 30.0,
+            "title": "Max Travel Minutes",
+            "default": 240
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "TripRequest",
+        "description": "New generation requests must fit the available forecast horizon."
+      },
+      "TripSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "destination": {
+            "type": "string",
+            "title": "Destination"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "travelers": {
+            "type": "integer",
+            "title": "Travelers"
+          },
+          "estimated_total_rub": {
+            "type": "integer",
+            "title": "Estimated Total Rub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "title",
+          "origin",
+          "destination",
+          "start_date",
+          "days",
+          "travelers",
+          "estimated_total_rub"
+        ],
+        "title": "TripSummary"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WeatherDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "temperature_min_c": {
+            "type": "number",
+            "title": "Temperature Min C"
+          },
+          "temperature_max_c": {
+            "type": "number",
+            "title": "Temperature Max C"
+          },
+          "precipitation_probability_percent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precipitation Probability Percent"
+          },
+          "precipitation_mm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precipitation Mm"
+          },
+          "wind_max_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Max Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "description",
+          "temperature_min_c",
+          "temperature_max_c"
+        ],
+        "title": "WeatherDay"
+      },
+      "WeatherForecast": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/WeatherDay"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "source_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Source Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider",
+          "location",
+          "days",
+          "source_url"
+        ],
+        "title": "WeatherForecast"
+      }
+    },
+    "securitySchemes": {
+      "MaxInitData": {
+        "type": "apiKey",
+        "description": "Исходная window.WebApp.initData; подпись и срок действия проверяются сервером.",
+        "in": "header",
+        "name": "X-Max-Init-Data"
+      }
+    }
+  }
+}

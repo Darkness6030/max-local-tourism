@@ -1,0 +1,62 @@
+name: max-local-tourism
+services:
+  app:
+    image: max-local-tourism:${RELEASE_TAG:-current}
+    build:
+      context: ..
+      args:
+        APP_BASE_PATH: /max/app
+    env_file: /opt/max-local-tourism/shared/.env
+    environment:
+      APP_ENV: production
+      APP_ROOT_PATH: /max/app
+      MAX_ALLOW_LOCAL_AUTH: "false"
+      GIGACHAT_VERIFY_SSL_CERTS: "true"
+      MAX_CA_BUNDLE_FILE: /app/certs/russian-trusted-root.pem
+      GIGACHAT_CA_BUNDLE_FILE: /app/certs/russian-trusted-root.pem
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:18091:8000"
+    command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--no-proxy-headers", "--root-path", "/max/app"]
+    volumes:
+      - /opt/max-local-tourism/shared/certs:/app/certs:ro
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  db:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    env_file: /opt/max-local-tourism/shared/postgres.env
+    environment:
+      POSTGRES_USER: tourism
+      POSTGRES_DB: tourism
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tourism -d tourism"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+volumes:
+  postgres_data:

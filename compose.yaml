@@ -1,0 +1,51 @@
+# Local development only. No public ports, tunnels or deployment.
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://tourism:local-tourism@db:5432/tourism
+      APP_ENV: development
+      MAX_ALLOW_LOCAL_AUTH: "true"
+      # Fixed bridge gateway + Docker Desktop host forwarding addresses.
+      # The published port and request Host must still be loopback.
+      MAX_LOCAL_CLIENT_HOSTS: '["127.0.0.1","::1","172.30.0.1","192.168.65.1","192.168.65.3"]'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data:ro
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - local
+  db:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    environment:
+      POSTGRES_USER: tourism
+      POSTGRES_PASSWORD: local-tourism
+      POSTGRES_DB: tourism
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tourism -d tourism"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    networks:
+      - local
+volumes:
+  postgres_data:
+networks:
+  local:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1

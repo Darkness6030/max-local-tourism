@@ -1,0 +1,13 @@
+-c requirements.lock
+fastapi==0.141.1
+uvicorn[standard]==0.35.0
+httpx==0.28.1
+pydantic-settings==2.10.1
+geopy[aiohttp]==2.5.0
+gigachat==0.2.3
+pytest==8.4.1
+pytest-asyncio==1.1.0
+SQLAlchemy[asyncio]==2.0.54
+sqlmodel==0.0.27
+asyncpg==0.31.0
+maxapi @ https://github.com/max-messenger/max-botapi-python/archive/4a286baa06d38f2db9f7244d94f89508743f8fee.tar.gz
