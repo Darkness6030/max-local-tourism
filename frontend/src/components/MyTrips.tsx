@@ -117,7 +117,7 @@ export function MyTrips({
               className="overflow-hidden rounded-[22px] border border-solid border-[var(--line)] bg-white motion-safe:animate-pulse"
             >
               <div className="h-[144px] bg-[#eff3ff]" />
-              <div className="space-y-[12px] p-[20px] mobile:p-[18px]">
+              <div className="space-y-[12px] p-[20px] mobile:p-[14px]">
                 <div className="h-[12px] w-24 rounded bg-[#eff3ff]" />
                 <div className="h-[20px] w-3/4 rounded bg-[#eff3ff]" />
                 <div className="h-[12px] w-1/2 rounded bg-[#eff3ff]" />
@@ -137,7 +137,7 @@ export function MyTrips({
             onClick={() => void load(item.id)}
           >
             <TripCover photo={item.destination_photo} />
-            <div className="flex w-full flex-1 flex-col p-[20px] mobile:p-[18px]">
+            <div className="flex w-full flex-1 flex-col p-[20px] mobile:p-[14px]">
               <small className="block text-[11px] font-medium leading-[16px] text-[#8e9bb2]">
                 {dateLabel(item.start_date)}
               </small>
