@@ -162,7 +162,7 @@ async def test_planner_only_loads_hotels_for_overnight_trips(days):
         assert plan.accommodation.status == "unavailable"
         assert not plan.budget.within_budget
         assert plan.budget.estimated_total_rub == (2000 + 12000 * (days - 1)) * 1.25
-        assert "запасом" in plan.warnings[-1]
+        assert plan.budget.estimated_total_rub > plan.budget.limit_rub
     assert plan.budget.estimated_total_rub == sum(
         item.amount_rub for item in plan.budget.items
     )

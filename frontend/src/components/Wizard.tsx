@@ -1,3 +1,4 @@
+import { nightsLabel } from "../lib";
 import {
   wizardFieldLabelStyles,
   activeStyles,
@@ -501,7 +502,7 @@ export function Wizard({
                       <span>
                         {draft.days === 1
                           ? "Уедем и вернёмся в один день"
-                          : `${draft.days - 1} ${draft.days === 2 ? "ночь" : "ночи"} в новом месте`}
+                          : `${nightsLabel(draft.days - 1)} в новом месте`}
                       </span>
                     </div>
                   </div>

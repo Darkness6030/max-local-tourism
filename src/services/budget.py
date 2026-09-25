@@ -68,9 +68,8 @@ def build_budget(
 
         items.append(
             BudgetItem(
-                category="Проживание",
+                category="lodging",
                 amount_rub=lodging_total,
-                comment=f"{rooms} ном. × {nights} ноч. × ≈{nightly} ₽",
             )
         )
 
@@ -78,9 +77,8 @@ def build_budget(
     reserve = ceil(subtotal * BUDGET_RESERVE_PERCENT / 100)
     items.append(
         BudgetItem(
-            category="Небольшой запас",
+            category="reserve",
             amount_rub=reserve,
-            comment="На непредвиденные расходы.",
         )
     )
 
@@ -91,5 +89,4 @@ def build_budget(
         per_person_rub=ceil(total / request.travelers),
         within_budget=total <= request.budget_rub,
         items=items,
-        disclaimer="Ориентировочные расходы на всю группу. Цены мест, билетов и проживания уточняйте перед поездкой.",
     ), accommodation

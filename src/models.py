@@ -62,6 +62,7 @@ class TripParameters(BaseModel):
         description="Если не задано, направление предложит ИИ.",
         examples=["Коломна"],
     )
+
     start_date: date = Field(default_factory=default_trip_date)
     days: int = Field(default=1, ge=1, le=MAX_TRIP_DAYS)
     budget_rub: int = Field(default=12_000, ge=1_000, le=1_000_000)
@@ -74,6 +75,7 @@ class TripParameters(BaseModel):
         max_length=1500,
         description="Интересы и пожелания пользователя в свободной форме.",
     )
+
     pace: Pace = Pace.BALANCED
     has_car: bool = False
     departure_after: time = time(7, 0)
@@ -84,8 +86,10 @@ class TripParameters(BaseModel):
     def validate_group(self) -> TripParameters:
         if any(age < 0 or age > 17 for age in self.children_ages):
             raise ValueError("возраст ребёнка должен быть от 0 до 17 лет")
+
         if self.children_ages and self.group_type != GroupType.FAMILY:
             raise ValueError("children_ages допустим только для group_type=family")
+
         return self
 
 
@@ -97,12 +101,10 @@ class TripRequest(TripParameters):
         today = current_date()
         if self.start_date < today:
             raise ValueError("start_date не может быть в прошлом")
-        if self.start_date + timedelta(days=self.days - 1) >= today + timedelta(
-            days=MAX_FORECAST_DAYS
-        ):
-            raise ValueError(
-                f"прогноз доступен максимум на {MAX_FORECAST_DAYS} дней вперёд"
-            )
+
+        if self.start_date + timedelta(days=self.days - 1) >= today + timedelta(days=MAX_FORECAST_DAYS):
+            raise ValueError(f"прогноз доступен максимум на {MAX_FORECAST_DAYS} дней вперёд")
+
         return self
 
 
@@ -229,9 +231,6 @@ class BudgetSummary(BaseModel):
     per_person_rub: int
     within_budget: bool
     items: list[BudgetItem]
-    disclaimer: str = (
-        "Оценка создана ИИ; цены мест и билетов нужно проверить перед поездкой."
-    )
 
 
 class CityPhoto(BaseModel):
@@ -239,7 +238,6 @@ class CityPhoto(BaseModel):
     source_url: HttpUrl
     article_url: HttpUrl
     author: str
-    license: str
 
 
 class Hotel(Coordinates):
@@ -264,10 +262,6 @@ class Accommodation(BaseModel):
     hotels: list[Hotel] = Field(default_factory=list)
     search_url: HttpUrl
     fetched_at: datetime | None = None
-    disclaimer: str = (
-        "Ориентир на проживание, не тариф конкретного отеля. "
-        "Цены и свободные номера на ваши даты уточняйте у гостиницы."
-    )
 
 
 class TripPlan(BaseModel):
@@ -276,6 +270,7 @@ class TripPlan(BaseModel):
     request: TripParameters
     title: str
     summary: str
+    estimated_travel_minutes: int | None = Field(default=None, ge=0)
     destination_reason: str | None = None
     destination_photo: CityPhoto | None = None
     accommodation: Accommodation | None = None

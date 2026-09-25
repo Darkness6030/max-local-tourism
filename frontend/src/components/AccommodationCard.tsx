@@ -1,6 +1,7 @@
+import { ACCOMMODATION_DISCLAIMER } from "../trip-copy";
 import { ArrowUpRight, BedDouble, MapPin } from "lucide-react";
 import type { Accommodation } from "../types";
-import { dateLabel, money, safeUrl } from "../lib";
+import { dateLabel, money, nightsLabel, safeUrl } from "../lib";
 
 const linkStyles =
   "inline-flex items-center gap-[5px] text-[12px] font-semibold text-brand no-underline";
@@ -25,7 +26,7 @@ export function AccommodationCard({
           <h2 className="text-[14px] font-bold">Где остановиться</h2>
           <p className="mt-[5px] text-[11px] leading-[1.7] text-muted">
             {dateLabel(stay.check_in)} — {dateLabel(stay.check_out)} ·{" "}
-            {stay.nights} ноч.
+            {nightsLabel(stay.nights)}
           </p>
         </div>
       </div>
@@ -35,7 +36,7 @@ export function AccommodationCard({
           номер / ночь
         </p>
         <p className="mt-[3px] text-muted">
-          {stay.rooms} ном. × {stay.nights} ноч. · ≈{" "}
+          {stay.rooms} ном. × {nightsLabel(stay.nights)} · ≈{" "}
           {money(stay.estimated_total_rub)} за поездку
         </p>
         <p className="mt-[3px] text-[11px] text-muted">
@@ -44,7 +45,7 @@ export function AccommodationCard({
         </p>
       </div>
       <p className="mt-[12px] text-[11px] leading-[1.8] text-muted">
-        {stay.disclaimer}
+        {ACCOMMODATION_DISCLAIMER}
       </p>
       <div className={`mt-[8px] divide-x-0 divide-y divide-solid divide-[var(--line)] ${stay.hotels.length ? "mb-[14px] border-x-0 border-t-0 border-b border-solid border-[var(--line)]" : ""}`}>
         {stay.hotels.map((hotel) => (

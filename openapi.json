@@ -848,11 +848,6 @@
               }
             ],
             "title": "Fetched At"
-          },
-          "disclaimer": {
-            "type": "string",
-            "title": "Disclaimer",
-            "default": "Ориентир на проживание, не тариф конкретного отеля. Цены и свободные номера на ваши даты уточняйте у гостиницы."
           }
         },
         "type": "object",
@@ -922,11 +917,6 @@
             },
             "type": "array",
             "title": "Items"
-          },
-          "disclaimer": {
-            "type": "string",
-            "title": "Disclaimer",
-            "default": "Оценка создана ИИ; цены мест и билетов нужно проверить перед поездкой."
           }
         },
         "type": "object",
@@ -965,10 +955,6 @@
           "author": {
             "type": "string",
             "title": "Author"
-          },
-          "license": {
-            "type": "string",
-            "title": "License"
           }
         },
         "type": "object",
@@ -976,8 +962,7 @@
           "url",
           "source_url",
           "article_url",
-          "author",
-          "license"
+          "author"
         ],
         "title": "CityPhoto"
       },
@@ -1961,6 +1946,18 @@
           "summary": {
             "type": "string",
             "title": "Summary"
+          },
+          "estimated_travel_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Travel Minutes"
           },
           "destination_reason": {
             "anyOf": [

@@ -66,6 +66,7 @@ async def test_photo_attribution_cache_and_persistence():
         )
         photo = await service.for_city(city)
         assert photo and photo.author == "Автор"
+        assert "license" not in photo.model_dump()
         assert await service.for_city(city) == photo
         assert len(calls) == 2
         plan = sample_trip().model_copy(update={"destination_photo": photo})
@@ -105,7 +106,6 @@ async def test_photo_survives_database_reload(store):
         source_url="https://commons.wikimedia.org/wiki/File:City.jpg",
         article_url="https://ru.wikipedia.org/wiki/Тверь",
         author="Автор",
-        license="CC BY-SA 4.0",
     )
     await store.put(plan, owner_id="max:42")
     loaded = await store.get(plan.id, owner_id="max:42")

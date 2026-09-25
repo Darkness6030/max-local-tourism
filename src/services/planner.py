@@ -117,16 +117,7 @@ class TripPlanner:
             )
 
         transport, warnings = _resolve_transport(transport_result)
-        if request.has_car:
-            warnings.append(
-                "Расписание показано как альтернатива автомобилю; дорожный трафик не учтён."
-            )
-
         estimated_travel_minutes = round(distance_km / ESTIMATED_REGIONAL_SPEED_KMH * 60)
-        if estimated_travel_minutes > request.max_travel_minutes:
-            warnings.append(
-                "Расстояние по прямой может не уложиться в желаемое время дороги; проверьте маршрут."
-            )
 
         await report(62, "Погода, станции и транспорт получены")
         facts = _planning_facts(
@@ -155,23 +146,12 @@ class TripPlanner:
             generated, request, destination,
             None if isinstance(catalog, BaseException) else catalog,
         )
-        if not budget.within_budget:
-            warnings.append(
-                f"Оценка с запасом превышает бюджет на {budget.estimated_total_rub - request.budget_rub} ₽."
-            )
-
         map_url = _plan_map_url(
             origin,
             destination,
             transport,
             by_car=request.has_car,
         )
-        if not request.has_car and transport and transport.outbound and not map_url:
-            warnings.append(
-                "Не удалось получить координаты станций выбранного рейса; "
-                "карта не построена по центрам городов намеренно."
-            )
-
         share_text = _share_text(
             generated=generated,
             request=request,
@@ -197,13 +177,8 @@ class TripPlanner:
             budget=budget,
             weather_advice=generated.weather_advice,
             packing_list=generated.packing_list,
-            notes=generated.notes
-                  + [
-                      (
-                          "Время ИИ-программы рекомендательное. Время отправления и прибытия "
-                          "проверяйте в блоке транспорта; часы работы мест не подтверждены."
-                      ),
-                  ],
+            notes=generated.notes,
+            estimated_travel_minutes=estimated_travel_minutes,
             map_url=map_url,
             share_text=share_text,
             warnings=warnings,
@@ -263,14 +238,7 @@ def _resolve_transport(
     if isinstance(result, BaseException):
         return None, [f"Транспорт не загружен: {result}"]
 
-    warnings: list[str] = []
-    if not result.outbound:
-        warnings.append("После выбранного времени не найдено подходящих рейсов туда.")
-    if not result.return_trip:
-        warnings.append(
-            "После выбранного времени не найдено подходящих рейсов обратно."
-        )
-    return result, warnings
+    return result, []
 
 
 def _planning_facts(

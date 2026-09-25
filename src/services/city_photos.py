@@ -154,10 +154,6 @@ class CityPhotoService:
             return None
 
         metadata = image.get("extmetadata", {})
-        license_name = plain_text(metadata.get("LicenseShortName", {}).get("value", ""))
-        if not license_name.lower().startswith(("cc by", "cc0", "public domain")):
-            return None
-
         author = plain_text(metadata.get("Artist", {}).get("value", ""))
         source = image.get("descriptionurl", "")
         if not author or not trusted_url(source, {"commons.wikimedia.org"}):
@@ -168,5 +164,4 @@ class CityPhotoService:
             article_url=article_url,
             source_url=source,
             author=author,
-            license=license_name,
         )

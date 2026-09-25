@@ -78,7 +78,6 @@ export interface Accommodation {
   }[];
   search_url: string;
   fetched_at: string | null;
-  disclaimer: string;
 }
 export interface TripPlan {
   id: string;
@@ -89,13 +88,13 @@ export interface TripPlan {
   origin: { title: string };
   destination: { title: string };
   accommodation?: Accommodation | null;
+  estimated_travel_minutes?: number | null;
   destination_reason?: string | null;
   destination_photo?: {
     url: string;
     source_url: string;
     article_url: string;
     author: string;
-    license: string;
   } | null;
   itinerary: { date: string; title: string; items: TimelineItem[] }[];
   budget: {
@@ -104,7 +103,6 @@ export interface TripPlan {
     per_person_rub: number;
     within_budget: boolean;
     items: { category: string; amount_rub: number; comment?: string | null }[];
-    disclaimer: string;
   };
   weather: {
     provider: string;

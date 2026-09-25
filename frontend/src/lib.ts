@@ -2,6 +2,11 @@ import type { AppConfig, Draft, TripRequest } from "./types";
 
 export const money = (value: number) =>
   `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
+const nightRules = new Intl.PluralRules("ru-RU");
+export const nightsLabel = (count: number) => {
+  const form = nightRules.select(count);
+  return `${count} ${form === "one" ? "ночь" : form === "few" ? "ночи" : "ночей"}`;
+};
 export const dateLabel = (
   value: string,
   options?: Intl.DateTimeFormatOptions,
@@ -40,7 +45,6 @@ const displayFields = new Set([
   "summary",
   "description",
   "comment",
-  "disclaimer",
   "weather_advice",
   "destination_reason",
   "warnings",

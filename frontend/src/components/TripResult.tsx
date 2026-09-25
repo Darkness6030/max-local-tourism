@@ -1,3 +1,4 @@
+import { BUDGET_DISCLAIMER, budgetItemCopy, tripNotices } from "../trip-copy";
 import {
   activeStyles,
   eyebrowStyles,
@@ -678,7 +679,7 @@ export function TripResult({
                       "mt-[24px] [&_>_div]:flex [&_>_div]:justify-between [&_>_div]:[align-items:start] [&_>_div]:gap-[20px] [&_>_div]:py-[16px] [&_>_div]:px-0 [&_>_div]:[border-bottom:1px_solid_var(--line)] [&_strong]:block [&_strong]:text-[11px] [&_strong]:[font-weight:650] mobile:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px] [&_small]:text-[11px] [&_small]:leading-[1.7] [&_small]:text-[#a1a9ba] [&_small]:block [&_small]:mt-[5px] mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px] [&_b]:text-[12px] [&_b]:whitespace-nowrap mobile:[&_b]:text-[11px]"
                     }
                   >
-                    {plan.budget.items.map((item, i) => (
+                    {plan.budget.items.map((entry) => ({ ...entry, ...budgetItemCopy(entry, plan) })).map((item, i) => (
                       <div key={i}>
                         <span>
                           <strong>{item.category}</strong>
@@ -690,7 +691,7 @@ export function TripResult({
                   </div>
                   <div data-ui="inline-note" className={inlineNoteStyles}>
                     <Info size={18} />
-                    <span>{plan.budget.disclaimer}</span>
+                    <span>{BUDGET_DISCLAIMER}</span>
                   </div>
                 </section>
               )}
@@ -786,7 +787,7 @@ export function TripResult({
             className="pt-[8px] px-0 pb-[4px] [&_ul]:mt-0 [&_ul]:mx-0 [&_ul]:mb-[12px] [&_p]:m-0"
           >
             <ul>
-              {[...plan.warnings, ...plan.notes].map((item, i) => (
+              {tripNotices(plan).map((item, i) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>

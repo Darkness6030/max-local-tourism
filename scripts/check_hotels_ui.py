@@ -30,7 +30,6 @@ def main():
         "estimated_total_rub": 6000,
         "status": "found",
         "fetched_at": None,
-        "disclaimer": "Ориентир на проживание, не тариф конкретного отеля. Цены и свободные номера уточняйте у гостиницы.",
         "search_url": "https://yandex.ru/maps/?text=Гостиницы",
         "hotels": [
             {
@@ -60,6 +59,7 @@ def main():
         for width, state in [
             (320, "found"),
             (390, "found"),
+            (390, "two-nights"),
             (1360, "found"),
             (390, "empty"),
             (390, "unavailable"),
@@ -68,6 +68,9 @@ def main():
         ]:
             fixture = copy.deepcopy(plan)
             fixture["accommodation"] = copy.deepcopy(stay)
+            if state == "two-nights":
+                fixture["accommodation"]["nights"] = 2
+                fixture["request"]["days"] = 3
             if state in {"empty", "unavailable"}:
                 fixture["accommodation"].update(status=state, hotels=[])
             if state == "one-day":
@@ -116,8 +119,10 @@ def main():
                 card.scroll_into_view_if_needed()
                 assert card.is_visible()
                 assert "6\u00a0000" in card.inner_text()
-                assert "не тариф" in card.inner_text()
-                if state == "found":
+                assert "Цены и свободные номера" in card.inner_text()
+                assert "ноч." not in card.inner_text()
+                assert ("2 ночи" if state == "two-nights" else "1 ночь") in card.inner_text()
+                if state in {"found", "two-nights"}:
                     page.get_by_role("link", name="Сайт гостиницы").click()
                     assert "https://example.com/hotel" in page.evaluate(
                         "window.WebApp.calls"
