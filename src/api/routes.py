@@ -24,6 +24,7 @@ from src.models import (
     WeatherForecast,
     current_date,
 )
+from src.services.destinations import RECENT_DESTINATION_LIMIT
 from src.services.planner import validate_destination
 
 router = APIRouter(prefix="/api/v1")
@@ -152,7 +153,8 @@ async def suggest_destination(
     payload: TripRequest,
     container: ContainerDep,
 ) -> DestinationSuggestion:
-    return await container.gigachat.suggest_destination(payload)
+    recent = await container.store.recent_destinations(identity.owner_id, RECENT_DESTINATION_LIMIT)
+    return await container.gigachat.suggest_destination(payload, recent_destinations=recent)
 
 
 @router.post("/trips/generate", response_model=TripPlan, tags=["trips"])

@@ -13,6 +13,7 @@ from src.models import (
     TripJobStatus,
     TripRequest,
 )
+from src.services.destinations import RECENT_DESTINATION_LIMIT
 from src.services.planner import TripPlanner
 from src.store import TripStore
 
@@ -60,7 +61,8 @@ class TripJobManager:
             job.status = JobState.RUNNING
             await report(1, "Генерация запущена")
             async with asyncio.timeout(360):
-                result = await self.planner.generate(request, progress=report)
+                recent = await self.store.recent_destinations(owner, RECENT_DESTINATION_LIMIT) if not request.destination else []
+                result = await self.planner.generate(request, progress=report, recent_destinations=recent)
             await self.store.finish_job(job.id, owner, result)
         except asyncio.CancelledError:
             # On restart, recover_interrupted_jobs converts this durable state to failed.

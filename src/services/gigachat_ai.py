@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 import re
 from typing import TypeVar
 
@@ -13,6 +14,13 @@ from src.models import (
     DestinationSuggestion,
     GeneratedTripContent,
     TripRequest,
+)
+from src.services.destinations import (
+    DESTINATION_CANDIDATE_COUNT,
+    DESTINATION_HINTS,
+    DESTINATION_TEMPERATURE,
+    DestinationCandidates,
+    choose_destination,
 )
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
@@ -47,25 +55,54 @@ class GigaChatService:
         if self._client is not None:
             await self._client.aclose()
 
-    async def suggest_destination(self, request: TripRequest) -> DestinationSuggestion:
+    async def suggest_destination(
+        self, request: TripRequest, recent_destinations: list[str] | None = None
+    ) -> DestinationSuggestion:
+        recent = recent_destinations or []
+        hints = list(DESTINATION_HINTS[request.origin])
+        random.shuffle(hints)
         prompt = f"""
-Подбери ОДНО направление для короткой поездки по России. Точка должна быть реальным
-городом менее чем в {SUGGESTED_CITY_DISTANCE_KM} км по прямой от точки отправления,
-который однозначно находится русским геокодером. Не выбирай
-точку отправления и не придумывай достопримечательности.
+Сравни направления и предложи до {DESTINATION_CANDIDATE_COUNT} РАЗНЫХ реальных городов
+России для этой анкеты. Сначала оцени интересы, затем длительность, дорогу,
+автомобиль, бюджет на человека, состав группы, возраст детей, темп и сезон.
+fit_score (0–100) оценивает соответствие именно этой анкете, а не известность города.
+90–100: полностью закрывает главный интерес и ограничения; 70–89: есть компромисс;
+ниже 70: лишь общее сходство. Если главный интерес не представлен, оценка не выше 60.
+Если интерес конкретный (композитор, космонавтика, живопись), в reason назови
+реального известного представителя или профильный музей. Обычный краеведческий
+музей не заменяет профильный интерес. Не включай город, если не уверен в фактах.
+В reason конкретно объясни связь города с пожеланиями; не используй одинаковые
+объяснения для разных городов. Не придумывай достопримечательности и возможности.
 
-Анкета:
+АНКЕТА:
 {request.model_dump_json(indent=2)}
 
-Ограничения: дорога в одну сторону примерно не больше {request.max_travel_minutes} минут,
-бюджет на всю группу {request.budget_rub} рублей. В region укажи субъект РФ.
+Города для расширения поиска (порядок случайный, список НЕ исчерпывающий):
+{json.dumps(hints, ensure_ascii=False)}
+Можно предлагать другие, в том числе менее известные города, если они подходят лучше.
+Не выбирай Коломну или Сергиев Посад по привычке: у них нет приоритета.
+Подбери несколько сопоставимо хороших вариантов. Если запрос узкий и подходят
+только 1–2 города, верни их; не дополняй список неподходящими ради количества.
+Города, уже встречавшиеся в последних поездках пользователя:
+{json.dumps(recent, ensure_ascii=False)}
+Предпочитай новые сопоставимые варианты, но не жертвуй главным пожеланием ради новизны.
+
+Ограничения: каждый город менее чем в {SUGGESTED_CITY_DISTANCE_KM} км по прямой от
+{request.origin.value}; сам город отправления исключён. Дорога в одну сторону
+примерно не более {request.max_travel_minutes} минут, с учётом наличия автомобиля.
+Для одного дня не предлагай дальние города, где дорога съест весь день.
+Не предлагай закрытые города или места с обязательными пропусками.
+Регион — субъект РФ; названия должны однозначно находиться русским геокодером.
+Не выдумывай точные расписания и цены: они проверяются отдельно.
 """.strip()
-        return await self._structured(
-            DestinationSuggestion,
-            system="Ты — эксперт по локальному туризму в России. Отвечай фактологично.",
+        candidates = await self._structured(
+            DestinationCandidates,
+            system="Ты — эксперт по локальному туризму России. Сравнивай соответствие запросу, а не популярность.",
             prompt=prompt,
-            max_tokens=900,
+            max_tokens=2000,
+            temperature=DESTINATION_TEMPERATURE,
         )
+        return choose_destination(candidates, request.origin.value, recent)
 
     async def build_trip(
         self,
@@ -122,6 +159,7 @@ class GigaChatService:
         system: str,
         prompt: str,
         max_tokens: int,
+        temperature: float = 0.2,
     ) -> ModelT:
         if self._client is None:
             raise ServiceError(
@@ -138,7 +176,7 @@ class GigaChatService:
                         {"role": "system", "content": system},
                         {"role": "user", "content": schema_prompt},
                     ],
-                    "model_options": {"temperature": 0.2, "max_tokens": max_tokens},
+                    "model_options": {"temperature": temperature, "max_tokens": max_tokens},
                 }
             )
             text = _response_text(response)

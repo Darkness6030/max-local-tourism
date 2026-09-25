@@ -8,7 +8,7 @@ from src.models import JobState, TripRequest
 
 
 class FailingPlanner:
-    async def generate(self, request, progress):
+    async def generate(self, request, progress, recent_destinations=None):
         await progress(35, "Точки маршрута определены")
         await progress(68, "GigaChat составляет программу")
         raise ServiceError(

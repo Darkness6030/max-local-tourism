@@ -19,7 +19,7 @@ class SamplePlanner:
     def __init__(self, store):
         self.store = store
 
-    async def generate(self, request, progress=None, owner_id=None):
+    async def generate(self, request, progress=None, owner_id=None, recent_destinations=None):
         if progress:
             await progress(65, "Проверка сценария")
         plan = sample_trip()

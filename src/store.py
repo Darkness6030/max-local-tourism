@@ -51,6 +51,13 @@ class TripStore:
                 TripRecord.id == trip_id, TripRecord.owner_id == (owner_id or "internal")))
             return TripPlan.model_validate(row.payload) if row else None
 
+    async def recent_destinations(self, owner_id: str, limit: int) -> list[str]:
+        async with self.sessions() as session:
+            names = await session.scalars(select(TripRecord.payload["destination"]["title"].astext)
+                .where(TripRecord.owner_id == owner_id)
+                .order_by(TripRecord.created_at.desc(), TripRecord.id.desc()).limit(limit))
+            return [name for name in names if name]
+
     async def set_packed(self, trip_id: UUID, owner_id: str, item_index: int, checked: bool) -> TripPlan | None:
         async with self.sessions.begin() as session:
             row = await session.scalar(select(TripRecord).where(

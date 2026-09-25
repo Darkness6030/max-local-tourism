@@ -66,6 +66,7 @@ class TripPlanner:
         self,
         request: TripRequest,
         progress: ProgressCallback | None = None,
+        recent_destinations: list[str] | None = None,
     ) -> TripPlan:
         report = progress or _noop_progress
         await report(5, "Определяем точки маршрута")
@@ -78,7 +79,7 @@ class TripPlanner:
         else:
             origin = await self.geocoding.geocode(request.origin)
             await report(15, "ИИ подбирает направление")
-            destination_suggestion = await self.gigachat.suggest_destination(request)
+            destination_suggestion = await self.gigachat.suggest_destination(request, recent_destinations=recent_destinations)
             await report(28, f"Выбрано направление: {destination_suggestion.name}")
             destination = await self.geocoding.geocode(
                 f"{destination_suggestion.name}, {destination_suggestion.region}, Россия"
