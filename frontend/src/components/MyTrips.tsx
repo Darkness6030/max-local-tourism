@@ -1,16 +1,16 @@
 import {
   emptyStateStyles,
-  softBlueIconStyles,
   textButtonStyles,
 } from "../ui-styles";
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, LoaderCircle, MapPin, Route } from "lucide-react";
-import { api, dateLabel, money } from "../lib";
+import { api, dateLabel, money, safeUrl } from "../lib";
 import type { TripPlan } from "../types";
 import { Notice, Primary } from "./UI";
 
 interface Summary {
   id: string;
+  destination_photo?: TripPlan["destination_photo"];
   title: string;
   start_date: string;
   travelers: number;
@@ -116,7 +116,7 @@ export function MyTrips({
               aria-hidden="true"
               className="flex items-center gap-[17px] rounded-[22px] border border-solid border-[var(--line)] bg-white p-[24px] motion-safe:animate-pulse mobile:gap-[13px] mobile:rounded-[22px] mobile:p-[18px]"
             >
-              <span className="h-[48px] w-[48px] shrink-0 rounded-[15px] bg-[#eff3ff]" />
+              <span className="h-[96px] w-[80px] shrink-0 rounded-[15px] mobile:h-[80px] mobile:w-[64px] bg-[#eff3ff]" />
               <div className="flex-1 space-y-[10px]">
                 <div className="h-[12px] w-24 rounded bg-[#eff3ff]" />
                 <div className="h-[20px] w-3/4 rounded bg-[#eff3ff]" />
@@ -137,9 +137,7 @@ export function MyTrips({
           aria-busy={openingId === item.id}
           onClick={() => void load(item.id)}
         >
-          <span data-ui="soft-icon blue" className={softBlueIconStyles}>
-            <Route size={25} />
-          </span>
+          <TripThumbnail photo={item.destination_photo} />
           <div className="flex flex-col items-start">
             <small className="block leading-[16px]">
               {dateLabel(item.start_date)}
@@ -157,7 +155,7 @@ export function MyTrips({
               className="shrink-0 motion-safe:animate-spin"
             />
           ) : (
-            <ChevronRight size={20} />
+            <ChevronRight size={20} className="shrink-0" />
           )}
         </button>
       ))}
@@ -193,5 +191,31 @@ export function MyTrips({
         </div>
       )}
     </>
+  );
+}
+
+function TripThumbnail({ photo }: { photo: TripPlan["destination_photo"] }) {
+  const [failed, setFailed] = useState(false);
+  const url = photo && safeUrl(photo.url);
+
+  return (
+    <span
+      data-ui="trip-thumbnail"
+      className="grid h-[96px] w-[80px] shrink-0 place-items-center overflow-hidden rounded-[15px] bg-[#eff3ff] text-[#8b9fe2] mobile:h-[80px] mobile:w-[64px] mobile:rounded-[12px]"
+    >
+      {url && !failed ? (
+        <img
+          src={url}
+          alt=""
+          title={`Фото: ${photo.author}`}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <Route size={25} aria-hidden="true" />
+      )}
+    </span>
   );
 }

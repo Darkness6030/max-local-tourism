@@ -306,6 +306,7 @@ class HealthResponse(BaseModel):
 
 
 class TripSummary(BaseModel):
+    destination_photo: CityPhoto | None = None
     id: UUID
     created_at: datetime
     title: str

@@ -110,3 +110,6 @@ async def test_photo_survives_database_reload(store):
     await store.put(plan, owner_id="max:42")
     loaded = await store.get(plan.id, owner_id="max:42")
     assert loaded.destination_photo == plan.destination_photo
+    history = await store.list("max:42")
+    assert history.items[0].destination_photo == plan.destination_photo
+    assert not (await store.list("max:43")).items

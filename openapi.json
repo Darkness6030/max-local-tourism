@@ -2257,6 +2257,16 @@
       },
       "TripSummary": {
         "properties": {
+          "destination_photo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CityPhoto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid",

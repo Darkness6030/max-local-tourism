@@ -140,6 +140,7 @@ class TripStore:
                 plan = TripPlan.model_validate(row.payload)
                 items.append(
                     TripSummary(
+                        destination_photo=plan.destination_photo,
                         id=plan.id,
                         created_at=plan.created_at,
                         title=plan.title,

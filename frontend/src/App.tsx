@@ -515,7 +515,7 @@ export default function App() {
                         <span data-ui="eyebrow" className={eyebrowStyles}>
                           ВАШ СЛЕДУЮЩИЙ ХОРОШИЙ ДЕНЬ
                         </span>
-                        <h1 className="mb-4">
+                        <h1>
                           Сменим
                           <br
                             data-ui="mobile-break"
