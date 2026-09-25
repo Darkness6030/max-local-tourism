@@ -54,7 +54,15 @@ const slides = [
   },
 ];
 
-export function Onboarding({ onDone }: { onDone: () => void }) {
+export function Onboarding({
+  onDone,
+  busy,
+  error,
+}: {
+  onDone: () => void;
+  busy: boolean;
+  error: string;
+}) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const change = (next: number) => {
@@ -80,6 +88,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       >
         <Brand />
         <button
+          disabled={busy}
           data-ui="text-button muted"
           className={
             "inline-flex items-center justify-center gap-[8px] text-[12px] [font-weight:650] [background:transparent] text-brand py-[10px] px-[4px] [[data-ui~=onboarding-header]_&]:text-[12px] mobile:[[data-ui~=onboarding-header]_&]:text-[11px] [[data-ui~=result-hero]_>_&]:text-[11px] [[data-ui~=result-hero]_>_&]:min-h-[38px] mobile:[[data-ui~=result-hero]_>_&]:text-[11px] mobile:[[data-ui~=result-hero]_>_&]:mt-[4px] [[data-ui~=train-bottom]_>_&]:text-[11px] mobile:[[data-ui~=train-bottom]_>_&]:text-[11px] mobile-type:[[data-ui~=train-bottom]_>_&]:text-[12px] text-muted [[data-ui~=text-button]&]:text-muted"
@@ -289,7 +298,15 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             </button>
           ))}
         </div>
-        <Primary onClick={() => (index === 2 ? onDone() : change(index + 1))}>
+        {error && (
+          <p role="alert" className="mb-3 text-center text-sm text-[#a34c37]">
+            {error}
+          </p>
+        )}
+        <Primary
+          busy={busy}
+          onClick={() => (index === 2 ? onDone() : change(index + 1))}
+        >
           {index === 2 ? "Начать путешествие" : "Дальше"}
         </Primary>
       </div>

@@ -32,6 +32,10 @@ def current_date() -> date:
     return datetime.now(MVP_TIMEZONE).date()
 
 
+class UserProfile(BaseModel):
+    onboarding_completed: bool
+
+
 class GroupType(StrEnum):
     SOLO = "solo"
     COUPLE = "couple"

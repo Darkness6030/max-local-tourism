@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from playwright.sync_api import sync_playwright
 
-from scripts.check_ui import BRIDGE
+from scripts.check_ui import BRIDGE, mock_profile
 from src.models import current_date, default_trip_date
 from src.sample import sample_trip
 
@@ -80,6 +80,7 @@ def main():
             context = browser.new_context(
                 viewport={"width": width, "height": 844}, reduced_motion="reduce"
             )
+            mock_profile(context, completed=True)
             context.route(
                 "https://st.max.ru/**",
                 lambda r: r.fulfill(content_type="application/javascript", body=BRIDGE),
@@ -106,7 +107,7 @@ def main():
                 ),
             )
             context.add_init_script(
-                "localStorage.setItem('nearby:onboarding:v2','true');sessionStorage.setItem('nearby:v2:max:42:job',JSON.stringify('result'))"
+                "sessionStorage.setItem('nearby:v2:max:42:job',JSON.stringify('result'))"
             )
             page = context.new_page()
             errors = []

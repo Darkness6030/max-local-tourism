@@ -21,6 +21,7 @@ from src.models import (
     TripPage,
     TripPlan,
     TripRequest,
+    UserProfile,
     WeatherForecast,
     current_date,
 )
@@ -41,6 +42,16 @@ def get_container(request: Request) -> Container:
 
 
 ContainerDep = Annotated[Container, Depends(get_container)]
+
+
+@router.get("/profile", response_model=UserProfile, tags=["profile"])
+async def profile(identity: IdentityDep, container: ContainerDep) -> UserProfile:
+    return await container.store.get_profile(identity.owner_id)
+
+
+@router.put("/profile/onboarding", response_model=UserProfile, tags=["profile"])
+async def complete_onboarding(identity: IdentityDep, container: ContainerDep) -> UserProfile:
+    return await container.store.complete_onboarding(identity.owner_id)
 
 
 @router.get("/cities/validate", tags=["trips"])

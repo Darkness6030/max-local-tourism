@@ -72,6 +72,10 @@ def main():
             get("/api/v1/auth/me", headers={"X-Max-Init-Data": "invalid"}).status_code
             == 401
         )
+        assert get("/api/v1/profile").status_code == 401
+        profile = get("/api/v1/profile", headers=headers)
+        profile.raise_for_status()
+        assert isinstance(profile.json()["onboarding_completed"], bool)
         identity = get("/api/v1/auth/me", headers=headers)
         identity.raise_for_status()
         assert identity.json()["mode"] == "max"

@@ -1,3 +1,7 @@
+export interface UserProfile {
+  onboarding_completed: boolean;
+}
+
 export interface Identity {
   mode: "max" | "local";
   user: {

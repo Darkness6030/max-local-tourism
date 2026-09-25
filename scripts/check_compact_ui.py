@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
-from scripts.check_ui import BRIDGE
+from scripts.check_ui import BRIDGE, mock_profile
 
 
 def main():
@@ -24,6 +24,7 @@ def main():
             context = browser.new_context(
                 viewport={"width": width, "height": height}, reduced_motion="reduce"
             )
+            mock_profile(context, completed=False)
             context.route(
                 "https://st.max.ru/**",
                 lambda r: r.fulfill(content_type="application/javascript", body=BRIDGE),

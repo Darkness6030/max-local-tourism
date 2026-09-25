@@ -32,6 +32,58 @@
         ]
       }
     },
+    "/api/v1/profile": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Profile",
+        "operationId": "profile_api_v1_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    },
+    "/api/v1/profile/onboarding": {
+      "put": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Complete Onboarding",
+        "operationId": "complete_onboarding_api_v1_profile_onboarding_put",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
+      }
+    },
     "/api/v1/cities/validate": {
       "get": {
         "tags": [
@@ -2258,6 +2310,19 @@
           "estimated_total_rub"
         ],
         "title": "TripSummary"
+      },
+      "UserProfile": {
+        "properties": {
+          "onboarding_completed": {
+            "type": "boolean",
+            "title": "Onboarding Completed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "onboarding_completed"
+        ],
+        "title": "UserProfile"
       },
       "ValidationError": {
         "properties": {

@@ -46,6 +46,7 @@ import type {
   Job,
   Screen,
   TripPlan,
+  UserProfile,
 } from "./types";
 import { ProfileAvatar } from "./components/ProfileAvatar";
 import { Brand, Notice, Primary } from "./components/UI";
@@ -58,7 +59,6 @@ import type { TripPreset } from "./presets";
 import journey from "./assets/journey.webp";
 import journeySpb from "./assets/journey-spb.webp";
 
-const onboardKey = "nearby:onboarding:v2";
 const rawLaunch = () => {
   if (window.WebApp?.initData) return window.WebApp.initData;
   const params = new URLSearchParams(location.hash.slice(1)).getAll(
@@ -73,9 +73,11 @@ const rawLaunch = () => {
 
 export default function App() {
   const reducedMotion = useReducedMotion();
-  const [onboarded, setOnboarded] = useState(() =>
-    readStorage(onboardKey, false, true),
-  );
+  const [onboarded, setOnboarded] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [onboardingBusy, setOnboardingBusy] = useState(false);
+  const [onboardingError, setOnboardingError] = useState("");
+  const onboardingLock = useRef(false);
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -113,6 +115,30 @@ export default function App() {
     setHomeRevision((value) => value + 1);
   };
 
+  const finishOnboarding = async () => {
+    if (onboardingLock.current) return;
+    onboardingLock.current = true;
+    setOnboardingBusy(true);
+    setOnboardingError("");
+    try {
+      if (!profile?.onboarding_completed) {
+        setProfile(
+          await api<UserProfile>("/profile/onboarding", initData.current, {
+            method: "PUT",
+          }),
+        );
+      }
+      navigate("home");
+      setWelcomeEntry(true);
+      setOnboarded(true);
+    } catch (err) {
+      setOnboardingError((err as Error).message);
+    } finally {
+      onboardingLock.current = false;
+      setOnboardingBusy(false);
+    }
+  };
+
   useEffect(() => {
     const controller = new AbortController();
     setBooting(true);
@@ -125,7 +151,7 @@ export default function App() {
     }
     const boot = async () => {
       try {
-        const [user, settings] = await Promise.all([
+        const [user, settings, userProfile] = await Promise.all([
           api<Identity>("/auth/me", initData.current, {
             signal: controller.signal,
           }),
@@ -135,10 +161,15 @@ export default function App() {
             if (!controller.signal.aborted) setConfig(settings);
             return settings;
           }),
+          api<UserProfile>("/profile", initData.current, {
+            signal: controller.signal,
+          }),
         ]);
         if (controller.signal.aborted) return;
         prefix.current = `nearby:v2:${user.mode}:${user.user.id}:`;
         setIdentity(user);
+        setProfile(userProfile);
+        setOnboarded(userProfile.onboarding_completed);
         setConfig(settings);
         setDraft(
           restoreDraft(
@@ -356,7 +387,7 @@ export default function App() {
       initial={false}
       onExitComplete={() => window.scrollTo({ top: 0, behavior: "instant" })}
     >
-      {!onboarded ? (
+      {!booting && !onboarded ? (
         <motion.div
           key="onboarding"
           initial={{ opacity: 0 }}
@@ -372,12 +403,9 @@ export default function App() {
           }}
         >
           <Onboarding
-            onDone={() => {
-              writeStorage(onboardKey, true, true);
-              navigate("home");
-              setWelcomeEntry(true);
-              setOnboarded(true);
-            }}
+            onDone={finishOnboarding}
+            busy={onboardingBusy}
+            error={onboardingError}
           />
         </motion.div>
       ) : (

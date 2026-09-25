@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
-from scripts.check_ui import BRIDGE
+from scripts.check_ui import BRIDGE, mock_profile
 from src.sample import sample_trip
 
 
@@ -23,7 +23,7 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="chrome")
         context = browser.new_context(viewport={"width": 390, "height": 844})
-        context.add_init_script('localStorage.setItem("nearby:onboarding:v2", "true")')
+        mock_profile(context, completed=True)
         context.route("https://st.max.ru/**", lambda r: r.fulfill(
             content_type="application/javascript", body=BRIDGE))
         context.route("**/api/v1/auth/me", lambda r: r.fulfill(

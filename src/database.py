@@ -10,6 +10,12 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlmodel import Field, SQLModel
 
 
+class UserProfileRecord(SQLModel, table=True):
+    __tablename__ = "user_profiles"
+    owner_id: str = Field(sa_column=Column(String(80), primary_key=True))
+    onboarding_completed_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
+
+
 class TripRecord(SQLModel, table=True):
     __tablename__ = "trips"
     __table_args__ = (Index("ix_trips_owner_created_id", "owner_id", "created_at", "id"),)
@@ -55,7 +61,7 @@ class Database:
         self._worker_connection = None
 
     async def initialize(self):
-        # Initial schema only: future structural changes require a migration.
+        # Create missing tables; changes to existing tables require a migration.
         async with self.engine.begin() as connection:
             await connection.execute(text("SELECT pg_advisory_xact_lock(759603986)"))
             await connection.run_sync(SQLModel.metadata.create_all)

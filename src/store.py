@@ -5,7 +5,7 @@ from sqlalchemy import delete, func, select, text, tuple_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from src.database import JobRecord, TripRecord
+from src.database import JobRecord, TripRecord, UserProfileRecord
 from src.errors import ServiceError
 from src.models import (
     ErrorBody,
@@ -14,6 +14,7 @@ from src.models import (
     TripPage,
     TripPlan,
     TripSummary,
+    UserProfile,
 )
 
 ACTIVE_JOB_STATES = (JobState.QUEUED, JobState.RUNNING)
@@ -24,6 +25,20 @@ class TripStore:
 
     def __init__(self, sessions: async_sessionmaker):
         self.sessions = sessions
+
+    async def get_profile(self, owner_id: str) -> UserProfile:
+        async with self.sessions() as session:
+            row = await session.get(UserProfileRecord, owner_id)
+            return UserProfile(onboarding_completed=row is not None)
+
+    async def complete_onboarding(self, owner_id: str) -> UserProfile:
+        async with self.sessions.begin() as session:
+            await session.execute(
+                insert(UserProfileRecord)
+                .values(owner_id=owner_id, onboarding_completed_at=datetime.now(timezone.utc))
+                .on_conflict_do_nothing(index_elements=["owner_id"])
+            )
+        return UserProfile(onboarding_completed=True)
 
     @staticmethod
     async def _put(session, plan: TripPlan, owner_id: str):

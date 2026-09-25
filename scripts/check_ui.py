@@ -21,6 +21,18 @@ BRIDGE = """window.WebApp = {
 };"""
 
 
+def mock_profile(context, completed=False):
+    profile = {"onboarding_completed": completed}
+
+    def complete(route):
+        assert route.request.method == "PUT"
+        profile["onboarding_completed"] = True
+        route.fulfill(json=profile)
+
+    context.route("**/api/v1/profile", lambda r: r.fulfill(json=profile))
+    context.route("**/api/v1/profile/onboarding", complete)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://127.0.0.1:8001")
@@ -40,6 +52,7 @@ def main():
             channel=None if args.browser == "chromium" else args.browser
         )
         context = browser.new_context(viewport={"width": 390, "height": args.height})
+        mock_profile(context)
         context.route(
             "https://st.max.ru/**",
             lambda r: r.fulfill(content_type="application/javascript", body=BRIDGE),
