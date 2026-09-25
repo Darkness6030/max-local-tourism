@@ -67,6 +67,7 @@ class GigaChatService:
     ) -> DestinationSuggestion:
         recent = recent_destinations or []
         hints = list(DESTINATION_HINTS[request.origin])
+
         random.shuffle(hints)
         prompt = DESTINATION_PROMPT.format(
             candidate_count=DESTINATION_CANDIDATE_COUNT,
@@ -77,6 +78,7 @@ class GigaChatService:
             origin=request.origin.value,
             max_travel_minutes=request.max_travel_minutes,
         )
+
         candidates = await self._structured(
             DestinationCandidates,
             system=DESTINATION_SYSTEM_PROMPT,
@@ -103,6 +105,7 @@ class GigaChatService:
             budget_rub=request.budget_rub,
             reserve_percent=BUDGET_RESERVE_PERCENT,
         )
+
         return await self._structured(
             GeneratedTripContent,
             system=TRIP_SYSTEM_PROMPT,
@@ -123,10 +126,12 @@ class GigaChatService:
             raise ServiceError(
                 "gigachat", "Не задан GIGACHAT_CREDENTIALS", status_code=503
             )
+
         schema_prompt = STRUCTURED_PROMPT.format(
             prompt=prompt,
             schema_json=json.dumps(response_model.model_json_schema(), ensure_ascii=False),
         )
+
         try:
             response = await self._client.achat.create(
                 {
@@ -137,6 +142,7 @@ class GigaChatService:
                     "model_options": {"temperature": temperature, "max_tokens": max_tokens},
                 }
             )
+
             text = _response_text(response)
             return response_model.model_validate_json(_extract_json(text))
         except Exception as exc:
@@ -151,6 +157,7 @@ def _response_text(response: object) -> str:
     messages = getattr(response, "messages", None) or []
     if not messages:
         return ""
+
     parts = getattr(messages[0], "content", None) or []
     return "".join((getattr(part, "text", None) or "") for part in parts)
 
@@ -160,6 +167,7 @@ def _extract_json(text: str) -> str:
     fenced = re.search(r"```(?:json)?\s*(\{.*\})\s*```", stripped, re.DOTALL)
     if fenced:
         return fenced.group(1)
+
     start = stripped.find("{")
     end = stripped.rfind("}")
-    return stripped[start: end + 1] if start >= 0 and end > start else stripped
+    return stripped[start: end + 1] if 0 <= start < end else stripped

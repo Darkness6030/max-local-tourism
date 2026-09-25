@@ -41,6 +41,7 @@ def build_budget(
         for item in generated.budget_items
         if not any(word in item.category.casefold() for word in LODGING_CATEGORY_WORDS)
     ]
+
     accommodation = None
     if request.days > 1:
         nights = request.days - 1
@@ -51,6 +52,7 @@ def build_budget(
         status = "unavailable"
         if catalog.available:
             status = "found" if catalog.hotels else "empty"
+
         accommodation = Accommodation(
             check_in=request.start_date,
             check_out=request.start_date + timedelta(days=nights),
@@ -63,6 +65,7 @@ def build_budget(
             search_url=hotel_search_url(destination),
             fetched_at=catalog.fetched_at,
         )
+
         items.append(
             BudgetItem(
                 category="Проживание",
@@ -70,6 +73,7 @@ def build_budget(
                 comment=f"{rooms} ном. × {nights} ноч. × ≈{nightly} ₽",
             )
         )
+
     subtotal = sum(item.amount_rub for item in items)
     reserve = ceil(subtotal * BUDGET_RESERVE_PERCENT / 100)
     items.append(
@@ -79,6 +83,7 @@ def build_budget(
             comment="На непредвиденные расходы.",
         )
     )
+
     total = subtotal + reserve
     return BudgetSummary(
         limit_rub=request.budget_rub,

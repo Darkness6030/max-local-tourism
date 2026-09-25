@@ -153,7 +153,7 @@ async def test_send_payload_and_safe_errors(monkeypatch):
                             [
                                 {
                                     "type": "open_app",
-                                    "text": "Открыть Рядом",
+                                    "text": "Открыть приложение",
                                     "web_app": "test_bot",
                                 }
                             ]

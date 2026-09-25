@@ -39,9 +39,11 @@ class GeocodingService:
         async with self._lock:
             if cache_key in self._cache:
                 return self._cache[cache_key].model_copy(deep=True)
+
             wait_seconds = 1.0 - (time.monotonic() - self._last_request_at)
             if wait_seconds > 0:
                 await asyncio.sleep(wait_seconds)
+
             try:
                 async with Nominatim(
                     user_agent=self.user_agent,
@@ -75,6 +77,7 @@ class GeocodingService:
             for location in (locations or [])
             if _is_matching_city(location, normalized_query)
         ]
+
         if not locations:
             raise ServiceError(
                 "geocoding",
@@ -97,9 +100,7 @@ class GeocodingService:
                 "municipality",
                 "county",
                 "state",
-            )
-                if address_data.get(key)
-            ),
+            ) if address_data.get(key)),
             str(location.address).split(",", maxsplit=1)[0],
         )
 
@@ -111,8 +112,10 @@ class GeocodingService:
             longitude=float(location.longitude),
             wikipedia_title=_wikipedia_title(raw),
         )
+
         if len(self._cache) >= 512:
             self._cache.pop(next(iter(self._cache)))
+
         self._cache[cache_key] = point
         return point.model_copy(deep=True)
 
@@ -124,8 +127,10 @@ def _location_rank(location: object) -> tuple[int, int]:
     settlement_types = {"city", "town", "village", "hamlet", "municipality", "locality"}
     if result_class == "place" and addresstype in settlement_types:
         return (0, 0)
+
     if result_class != "boundary":
         return (1, 0)
+
     return (2, 0)
 
 
@@ -137,11 +142,9 @@ def _city_name(value: str) -> str:
 def _is_matching_city(location: object, query: str) -> bool:
     raw = getattr(location, "raw", {}) or {}
     address = raw.get("address") or {}
-    if address.get("country_code") != "ru" or raw.get("addresstype") not in {
-        "city",
-        "town",
-    }:
+    if address.get("country_code") != "ru" or raw.get("addresstype") not in {"city", "town"}:
         return False
+
     names = [raw.get("name"), address.get("city"), address.get("town")]
     details = raw.get("namedetails") or {}
     for key in (
@@ -154,6 +157,7 @@ def _is_matching_city(location: object, query: str) -> bool:
     ):
         if isinstance(details.get(key), str):
             names.extend(details[key].split(";"))
+
     sought = _city_name(query.split(",")[0])
     return any(_city_name(name) == sought for name in names if isinstance(name, str))
 

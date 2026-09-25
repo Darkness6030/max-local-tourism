@@ -8,7 +8,6 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.api.bot import router as bot_router
-from src.api.demo import router as demo_router
 from src.api.miniapp import router as miniapp_router
 from src.api.routes import development_router, router
 from src.config import ROOT_DIR, get_settings
@@ -53,7 +52,6 @@ app.include_router(router)
 app.include_router(bot_router)
 app.include_router(miniapp_router)
 if settings.app_env != "production":
-    app.include_router(demo_router)
     app.include_router(development_router)
 
 app.mount("/static", StaticFiles(directory=ROOT_DIR / "src" / "static"), name="static")

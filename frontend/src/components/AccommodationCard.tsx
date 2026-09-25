@@ -3,7 +3,7 @@ import type { Accommodation } from "../types";
 import { dateLabel, money, safeUrl } from "../lib";
 
 const linkStyles =
-  "inline-flex min-h-[44px] items-center gap-[5px] text-[12px] font-semibold text-brand no-underline";
+  "inline-flex items-center gap-[5px] text-[12px] font-semibold text-brand no-underline";
 
 export function AccommodationCard({
   stay,
@@ -46,7 +46,7 @@ export function AccommodationCard({
       <p className="mt-[12px] text-[11px] leading-[1.8] text-muted">
         {stay.disclaimer}
       </p>
-      <div className="mt-[8px] divide-x-0 divide-y divide-solid divide-[var(--line)]">
+      <div className={`mt-[8px] divide-x-0 divide-y divide-solid divide-[var(--line)] ${stay.hotels.length ? "mb-[14px] border-x-0 border-t-0 border-b border-solid border-[var(--line)]" : ""}`}>
         {stay.hotels.map((hotel) => (
           <article
             key={hotel.id}
@@ -118,17 +118,6 @@ export function AccommodationCard({
       >
         Все гостиницы на карте <ArrowUpRight size={14} />
       </a>
-      <p className="mt-[5px] text-[10px] leading-[1.8] text-muted">
-        <a
-          className="text-inherit"
-          href="https://www.openstreetmap.org/copyright"
-          target="_blank"
-          rel="noreferrer"
-        >
-          © OpenStreetMap contributors · ODbL
-        </a>
-        {stay.fetched_at && ` · ${dateLabel(stay.fetched_at.slice(0, 10))}`}
-      </p>
     </section>
   );
 }

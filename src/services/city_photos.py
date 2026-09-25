@@ -81,6 +81,7 @@ class CityPhotoService:
                 gsradius=10000,
                 gslimit=50,
             )
+
             for page in nearby.get("geosearch", []):
                 candidate = page.get("title", "")
                 if (
@@ -89,8 +90,10 @@ class CityPhotoService:
                 ):
                     title = candidate
                     break
+
         if not title:
             return None
+
         result = await self._query(
             WIKIPEDIA_API,
             titles=title,
@@ -102,53 +105,64 @@ class CityPhotoService:
             inprop="url",
             colimit=1,
         )
+
         pages = result.get("pages", [])
         if not pages:
             return None
+
         page = pages[0]
         coordinates = page.get("coordinates") or []
         if not coordinates:
             return None
-        # Coordinate match also protects against stale or incorrect OSM tags.
 
+        # Coordinate match also protects against stale or incorrect OSM tags.
         article_point = city.model_copy(
             update={
                 "latitude": coordinates[0]["lat"],
                 "longitude": coordinates[0]["lon"],
             }
         )
+
         if distance_km(city, article_point) > 30:
             return None
+
         image_url = (page.get("thumbnail") or {}).get("source", "")
         article_url = page.get("fullurl", "")
         filename = page.get("pageimage")
+
         if (
             not filename
             or not trusted_url(image_url, {"upload.wikimedia.org", "thumb.wikimedia.org"})
             or not trusted_url(article_url, {"ru.wikipedia.org"})
         ):
             return None
+
         info = await self._query(
             COMMONS_API,
             titles=f"File:{filename}",
             prop="imageinfo",
             iiprop="extmetadata|url|mime",
         )
+
         image_pages = info.get("pages", [])
         images = image_pages[0].get("imageinfo", []) if image_pages else []
         if not images:
             return None
+
         image = images[0]
         if image.get("mime") not in {"image/jpeg", "image/png", "image/webp"}:
             return None
+
         metadata = image.get("extmetadata", {})
         license_name = plain_text(metadata.get("LicenseShortName", {}).get("value", ""))
         if not license_name.lower().startswith(("cc by", "cc0", "public domain")):
             return None
+
         author = plain_text(metadata.get("Artist", {}).get("value", ""))
         source = image.get("descriptionurl", "")
         if not author or not trusted_url(source, {"commons.wikimedia.org"}):
             return None
+
         return CityPhoto(
             url=image_url,
             article_url=article_url,

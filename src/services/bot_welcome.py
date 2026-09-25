@@ -20,7 +20,7 @@ WELCOME_TEXT = (
 
 def welcome_keyboard(username: str):
     return ButtonsPayload(
-        buttons=[[OpenAppButton(text="Открыть Рядом", web_app=username)]]
+        buttons=[[OpenAppButton(text="Открыть приложение", web_app=username)]]
     ).pack()
 
 

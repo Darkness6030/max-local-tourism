@@ -77,24 +77,29 @@ class HotelService:
             f"(around:{HOTEL_RADIUS_METERS},{city.latitude},{city.longitude});"
             "out center tags 100;"
         )
+
         response = await self.http.post(
             self.endpoint,
             data={"data": query},
             timeout=HOTEL_TIMEOUT_SECONDS,
             follow_redirects=False,
         )
+
         response.raise_for_status()
         payload = response.json()
         if payload.get("remark") or not isinstance(payload.get("elements"), list):
             raise ValueError("Incomplete Overpass response")
+
         hotels = []
         for element in payload["elements"]:
             try:
                 hotel = _parse_hotel(element, city)
             except (ValidationError, ValueError, TypeError, KeyError):
                 continue
+
             if hotel:
                 hotels.append(hotel)
+
         hotels.sort(key=lambda hotel: hotel.distance_km)
         unique: list[Hotel] = []
         for hotel in hotels:
@@ -104,9 +109,11 @@ class HotelService:
                 for other in unique
             ):
                 continue
+
             unique.append(hotel)
             if len(unique) == HOTEL_LIMIT:
                 break
+
         return HotelCatalog(unique, fetched_at=datetime.now(timezone.utc))
 
 
@@ -115,19 +122,24 @@ def _parse_hotel(element: dict, city: GeoPoint) -> Hotel | None:
     name = tags.get("name:ru") or tags.get("name")
     if not name or tags.get("tourism") not in {"hotel", "guest_house"}:
         return None
+
     if any(tags.get(key) == "yes" for key in ("disused", "abandoned", "demolished")):
         return None
+
     element_type, element_id = element["type"], element["id"]
     if element_type not in {"node", "way", "relation"} or type(element_id) is not int:
         return None
+
     point = element.get("center") or element
     coordinates = Coordinates(latitude=point["lat"], longitude=point["lon"])
     distance = distance_km(city, coordinates)
     if distance * 1000 > HOTEL_RADIUS_METERS:
         return None
+
     address = ", ".join(
         str(tags[key]) for key in ("addr:street", "addr:housenumber") if tags.get(key)
     ) or tags.get("addr:full")
+
     website = tags.get("website") or tags.get("contact:website")
     if website:
         parsed = urlsplit(website)
@@ -137,9 +149,8 @@ def _parse_hotel(element: dict, city: GeoPoint) -> Hotel | None:
             or parsed.username
         ):
             website = None
-    map_query = urlencode(
-        {"pt": f"{coordinates.longitude},{coordinates.latitude},pm2blm", "z": 16}
-    )
+
+    map_query = urlencode({"pt": f"{coordinates.longitude},{coordinates.latitude},pm2blm", "z": 16})
     return Hotel(
         id=f"{element_type}/{element_id}",
         name=name,

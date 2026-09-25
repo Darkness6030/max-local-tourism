@@ -50,9 +50,7 @@ async def validate_city(
     origin: OriginCity,
     destination: Annotated[str, Query(min_length=2, max_length=160)],
 ) -> dict:
-    city, distance = await validate_destination(
-        container.geocoding, origin, destination
-    )
+    city, distance = await validate_destination(container.geocoding, origin, destination)
     return {"city": city, "distance_km": round(distance, 1)}
 
 
@@ -165,15 +163,19 @@ async def generate_trip(
         await validate_destination(
             container.geocoding, payload.origin, payload.destination
         )
+
     created = await container.jobs.submit(payload, owner_id=identity.owner_id)
     while True:
         job = await container.jobs.get(created.id, owner_id=identity.owner_id)
         if job is None:
             raise HTTPException(status_code=404, detail="Задача больше недоступна")
+
         if job.status == JobState.SUCCEEDED:
             return job.result
+
         if job.status == JobState.FAILED:
             raise HTTPException(status_code=502, detail=job.error.error)
+
         await asyncio.sleep(0.1)
 
 
@@ -193,6 +195,7 @@ async def create_trip_job(
         await validate_destination(
             container.geocoding, payload.origin, payload.destination
         )
+
     created = await container.jobs.submit(payload, owner_id=identity.owner_id)
     created.status_url = request.scope.get("root_path", "") + created.status_url
     return created
@@ -205,8 +208,10 @@ async def get_trip_job(
     job = await container.jobs.get(job_id, owner_id=identity.owner_id)
     if job and job.error:
         job.error.details = None
+
     if job is None:
         raise HTTPException(status_code=404, detail="Задача генерации не найдена")
+
     return job
 
 
@@ -227,6 +232,7 @@ async def get_trip(
     trip = await container.store.get(trip_id, owner_id=identity.owner_id)
     if trip is None:
         raise HTTPException(status_code=404, detail="Поездка не найдена")
+
     return trip
 
 
@@ -234,11 +240,10 @@ async def get_trip(
 async def update_packing(
     trip_id: UUID, payload: PackingUpdate, container: ContainerDep, identity: IdentityDep
 ) -> TripPlan:
-    trip = await container.store.set_packed(
-        trip_id, identity.owner_id, payload.item_index, payload.checked
-    )
+    trip = await container.store.set_packed(trip_id, identity.owner_id, payload.item_index, payload.checked)
     if trip is None:
         raise HTTPException(status_code=404, detail="Поездка не найдена")
+
     return trip
 
 
@@ -249,6 +254,7 @@ async def share_trip(
     trip = await container.store.get(trip_id, owner_id=identity.owner_id)
     if trip is None:
         raise HTTPException(status_code=404, detail="Поездка не найдена")
+
     return {"text": trip.share_text}
 
 

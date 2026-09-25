@@ -173,7 +173,7 @@ docker compose exec app python -m src.services.max_bot
 | GET | `/api/v1/geocode`, `/weather`, `/transport` | Диагностика провайдеров |
 | POST | `/api/v1/destinations/suggest` | AI-подбор направления |
 
-`/demo` — старая техническая JSON-форма, только в development/test. Основной интерфейс — `/`. Локальные read-only проверки:
+Основной интерфейс — `/`. Устаревшая техническая форма `/demo` удалена. Локальные read-only проверки:
 
 ```bash
 curl -fsS http://127.0.0.1:8001/api/v1/auth/me

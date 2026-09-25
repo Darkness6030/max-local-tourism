@@ -200,18 +200,21 @@ class YandexScheduleService:
             "format": "json",
             "lang": "ru_RU",
         }
+
         try:
             response = await self.client.get(
                 f"{YANDEX_SCHEDULE_API_URL}{path}",
                 params=request_params,
                 headers={"Authorization": self.api_key or ""},
             )
+
             response.raise_for_status()
             return response.json()
-        except (httpx.HTTPError, ValueError) as exc:
+        except Exception as exc:
             details = str(exc)
             if isinstance(exc, httpx.HTTPStatusError):
                 details = exc.response.text[:500]
+
             raise ServiceError(
                 "yandex_schedule",
                 "Ошибка запроса к Яндекс Расписаниям",
@@ -239,21 +242,26 @@ class YandexScheduleService:
                 or departure.timetz().replace(tzinfo=None) < after
             ):
                 continue
+
             details = segment.get("details") or []
             thread = (
                 segment.get("thread")
                 or (details[0].get("thread") if details else {})
                 or {}
             )
+
             from_data = (
                 segment.get("from") or (details[0].get("from") if details else {}) or {}
             )
+
             to_data = (
                 segment.get("to") or (details[-1].get("to") if details else {}) or {}
             )
+
             transport_type = thread.get("transport_type") or "mixed"
             if transport_type in {"plane", "helicopter", "water"}:
                 continue
+
             from_station_code = from_data.get("code")
             to_station_code = to_data.get("code")
             from_coordinates = station_coordinates.get(from_station_code)
@@ -268,9 +276,8 @@ class YandexScheduleService:
                 if from_coordinates and to_coordinates
                 else None
             )
-            duration_seconds = int(
-                segment.get("duration") or (arrival - departure).total_seconds()
-            )
+
+            duration_seconds = int(segment.get("duration") or (arrival - departure).total_seconds())
             result.append(
                 TransportOption(
                     departure=departure,
@@ -293,6 +300,7 @@ class YandexScheduleService:
                     map_url=map_url,
                 )
             )
+
         result.sort(key=lambda option: option.departure)
         return result[:limit]
 
@@ -306,6 +314,7 @@ def _endpoint_stations(payload: dict[str, Any]) -> list[dict[str, Any]]:
         )
         to_data = segment.get("to") or (details[-1].get("to") if details else {}) or {}
         stations.extend((from_data, to_data))
+
     return stations
 
 
@@ -339,13 +348,12 @@ def _extract_price(segment: dict[str, Any]) -> float | None:
 def _buy_url(
     origin: SettlementRef, destination: SettlementRef, travel_date: date
 ) -> str:
-    query = urlencode(
-        {
-            "fromName": origin.title,
-            "fromId": origin.code,
-            "toName": destination.title,
-            "toId": destination.code,
-            "when": travel_date.isoformat(),
-        }
-    )
+    query = urlencode({
+        "fromName": origin.title,
+        "fromId": origin.code,
+        "toName": destination.title,
+        "toId": destination.code,
+        "when": travel_date.isoformat(),
+    })
+
     return f"{YANDEX_SCHEDULE_SITE_URL}search/?{query}"
