@@ -368,7 +368,7 @@ export function TripResult({
                         <div
                           data-ui="activity-card"
                           className={
-                            "[border:1px_solid_var(--line)] [background:#fff] rounded-[20px] [flex:1] py-[19px] px-[21px] min-w-0 tablet:p-[17px] mobile:py-[16px] mobile:px-[15px] mobile:rounded-[18px] narrow:py-[14px] narrow:px-[12px] [&_h3]:text-[15px] [&_h3]:[font-weight:750] [&_h3]:leading-[1.5] [&_h3]:mt-[10px] [&_h3]:mx-0 [&_h3]:mb-[7px] [&_h3]:tracking-[-0.3px] [&_h3]:[overflow-wrap:anywhere] mobile:[&_h3]:text-[14px] mobile:[&_h3]:leading-[1.5] mobile:[&_h3]:mt-[11px] mobile:[&_h3]:mx-0 mobile:[&_h3]:mb-[7px] [&_>_p]:text-[11px] [&_>_p]:leading-[1.9] [&_>_p]:my-[10px] [&_>_p]:mx-0 mobile:[&_>_p]:text-[11px] mobile:[&_>_p]:leading-[1.9] mobile:[&_>_p]:my-[9px] mobile:[&_>_p]:mx-0 mobile-type:[&_>_p]:text-[14px] [&_>_p]:text-[#687389]"
+                            "[border:1px_solid_var(--line)] [background:#fff] rounded-[20px] [flex:1] py-[19px] px-[21px] min-w-0 tablet:p-[17px] mobile:py-[16px] mobile:px-[15px] mobile:rounded-[18px] narrow:py-[14px] narrow:px-[12px] [&_h3]:text-[15px] [&_h3]:[font-weight:750] [&_h3]:leading-[1.5] [&_h3]:mt-[10px] [&_h3]:mx-0 [&_h3]:mb-[7px] [&_h3]:tracking-[-0.3px] [&_h3]:[overflow-wrap:anywhere] mobile:[&_h3]:text-[14px] mobile:[&_h3]:leading-[1.5] mobile:[&_h3]:mt-[11px] mobile:[&_h3]:mx-0 mobile:[&_h3]:mb-[7px]"
                           }
                         >
                           <div
@@ -403,7 +403,15 @@ export function TripResult({
                             <MapPin size={13} />
                             {item.place}
                           </span>
-                          <p>{item.description}</p>
+                          <p
+                            className={`mt-[10px] mx-0 text-[11px] leading-[1.9] text-[#687389] mobile:mt-[9px] mobile-type:text-[14px] ${
+                              item.estimated_cost_rub > 0
+                                ? "mb-[10px] mobile:mb-[9px]"
+                                : "mb-0"
+                            }`}
+                          >
+                            {item.description}
+                          </p>
                           {item.estimated_cost_rub > 0 && (
                             <span
                               data-ui="activity-price"
