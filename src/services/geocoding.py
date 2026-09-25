@@ -91,13 +91,13 @@ class GeocodingService:
             (
                 address_data.get(key)
                 for key in (
-                    "city",
-                    "town",
-                    "village",
-                    "municipality",
-                    "county",
-                    "state",
-                )
+                "city",
+                "town",
+                "village",
+                "municipality",
+                "county",
+                "state",
+            )
                 if address_data.get(key)
             ),
             str(location.address).split(",", maxsplit=1)[0],
@@ -145,12 +145,12 @@ def _is_matching_city(location: object, query: str) -> bool:
     names = [raw.get("name"), address.get("city"), address.get("town")]
     details = raw.get("namedetails") or {}
     for key in (
-        "name",
-        "name:ru",
-        "name:en",
-        "official_name",
-        "alt_name",
-        "short_name",
+            "name",
+            "name:ru",
+            "name:en",
+            "official_name",
+            "alt_name",
+            "short_name",
     ):
         if isinstance(details.get(key), str):
             names.extend(details[key].split(";"))

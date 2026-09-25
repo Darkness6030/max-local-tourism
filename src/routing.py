@@ -23,16 +23,16 @@ def build_yandex_map_url(
         "rtt": "auto" if by_car else "mt",
         "ruri": "~",
     }
+
     if departure_at is not None:
         map_departure_at = departure_at - timedelta(minutes=DEPARTURE_BUFFER_MINUTES)
         params.update(
             {
-                "routes[timeDependent][time]": map_departure_at.replace(
-                    tzinfo=None
-                ).isoformat(timespec="seconds"),
+                "routes[timeDependent][time]": map_departure_at.replace(tzinfo=None).isoformat(timespec="seconds"),
                 "routes[timeDependent][type]": "departure",
             }
         )
+
     return f"{YANDEX_MAPS_URL}?{urlencode(params)}"
 
 
@@ -44,5 +44,6 @@ def distance_km(first: Coordinates, second: Coordinates) -> float:
         math.sin(delta_lat / 2) ** 2
         + math.cos(lat1) * math.cos(lat2) * math.sin(delta_lon / 2) ** 2
     )
+
     value = min(1.0, max(0.0, value))
     return EARTH_RADIUS_KM * 2 * math.atan2(math.sqrt(value), math.sqrt(1 - value))

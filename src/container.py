@@ -23,7 +23,7 @@ class Container:
     geocoding: GeocodingService
     weather: WeatherService
     schedule: YandexScheduleService
-    ai: GigaChatService
+    gigachat: GigaChatService
     store: TripStore
     planner: TripPlanner
     jobs: TripJobManager
@@ -32,27 +32,32 @@ class Container:
     def build(cls, settings: Settings) -> "Container":
         if not settings.database_url:
             raise ValueError("Задайте DATABASE_URL для постоянного хранения поездок")
+
         database = Database(settings.database_url.get_secret_value())
         http = httpx.AsyncClient(
             timeout=httpx.Timeout(settings.http_timeout_seconds),
             headers={"User-Agent": settings.nominatim_user_agent},
             follow_redirects=True,
         )
+
         geocoding = GeocodingService(
             user_agent=settings.nominatim_user_agent,
             domain=settings.nominatim_domain,
             timeout=settings.http_timeout_seconds,
         )
+
         weather = WeatherService(
             http,
             provider=settings.selected_weather_provider,
             openweather_api_key=_secret_value(settings.openweather_api_key),
         )
+
         schedule = YandexScheduleService(
             http,
             api_key=_secret_value(settings.yandex_schedule_api_key),
         )
-        ai = GigaChatService(
+
+        gigachat = GigaChatService(
             credentials=_secret_value(settings.gigachat_credentials),
             scope=settings.gigachat_scope,
             model=settings.gigachat_model,
@@ -60,15 +65,17 @@ class Container:
             ca_bundle_file=settings.gigachat_ca_bundle_file,
             timeout=settings.gigachat_timeout_seconds,
         )
+
         store = TripStore(database.sessions)
         planner = TripPlanner(
             geocoding=geocoding,
             weather=weather,
             schedule=schedule,
-            ai=ai,
+            gigachat=gigachat,
             photos=CityPhotoService(http),
             hotels=HotelService(http, endpoint=str(settings.overpass_api_url)),
         )
+
         jobs = TripJobManager(planner, store, max_active=settings.max_job_concurrency)
         return cls(
             database=database,
@@ -76,7 +83,7 @@ class Container:
             geocoding=geocoding,
             weather=weather,
             schedule=schedule,
-            ai=ai,
+            gigachat=gigachat,
             store=store,
             planner=planner,
             jobs=jobs,
@@ -89,7 +96,7 @@ class Container:
 
     async def close(self) -> None:
         await self.jobs.close()
-        await self.ai.close()
+        await self.gigachat.close()
         await self.http.aclose()
         await self.database.close()
 

@@ -51,14 +51,14 @@ class TripPlanner:
         geocoding: GeocodingService,
         weather: WeatherService,
         schedule: YandexScheduleService,
-        ai: GigaChatService,
+        gigachat: GigaChatService,
         photos: CityPhotoService | None = None,
         hotels: HotelService | None = None,
     ) -> None:
         self.geocoding = geocoding
         self.weather = weather
         self.schedule = schedule
-        self.ai = ai
+        self.gigachat = gigachat
         self.photos = photos
         self.hotels = hotels
 
@@ -78,7 +78,7 @@ class TripPlanner:
         else:
             origin = await self.geocoding.geocode(request.origin)
             await report(15, "ИИ подбирает направление")
-            destination_suggestion = await self.ai.suggest_destination(request)
+            destination_suggestion = await self.gigachat.suggest_destination(request)
             await report(28, f"Выбрано направление: {destination_suggestion.name}")
             destination = await self.geocoding.geocode(
                 f"{destination_suggestion.name}, {destination_suggestion.region}, Россия"
@@ -106,23 +106,22 @@ class TripPlanner:
             else asyncio.sleep(0, result=None),
             return_exceptions=True,
         )
+
         if isinstance(weather_result, BaseException):
             if isinstance(weather_result, ServiceError):
                 raise weather_result
+
             raise ServiceError(
                 "weather", "Не удалось получить погоду", details=str(weather_result)
             )
-        weather: WeatherForecast = weather_result
 
         transport, warnings = _resolve_transport(transport_result)
-
         if request.has_car:
             warnings.append(
                 "Расписание показано как альтернатива автомобилю; дорожный трафик не учтён."
             )
-        estimated_travel_minutes = round(
-            distance_km / ESTIMATED_REGIONAL_SPEED_KMH * 60
-        )
+
+        estimated_travel_minutes = round(distance_km / ESTIMATED_REGIONAL_SPEED_KMH * 60)
         if estimated_travel_minutes > request.max_travel_minutes:
             warnings.append(
                 "Расстояние по прямой может не уложиться в желаемое время дороги; проверьте маршрут."
@@ -133,19 +132,21 @@ class TripPlanner:
             distance_km=distance_km,
             origin=origin,
             destination=destination,
-            weather=weather,
+            weather=weather_result,
             transport=transport,
             warnings=warnings,
         )
+
         await report(68, "ИИ составляет программу и бюджет")
         generated = await _with_heartbeat(
-            self.ai.build_trip(
+            self.gigachat.build_trip(
                 request,
                 destination_name=destination.title,
                 facts=facts,
             ),
             report,
         )
+
         await report(90, "Проверяем и собираем результат")
         self._normalize_generated_dates(generated, request)
 
@@ -157,6 +158,7 @@ class TripPlanner:
             warnings.append(
                 f"Оценка с запасом превышает бюджет на {budget.estimated_total_rub - request.budget_rub} ₽."
             )
+
         map_url = _plan_map_url(
             origin,
             destination,
@@ -168,12 +170,14 @@ class TripPlanner:
                 "Не удалось получить координаты станций выбранного рейса; "
                 "карта не построена по центрам городов намеренно."
             )
+
         share_text = _share_text(
             generated=generated,
             request=request,
             destination=destination,
             map_url=map_url,
         )
+
         plan = TripPlan(
             id=uuid4(),
             request=request,
@@ -185,7 +189,7 @@ class TripPlanner:
             origin=origin,
             destination=destination,
             destination_photo=None if isinstance(photo, BaseException) else photo,
-            weather=weather,
+            weather=weather_result,
             transport=transport,
             accommodation=accommodation,
             itinerary=generated.itinerary,
@@ -193,20 +197,21 @@ class TripPlanner:
             weather_advice=generated.weather_advice,
             packing_list=generated.packing_list,
             notes=generated.notes
-            + [
-                (
-                    "Время ИИ-программы рекомендательное. Время отправления и прибытия "
-                    "проверяйте в блоке транспорта; часы работы мест не подтверждены."
-                )
-            ],
+                  + [
+                      (
+                          "Время ИИ-программы рекомендательное. Время отправления и прибытия "
+                          "проверяйте в блоке транспорта; часы работы мест не подтверждены."
+                      ),
+                  ],
             map_url=map_url,
             share_text=share_text,
             warnings=warnings,
-            sources=_sources(weather) + (
+            sources=_sources(weather_result) + (
                 [{"name": "© OpenStreetMap contributors · ODbL", "url": OSM_COPYRIGHT_URL}]
                 if accommodation else []
             ),
         )
+
         await report(100, "Сценарий готов")
         return plan
 
@@ -219,6 +224,7 @@ class TripPlanner:
                 "gigachat",
                 f"ИИ вернул {len(generated.itinerary)} дн. вместо {request.days}",
             )
+
         for offset, day in enumerate(generated.itinerary):
             day.date = request.start_date + timedelta(days=offset)
 

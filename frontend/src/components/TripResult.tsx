@@ -59,24 +59,43 @@ export function TripResult({
   const [message, setMessage] = useState("");
   const [manualCopy, setManualCopy] = useState(false);
   const packed = plan.packed_items ?? [];
-  const [savingPacking, setSavingPacking] = useState(false);
-  const packingLock = useRef(false);
+  const packing = useRef({
+    confirmed: plan,
+    pending: new Map<number, boolean>(),
+    saving: false,
+  });
+  const publishPacking = () => {
+    const { confirmed, pending } = packing.current;
+    const items = new Set(confirmed.packed_items ?? []);
+    pending.forEach((checked, index) => {
+      if (checked) items.add(index);
+      else items.delete(index);
+    });
+    onPlanChange({ ...confirmed, packed_items: [...items].sort((a, b) => a - b) });
+  };
   const togglePacked = async (itemIndex: number) => {
-    if (packingLock.current) return;
-    packingLock.current = true;
-    setSavingPacking(true);
-    try {
-      const saved = await api<TripPlan>(`/trips/${plan.id}/packing`, initData, {
-        method: "PATCH",
-        body: JSON.stringify({ item_index: itemIndex, checked: !packed.includes(itemIndex) }),
-      });
-      onPlanChange(saved);
-    } catch (error) {
-      setMessage((error as Error).message);
-    } finally {
-      packingLock.current = false;
-      setSavingPacking(false);
+    const state = packing.current;
+    const checked = state.pending.get(itemIndex)
+      ?? (state.confirmed.packed_items ?? []).includes(itemIndex);
+    state.pending.set(itemIndex, !checked);
+    publishPacking();
+    if (state.saving) return;
+    state.saving = true;
+    // Serialize writes; later clicks remain visible while a response is in flight.
+    while (state.pending.size) {
+      const [index, value] = state.pending.entries().next().value!;
+      try {
+        state.confirmed = await api<TripPlan>(`/trips/${plan.id}/packing`, initData, {
+          method: "PATCH",
+          body: JSON.stringify({ item_index: index, checked: value }),
+        });
+      } catch (error) {
+        setMessage((error as Error).message);
+      }
+      if (state.pending.get(index) === value) state.pending.delete(index);
+      publishPacking();
     }
+    state.saving = false;
   };
   const [checksOpen, setChecksOpen] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -427,7 +446,6 @@ export function TripResult({
                           <input
                             type="checkbox"
                             checked={packed.includes(itemIndex)}
-                            disabled={savingPacking}
                             onChange={() => void togglePacked(itemIndex)}
                           />
                           <span

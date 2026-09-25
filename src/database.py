@@ -50,6 +50,7 @@ class Database:
             database_url(url), pool_pre_ping=True, pool_size=5, max_overflow=5,
             echo=False, hide_parameters=True,
         )
+
         self.sessions = async_sessionmaker(self.engine, expire_on_commit=False)
         self._worker_connection = None
 
@@ -66,6 +67,7 @@ class Database:
         if not acquired:
             await connection.close()
             raise RuntimeError("БД уже обслуживается другим процессом генерации")
+
         await connection.commit()
         self._worker_connection = connection
 
@@ -74,4 +76,5 @@ class Database:
             await self._worker_connection.execute(text("SELECT pg_advisory_unlock(759603984)"))
             await self._worker_connection.close()
             self._worker_connection = None
+
         await self.engine.dispose()

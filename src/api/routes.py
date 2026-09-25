@@ -152,7 +152,7 @@ async def suggest_destination(
     payload: TripRequest,
     container: ContainerDep,
 ) -> DestinationSuggestion:
-    return await container.ai.suggest_destination(payload)
+    return await container.gigachat.suggest_destination(payload)
 
 
 @router.post("/trips/generate", response_model=TripPlan, tags=["trips"])

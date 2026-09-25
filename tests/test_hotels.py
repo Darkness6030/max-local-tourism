@@ -140,7 +140,7 @@ async def test_planner_only_loads_hotels_for_overnight_trips(days):
         geocoding=FakeGeocoding(),
         weather=FakeWeather(),
         schedule=FailingSchedule(),
-        ai=MultiDayAI(),
+        gigachat=MultiDayAI(),
         hotels=hotels,
     )
     request = TripRequest(
@@ -195,7 +195,7 @@ async def test_hotels_budget_survive_database_reload(store):
         geocoding=FakeGeocoding(),
         weather=FakeWeather(),
         schedule=FailingSchedule(),
-        ai=MultiDayAI(),
+        gigachat=MultiDayAI(),
     ).generate(TripRequest(destination="Коломна", days=3))
     await store.put(plan, owner_id="max:42")
     restored = await store.get(plan.id, owner_id="max:42")

@@ -107,8 +107,8 @@ class TripStore:
             if len(owners) >= max_active or owner_id in owners:
                 raise ServiceError("planner", "Генерация уже выполняется. Дождитесь результата и попробуйте ещё раз.", status_code=429)
             session.add(JobRecord(id=job.id, owner_id=owner_id,
-                created_at=datetime.now(timezone.utc), status=job.status,
-                payload=job.model_dump(mode="json", exclude={"result"})))
+                                  created_at=datetime.now(timezone.utc), status=job.status,
+                                  payload=job.model_dump(mode="json", exclude={"result"})))
 
     async def get_job(self, job_id: UUID, owner_id: str) -> TripJobStatus | None:
         async with self.sessions() as session:

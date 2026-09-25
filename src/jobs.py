@@ -55,10 +55,11 @@ class TripJobManager:
             job.message = message
             job.events.append(ProgressEvent(progress=job.progress, message=message))
             await self.store.update_job(job, owner)
+
         try:
             job.status = JobState.RUNNING
             await report(1, "Генерация запущена")
-            async with asyncio.timeout(240):
+            async with asyncio.timeout(360):
                 result = await self.planner.generate(request, progress=report)
             await self.store.finish_job(job.id, owner, result)
         except asyncio.CancelledError:
@@ -77,6 +78,7 @@ class TripJobManager:
         job.message = message
         job.error = ErrorBody(error=message, service=service)
         job.events.append(ProgressEvent(progress=job.progress, message=message))
+
         try:
             await self.store.update_job(job, owner)
         except Exception as exc:  # noqa: BLE001

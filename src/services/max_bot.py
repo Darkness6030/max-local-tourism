@@ -81,12 +81,12 @@ async def max_bot(settings: Settings):
                 bot.session = _SdkSession(session)
                 yield bot
     except (
-        aiohttp.ClientError,
-        MaxConnection,
-        InvalidToken,
-        ValueError,
-        TimeoutError,
-        OSError,
+            aiohttp.ClientError,
+            MaxConnection,
+            InvalidToken,
+            ValueError,
+            TimeoutError,
+            OSError,
     ):
         raise ServiceError(
             "max",

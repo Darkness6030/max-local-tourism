@@ -57,18 +57,23 @@ class Settings(BaseSettings):
         if self.app_env == "production":
             if self.max_allow_local_auth:
                 raise ValueError("Production запрещает MAX_ALLOW_LOCAL_AUTH")
+
             if not self.max_bot_token:
                 raise ValueError("Production требует MAX_BOT_TOKEN")
+
             if self.gigachat_credentials and not self.gigachat_verify_ssl_certs:
                 raise ValueError("Production требует проверку сертификата сервиса ИИ")
+
         return self
 
     @property
     def selected_weather_provider(self) -> Literal["open-meteo", "openweather"]:
         if self.weather_provider == "openweather":
             return "openweather"
+
         if self.weather_provider == "open-meteo":
             return "open-meteo"
+
         return "openweather" if self.openweather_api_key else "open-meteo"
 
 

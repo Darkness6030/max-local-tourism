@@ -48,12 +48,14 @@ app = FastAPI(
     redoc_url=None if settings.app_env == "production" else "/redoc",
     openapi_url=None if settings.app_env == "production" else "/openapi.json",
 )
+
 app.include_router(router)
 app.include_router(bot_router)
 app.include_router(miniapp_router)
 if settings.app_env != "production":
     app.include_router(demo_router)
     app.include_router(development_router)
+
 app.mount("/static", StaticFiles(directory=ROOT_DIR / "src" / "static"), name="static")
 
 

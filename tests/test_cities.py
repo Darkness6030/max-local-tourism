@@ -116,7 +116,7 @@ async def test_planner_checks_radius_before_external_planning(manual):
         )
     )
     planner = TripPlanner(
-        geocoding=geocoder, weather=weather, schedule=SimpleNamespace(), ai=ai
+        geocoding=geocoder, weather=weather, schedule=SimpleNamespace(), gigachat=ai
     )
     with pytest.raises(ServiceError):
         await planner.generate(

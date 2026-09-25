@@ -1,6 +1,7 @@
 """Check checklist restore, save and errors in a browser; API responses are mocked."""
 import argparse
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -17,6 +18,8 @@ def main():
     plan = sample_trip().model_dump(mode="json")
     plan["packed_items"] = [1]
     fail = False
+    hold = False
+    held = []
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="chrome")
         context = browser.new_context(viewport={"width": 390, "height": 844})
@@ -32,7 +35,7 @@ def main():
             "total": 1, "next_cursor": None}))
         context.route(f"**/api/v1/trips/{plan['id']}", lambda r: r.fulfill(json=plan))
 
-        def packing(route):
+        def respond(route):
             assert route.request.method == "PATCH"
             assert route.request.headers["x-max-init-data"] == "test-launch-data"
             if fail:
@@ -47,6 +50,19 @@ def main():
             plan["packed_items"] = sorted(checked)
             route.fulfill(json=plan)
 
+        def packing(route):
+            if hold:
+                held.append(route)
+            else:
+                respond(route)
+
+        def release():
+            deadline = time.monotonic() + 5
+            while not held and time.monotonic() < deadline:
+                page.wait_for_timeout(10)
+            assert held, "Background write did not arrive"
+            respond(held.pop(0))
+
         context.route(f"**/api/v1/trips/{plan['id']}/packing", packing)
         page = context.new_page()
         errors = []
@@ -60,13 +76,36 @@ def main():
         open_trip()
         checks = page.locator('[data-ui~="packing-list"] input')
         expect(checks.nth(1)).to_be_checked()
-        page.locator('[data-ui~="packing-list"] label').nth(0).click()
+        labels = page.locator('[data-ui~="packing-list"] label')
+        hold = True
+        labels.nth(0).click()
+        expect(checks.nth(0)).to_be_checked()
+        expect(checks.nth(0)).to_be_enabled()
+        assert plan["packed_items"] == [1]  # Server has not replied yet.
+        labels.nth(0).click()
+        labels.nth(2).click()
+        expect(checks.nth(0)).not_to_be_checked()
+        expect(checks.nth(2)).to_be_checked()
+        release()  # A stale response for the first click must not undo newer clicks.
+        expect(checks.nth(0)).not_to_be_checked()
+        expect(checks.nth(2)).to_be_checked()
+        release()
+        release()
+        assert plan["packed_items"] == [1, 2]
+        hold = False
+        page.reload()
+        open_trip()
+        expect(checks.nth(0)).not_to_be_checked()
+        expect(checks.nth(2)).to_be_checked()
+        with page.expect_response("**/packing"):
+            labels.nth(0).click()
         expect(checks.nth(0)).to_be_checked()
         page.reload()
         open_trip()
         expect(checks.nth(0)).to_be_checked()
         expect(checks.nth(1)).to_be_checked()
-        page.locator('[data-ui~="packing-list"] label').nth(0).click()
+        with page.expect_response("**/packing"):
+            labels.nth(0).click()
         expect(checks.nth(0)).not_to_be_checked()
         fail = True
         page.locator('[data-ui~="packing-list"] label').nth(0).click()
@@ -74,7 +113,7 @@ def main():
         expect(checks.nth(0)).not_to_be_checked()
         assert not errors, errors
         browser.close()
-    print("Checklist UI: restore, save, reload, uncheck and failed save passed")
+    print("Checklist UI: immediate toggles, rapid clicks, delayed responses, reload and rollback passed")
 
 
 if __name__ == "__main__":

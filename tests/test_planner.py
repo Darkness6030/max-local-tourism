@@ -137,7 +137,7 @@ async def test_planner_reports_progress_and_tolerates_schedule_error() -> None:
         geocoding=FakeGeocoding(),
         weather=FakeWeather(),
         schedule=FailingSchedule(),
-        ai=FakeAI(),
+        gigachat=FakeAI(),
     )
     request = TripRequest(
         origin="Москва",
@@ -166,7 +166,7 @@ async def test_planner_uses_first_trip_station_coordinates_for_map() -> None:
         geocoding=FakeGeocoding(),
         weather=FakeWeather(),
         schedule=StationSchedule(),
-        ai=FakeAI(),
+        gigachat=FakeAI(),
     )
     request = TripRequest(
         origin="Москва",
