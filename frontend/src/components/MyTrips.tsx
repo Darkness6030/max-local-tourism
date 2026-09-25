@@ -3,7 +3,7 @@ import {
   textButtonStyles,
 } from "../ui-styles";
 import { useEffect, useRef, useState } from "react";
-import { ChevronRight, LoaderCircle, MapPin, Route } from "lucide-react";
+import { ChevronRight, LoaderCircle, MapPin } from "lucide-react";
 import { api, dateLabel, money, safeUrl } from "../lib";
 import type { TripPlan } from "../types";
 import { Notice, Primary } from "./UI";
@@ -109,15 +109,15 @@ export function MyTrips({
         </Notice>
       )}
       {busy && !page && (
-        <div role="status" aria-label="Загрузка поездок" className="space-y-[12px]">
+        <div role="status" aria-label="Загрузка поездок" className="grid gap-[16px] min-[760px]:grid-cols-2">
           {[0, 1, 2].map((index) => (
             <div
               key={index}
               aria-hidden="true"
-              className="flex items-center gap-[17px] rounded-[22px] border border-solid border-[var(--line)] bg-white p-[24px] motion-safe:animate-pulse mobile:gap-[13px] mobile:rounded-[22px] mobile:p-[18px]"
+              className="overflow-hidden rounded-[22px] border border-solid border-[var(--line)] bg-white motion-safe:animate-pulse"
             >
-              <span className="h-[96px] w-[80px] shrink-0 rounded-[15px] mobile:h-[80px] mobile:w-[64px] bg-[#eff3ff]" />
-              <div className="flex-1 space-y-[10px]">
+              <div className="h-[144px] bg-[#eff3ff]" />
+              <div className="space-y-[12px] p-[20px] mobile:p-[18px]">
                 <div className="h-[12px] w-24 rounded bg-[#eff3ff]" />
                 <div className="h-[20px] w-3/4 rounded bg-[#eff3ff]" />
                 <div className="h-[12px] w-1/2 rounded bg-[#eff3ff]" />
@@ -126,39 +126,47 @@ export function MyTrips({
           ))}
         </div>
       )}
-      {page?.items.map((item) => (
-        <button
-          key={item.id}
-          data-ui="saved-trip"
-          className={
-            "w-full flex gap-[17px] items-center text-left p-[24px] [background:white] [border:1px_solid_var(--line)] rounded-[22px] mobile:p-[18px] mobile:gap-[13px] [&_>_div]:[flex:1] [&_>_div]:min-w-0 [&_>_div]:[overflow-wrap:anywhere] [&_small]:text-[11px] [&_small]:text-[#9ba6b9] mobile:[&_small]:text-[11px] [&_h2]:text-[18px] [&_h2]:leading-[1.5] [&_h2]:tracking-[-0.5px] [&_h2]:mt-[6px] [&_h2]:mx-0 [&_h2]:mb-[9px] [&_h2]:[font-weight:750] mobile:[&_h2]:text-[14px] mobile:[&_h2]:mt-[5px] mobile:[&_h2]:mx-0 mobile:[&_h2]:mb-[8px] [&_>_div_>_span]:text-[11px] [&_>_div_>_span]:text-[#8e9bb2] mobile:[&_>_div_>_span]:text-[11px] [&_>_svg]:text-[#a0afc8] mobile:[&_>_svg]:h-[17px] mobile:[&_>_svg]:w-[17px] [[data-ui~=saved-trip]_+_&]:mt-[12px]"
-          }
-          disabled={busy}
-          aria-busy={openingId === item.id}
-          onClick={() => void load(item.id)}
-        >
-          <TripThumbnail photo={item.destination_photo} />
-          <div className="flex flex-col items-start">
-            <small className="block leading-[16px]">
-              {dateLabel(item.start_date)}
-            </small>
-            <h2>{item.title}</h2>
-            <span className="block leading-[16px]">
-              {item.travelers} чел. · ≈ {money(item.estimated_total_rub)}
-            </span>
-          </div>
-          {openingId === item.id ? (
-            <LoaderCircle
-              size={20}
-              role="status"
-              aria-label="Открываем поездку"
-              className="shrink-0 motion-safe:animate-spin"
-            />
-          ) : (
-            <ChevronRight size={20} className="shrink-0" />
-          )}
-        </button>
-      ))}
+      <div className="grid items-start gap-[16px] min-[760px]:grid-cols-2">
+        {page?.items.map((item) => (
+          <button
+            key={item.id}
+            data-ui="saved-trip"
+            className="group flex w-full flex-col overflow-hidden rounded-[22px] border border-solid border-[var(--line)] bg-white p-0 text-left transition-[border-color,box-shadow] duration-200 hover:border-[#cbd5ed] hover:shadow-[0_6px_24px_#263b6410] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+            disabled={busy}
+            aria-busy={openingId === item.id}
+            onClick={() => void load(item.id)}
+          >
+            <TripCover photo={item.destination_photo} />
+            <div className="flex w-full flex-1 flex-col p-[20px] mobile:p-[18px]">
+              <small className="block text-[11px] font-medium leading-[16px] text-[#8e9bb2]">
+                {dateLabel(item.start_date)}
+              </small>
+              <h2 className="mt-[8px] mb-[18px] text-[17px] font-bold leading-[1.45] tracking-[-0.4px] text-[#252b3d] [overflow-wrap:anywhere] mobile:text-[16px]">
+                {item.title}
+              </h2>
+              <div className="mt-auto flex items-center justify-between gap-[12px] border-0 border-t border-solid border-[#edf0f6] pt-[14px]">
+                <span className="text-[12px] leading-[18px] text-[#8e9bb2]">
+                  {item.travelers} чел.
+                  <span className="mx-[8px] text-[#c7cedc]">·</span>
+                  <span className="font-semibold text-[#52617a]">
+                    ≈ {money(item.estimated_total_rub)}
+                  </span>
+                </span>
+                {openingId === item.id ? (
+                  <LoaderCircle
+                    size={18}
+                    role="status"
+                    aria-label="Открываем поездку"
+                    className="shrink-0 text-brand motion-safe:animate-spin"
+                  />
+                ) : (
+                  <ChevronRight size={18} className="shrink-0 text-[#99a8c1]" />
+                )}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
       {busy && page && !openingId && (
         <div role="status" aria-label="Загрузка поездок" className="flex justify-center py-[16px] text-brand">
           <LoaderCircle size={22} aria-hidden="true" className="motion-safe:animate-spin" />
@@ -194,28 +202,23 @@ export function MyTrips({
   );
 }
 
-function TripThumbnail({ photo }: { photo: TripPlan["destination_photo"] }) {
+function TripCover({ photo }: { photo: TripPlan["destination_photo"] }) {
   const [failed, setFailed] = useState(false);
   const url = photo && safeUrl(photo.url);
+  if (!url || failed) return null;
 
   return (
-    <span
-      data-ui="trip-thumbnail"
-      className="grid h-[96px] w-[80px] shrink-0 place-items-center overflow-hidden rounded-[15px] bg-[#eff3ff] text-[#8b9fe2] mobile:h-[80px] mobile:w-[64px] mobile:rounded-[12px]"
-    >
-      {url && !failed ? (
-        <img
-          src={url}
-          alt=""
-          title={`Фото: ${photo.author}`}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <Route size={25} aria-hidden="true" />
-      )}
+    <span data-ui="trip-cover" className="relative block h-[144px] w-full shrink-0 overflow-hidden bg-[#eff3ff]">
+      <img
+        src={url}
+        alt=""
+        title={`Фото: ${photo.author}`}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+        onError={() => setFailed(true)}
+      />
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
     </span>
   );
 }
