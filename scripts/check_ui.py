@@ -258,7 +258,6 @@ def main():
             "ИИ подготовил ИИ-программу."
         )
         page.locator("#share-trip").click()
-        page.get_by_role("button", name="Отправить в MAX", exact=True).click()
         assert page.evaluate(
             "window.WebApp.calls.some(x => x.text?.startsWith('ИИ: ИИ-программа. https://example.com/AI') && x.text.includes('?startapp=trip_'))"
         )
@@ -300,7 +299,6 @@ def main():
             "window.WebApp.calls.some(x => typeof x === 'string' && x.startsWith('https://yandex.ru/maps/'))"
         )
         page.locator("#share-trip").click()
-        page.get_by_role("button", name="Отправить в MAX", exact=True).click()
         assert page.evaluate("window.WebApp.calls.some(x => x.text?.startsWith('ИИ:'))")
         page.locator("#copy-trip").click()
         expect(page.locator("[data-ui~=result-page] > [data-ui~=notice]")).to_be_visible()

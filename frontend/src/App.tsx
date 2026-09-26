@@ -6,7 +6,6 @@ import {
   doneStyles,
   emptyStateStyles,
   eyebrowStyles,
-  primaryButtonStyles,
   sectionHeadingStyles,
   softBlueIconStyles,
   textButtonStyles,
@@ -53,6 +52,7 @@ import { Brand, Notice, Primary } from "./components/UI";
 import { Onboarding } from "./components/Onboarding";
 import { Wizard } from "./components/Wizard";
 import { MyTrips } from "./components/MyTrips";
+import { MaxEntry } from "./components/MaxEntry";
 import { TripResult } from "./components/TripResult";
 import { PresetCards, PresetDetail } from "./components/Presets";
 import type { TripPreset } from "./presets";
@@ -383,47 +383,17 @@ export default function App() {
     }
   };
 
-  if (!booting && !identity)
+  if (!booting && !identity) {
+    const botUrl = (config?.bot_url || "https://max.ru/t539_hakaton_max_bot?startapp")
+      + (pendingShare.current ? `=trip_${pendingShare.current}` : "");
     return (
-      <div
-        data-ui="app-shell"
-        className="min-h-[100dvh] [&[data-ui~=screen-loading]]:flex [&[data-ui~=screen-loading]]:flex-col"
-      >
-        <header data-ui="app-header" className={appHeaderStyles}>
-          <Brand />
-        </header>
-        <main data-ui="app-main" className={appMainStyles}>
-          <div data-ui="empty-state" className={emptyStateStyles}>
-            <span data-ui="soft-icon blue" className={softBlueIconStyles}>
-              <Compass size={30} />
-            </span>
-            <h1>Путешествия начинаются в MAX</h1>
-            <p>
-              Откройте «Рядом» в MAX, чтобы войти со своим профилем и собрать
-              поездку.
-            </p>
-            {error && <Notice>{error}</Notice>}
-            <a
-              data-ui="button primary"
-              className={primaryButtonStyles}
-              href={
-                (config?.bot_url || "https://max.ru/t539_hakaton_max_bot?startapp")
-                  + (pendingShare.current ? `=trip_${pendingShare.current}` : "")
-              }
-            >
-              Открыть в MAX <ArrowUpRight size={18} />
-            </a>
-            <button
-              data-ui="text-button"
-              className={textButtonStyles}
-              onClick={() => setBootRetry((value) => value + 1)}
-            >
-              Проверить подключение
-            </button>
-          </div>
-        </main>
-      </div>
+      <MaxEntry
+        botUrl={botUrl}
+        sharedTrip={Boolean(pendingShare.current)}
+        error={initData.current ? error : undefined}
+      />
     );
+  }
   const navVisible = ["home", "trips", "about"].includes(screen);
   return (
     <AnimatePresence

@@ -150,7 +150,7 @@ async def test_planner_only_loads_hotels_for_overnight_trips(days):
     if days == 1:
         hotels.for_city.assert_not_called()
         assert plan.accommodation is None
-        assert plan.budget.estimated_total_rub == 2500
+        assert plan.budget.estimated_total_rub == 2400
     else:
         hotels.for_city.assert_awaited_once()
         assert plan.accommodation.rooms == 2
@@ -161,7 +161,7 @@ async def test_planner_only_loads_hotels_for_overnight_trips(days):
         assert plan.accommodation.estimated_total_rub == 12000 * (days - 1)
         assert plan.accommodation.status == "unavailable"
         assert not plan.budget.within_budget
-        assert plan.budget.estimated_total_rub == (2000 + 12000 * (days - 1)) * 1.25
+        assert plan.budget.estimated_total_rub == (2000 + 12000 * (days - 1)) * 1.20
         assert plan.budget.estimated_total_rub > plan.budget.limit_rub
     assert plan.budget.estimated_total_rub == sum(
         item.amount_rub for item in plan.budget.items
@@ -184,7 +184,7 @@ async def test_no_duplicate_lodging_and_no_mutation():
     budget, stay = build_budget(generated, request, city(), HotelCatalog([]))
     assert stay.estimated_room_night_rub == 5000
     assert stay.status == "empty"
-    assert budget.estimated_total_rub == 8750
+    assert budget.estimated_total_rub == 8400
     assert len(generated.budget_items) == 2
     assert build_budget(generated, request, city(), HotelCatalog([]))[0] == budget
 

@@ -40,8 +40,17 @@ def main():
                 route.fulfill(json=plan)
 
             context.route(f"**/api/v1/shared-trips/{token}/import", import_trip)
-            context.route(f"**/api/v1/trips/{plan['id']}/share", lambda r: r.fulfill(
-                json={"text": shared_text, "url": link}))
+            preparations = []
+
+            def prepare_share(route, *, attempts=preparations, fail_first=completed):
+                assert route.request.method == "POST"
+                attempts.append(True)
+                if fail_first and len(attempts) == 1:
+                    route.fulfill(status=503, json={"error": "Temporary failure"})
+                else:
+                    route.fulfill(json={"text": shared_text, "url": link})
+
+            context.route(f"**/api/v1/trips/{plan['id']}/share", prepare_share)
             page = context.new_page()
             errors = []
             page.on("pageerror", lambda e, captured=errors: captured.append(str(e)))
@@ -52,9 +61,17 @@ def main():
                 page.get_by_role("button", name="Пропустить знакомство").click()
             expect(page.locator('[data-ui="result-page"]')).to_be_visible()
             assert len(imports) == 1
+            if completed:
+                expect(page.locator("#share-trip")).to_have_text("Повторить подготовку")
+                page.locator("#share-trip").click()
+            expect(page.locator("#share-trip")).to_have_text("Позвать с собой")
+            expect(page.locator("#share-trip")).to_be_enabled()
+            assert len(preparations) == (2 if completed else 1)
+            before_click = len(preparations)
+            assert page.evaluate("window.WebApp.calls.filter(x => x && x.text).length") == 0
             page.locator("#share-trip").click()
-            expect(page.get_by_role("dialog")).to_be_visible()
-            page.get_by_role("button", name="Отправить в MAX", exact=True).click()
+            expect(page.get_by_role("dialog")).to_have_count(0)
+            assert len(preparations) == before_click
             assert page.evaluate("window.WebApp.calls.filter(x => x && x.text).at(-1).text") == shared_text
             assert not errors, errors
             context.close()

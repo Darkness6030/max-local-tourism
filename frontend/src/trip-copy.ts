@@ -6,7 +6,7 @@ export const BUDGET_DISCLAIMER =
 export const ACCOMMODATION_DISCLAIMER =
   "Цены и свободные номера на ваши даты уточняйте у гостиницы.";
 export const ITINERARY_DISCLAIMER =
-  "Время ИИ-программы рекомендательное. Время отправления и прибытия проверяйте в блоке транспорта; часы работы мест не подтверждены.";
+  "Время программы рекомендательное. Время отправления и прибытия проверяйте в блоке транспорта; часы работы мест не подтверждены.";
 
 export function budgetItemCopy(item: TripPlan["budget"]["items"][number], plan: TripPlan) {
   // Russian labels are supported for trips saved before the presentation moved here.
@@ -54,10 +54,6 @@ export function tripNotices(plan: TripPlan): string[] {
 
     if (!plan.transport.return_trip.length) {
       notes.push("После выбранного времени не найдено подходящих рейсов обратно.");
-    }
-
-    if (!plan.request.has_car && plan.transport.outbound.length && !plan.map_url) {
-      notes.push("Не удалось получить координаты станций выбранного рейса; карта не построена по центрам городов намеренно.");
     }
   }
 

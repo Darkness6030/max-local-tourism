@@ -2,7 +2,7 @@
 
 from zoneinfo import ZoneInfo
 
-MVP_TIMEZONE = ZoneInfo("Europe/Moscow")
+MSK_TIMEZONE = ZoneInfo("Europe/Moscow")
 
 MAX_FORECAST_DAYS = 16
 MAX_TRIP_DAYS = 3
@@ -31,7 +31,7 @@ MAX_CITY_DISTANCE_KM = 600
 SUGGESTED_CITY_DISTANCE_KM = 500
 EARTH_RADIUS_KM = 6371.0
 DEPARTURE_BUFFER_MINUTES = 30
-BUDGET_RESERVE_PERCENT = 25
+BUDGET_RESERVE_PERCENT = 20
 DEFAULT_ROOM_NIGHT_RUB = 5000  # Planning assumption, not a hotel tariff.
 TRAVELERS_PER_ROOM = 2
 OVERPASS_API_URL = "https://maps.mail.ru/osm/tools/overpass/api/interpreter"

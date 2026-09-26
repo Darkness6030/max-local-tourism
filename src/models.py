@@ -17,7 +17,7 @@ from pydantic import (
 from src.constants import (
     MAX_FORECAST_DAYS,
     MAX_TRIP_DAYS,
-    MVP_TIMEZONE,
+    MSK_TIMEZONE,
     SOURCE_NOMINATIM,
     SOURCE_YANDEX,
     YANDEX_SCHEDULE_SITE_URL,
@@ -29,7 +29,7 @@ def default_trip_date() -> date:
 
 
 def current_date() -> date:
-    return datetime.now(MVP_TIMEZONE).date()
+    return datetime.now(MSK_TIMEZONE).date()
 
 
 class UserProfile(BaseModel):
