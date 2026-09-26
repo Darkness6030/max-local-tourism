@@ -71,6 +71,15 @@ const rawLaunch = () => {
       : "";
 };
 
+const sharedLaunch = () => {
+  const value = window.WebApp?.initDataUnsafe?.start_param
+    || new URLSearchParams(rawLaunch()).get("start_param")
+    || new URLSearchParams(location.search).get("WebAppStartParam")
+    || new URLSearchParams(location.hash.slice(1)).get("WebAppStartParam");
+  return typeof value === "string" && /^trip_[a-f0-9]{32}$/.test(value)
+    ? value.slice(5) : null;
+};
+
 export default function App() {
   const reducedMotion = useReducedMotion();
   const [onboarded, setOnboarded] = useState(true);
@@ -98,6 +107,7 @@ export default function App() {
   const [booting, setBooting] = useState(true);
   const initData = useRef(rawLaunch());
   const prefix = useRef("");
+  const pendingShare = useRef(sharedLaunch());
   const submitLock = useRef(false);
   const navigate = useCallback((next: Screen) => {
     setWelcomeEntry(false);
@@ -128,8 +138,9 @@ export default function App() {
           }),
         );
       }
-      navigate("home");
-      setWelcomeEntry(true);
+      navigate(pendingShare.current && trip ? "result" : "home");
+      setWelcomeEntry(!pendingShare.current);
+      pendingShare.current = null;
       setOnboarded(true);
     } catch (err) {
       setOnboardingError((err as Error).message);
@@ -191,7 +202,22 @@ export default function App() {
           prefix.current + "trip",
           null,
         );
-        if (savedJob && typeof savedJob === "string") {
+        const sharedToken = sharedLaunch() || pendingShare.current;
+        if (sharedToken) {
+          pendingShare.current = sharedToken;
+          try {
+            const plan = await api<TripPlan>(`/shared-trips/${sharedToken}/import`, initData.current, {
+              method: "POST", signal: controller.signal,
+            });
+            if (controller.signal.aborted) return;
+            setTrip({ plan });
+            writeStorage(prefix.current + "trip", plan.id);
+            navigate("result");
+            if (userProfile.onboarding_completed) pendingShare.current = null;
+          } catch (err) {
+            if (!controller.signal.aborted) setError((err as Error).message);
+          }
+        } else if (savedJob && typeof savedJob === "string") {
           setJobId(savedJob);
           navigate("loading");
         } else if (savedTrip && typeof savedTrip === "string") {
@@ -363,8 +389,8 @@ export default function App() {
               data-ui="button primary"
               className={primaryButtonStyles}
               href={
-                config?.bot_url ||
-                "https://max.ru/t539_hakaton_max_bot?startapp"
+                (config?.bot_url || "https://max.ru/t539_hakaton_max_bot?startapp")
+                  + (pendingShare.current ? `=trip_${pendingShare.current}` : "")
               }
             >
               Открыть в MAX <ArrowUpRight size={18} />
@@ -813,7 +839,7 @@ export default function App() {
                     <span data-ui="eyebrow" className={eyebrowStyles}>
                       ЕЩЁ ОДИН ПОВОД ВЫБРАТЬСЯ
                     </span>
-                    <h1 className="mb-4">Мои поездки</h1>
+                    <h1 className="mb-3">Мои поездки</h1>
                     {jobId && (
                       <button
                         data-ui="active-job"
@@ -850,14 +876,14 @@ export default function App() {
                     <span data-ui="eyebrow" className={eyebrowStyles}>
                       ПРИЯТНО ПОЗНАКОМИТЬСЯ
                     </span>
-                    <h1 className="mb-4">
+                    <h1 className="mb-3">
                       {identity.mode === "max"
                         ? `${identity.user.first_name}, поехали?`
                         : "Большие открытия рядом."}
                     </h1>
                     <p
                       data-ui="page-description"
-                      className="leading-[1.9] text-[15px] mobile:text-[12px] mobile:leading-[1.9] mobile-type:text-[14px] text-[#687389]"
+                      className="leading-[1.7] text-[15px] mobile:text-[12px] mobile:leading-[1.7] mobile-type:text-[14px] text-[#687389]"
                     >
                       Помогаем придумать поездку выходного дня — с вниманием к
                       вашему времени, интересам и бюджету.

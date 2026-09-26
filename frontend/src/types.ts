@@ -145,6 +145,7 @@ export type Screen =
   "home" | "wizard" | "loading" | "result" | "preset" | "trips" | "about";
 export interface Bridge {
   initData?: string;
+  initDataUnsafe?: { start_param?: string };
   ready?: () => void;
   enableClosingConfirmation?: () => void;
   disableClosingConfirmation?: () => void;

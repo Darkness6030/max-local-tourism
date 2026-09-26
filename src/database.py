@@ -25,6 +25,22 @@ class TripRecord(SQLModel, table=True):
     payload: dict = Field(sa_column=Column(JSONB, nullable=False))
 
 
+class SharedTripRecord(SQLModel, table=True):
+    __tablename__ = "shared_trips"
+    token: UUID = Field(sa_column=Column(Uuid, primary_key=True))
+    source_id: UUID = Field(sa_column=Column(
+        Uuid, ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, unique=True))
+
+
+class SharedTripImportRecord(SQLModel, table=True):
+    __tablename__ = "shared_trip_imports"
+    token: UUID = Field(sa_column=Column(
+        Uuid, ForeignKey("shared_trips.token", ondelete="CASCADE"), primary_key=True))
+    owner_id: str = Field(sa_column=Column(String(80), primary_key=True))
+    trip_id: UUID = Field(sa_column=Column(
+        Uuid, ForeignKey("trips.id", ondelete="CASCADE"), nullable=False))
+
+
 class JobRecord(SQLModel, table=True):
     __tablename__ = "trip_jobs"
     __table_args__ = (

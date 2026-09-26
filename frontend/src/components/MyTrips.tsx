@@ -141,7 +141,7 @@ export function MyTrips({
               <small className="block text-[11px] font-medium leading-[16px] text-[#8e9bb2]">
                 {dateLabel(item.start_date)}
               </small>
-              <h2 className="mt-[8px] mb-[18px] text-[17px] font-bold leading-[1.45] tracking-[-0.4px] text-[#252b3d] [overflow-wrap:anywhere] mobile:text-[16px]">
+              <h2 className="mt-[8px] mb-[14px] text-[17px] font-bold leading-[1.45] tracking-[-0.4px] text-[#252b3d] [overflow-wrap:anywhere] mobile:text-[16px]">
                 {item.title}
               </h2>
               <div className="mt-auto flex items-center justify-between gap-[12px] border-0 border-t border-solid border-[#edf0f6] pt-[14px]">

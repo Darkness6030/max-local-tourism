@@ -269,6 +269,31 @@ async def share_trip(
     return {"text": trip.share_text}
 
 
+@router.post("/trips/{trip_id}/share", tags=["trips"])
+async def publish_trip_share(
+    trip_id: UUID, container: ContainerDep, identity: IdentityDep,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> dict[str, str]:
+    if not settings.max_bot_username:
+        raise HTTPException(status_code=503, detail="Ссылка на бота пока недоступна")
+    token = await container.store.publish_share(trip_id, identity.owner_id)
+    if token is None:
+        raise HTTPException(status_code=404, detail="Поездка не найдена")
+    trip = await container.store.get(trip_id, identity.owner_id)
+    url = f"https://max.ru/{settings.max_bot_username}?startapp=trip_{token.hex}"
+    return {"text": f"{trip.share_text}\n\nСохранить и открыть маршрут:\n{url}", "url": url}
+
+
+@router.post("/shared-trips/{token}/import", response_model=TripPlan, tags=["trips"])
+async def import_shared_trip(
+    token: UUID, container: ContainerDep, identity: IdentityDep,
+) -> TripPlan:
+    trip = await container.store.import_share(token, identity.owner_id)
+    if trip is None:
+        raise HTTPException(status_code=404, detail="Ссылка на маршрут больше не действует")
+    return trip
+
+
 async def _geocode_pair(
     container: Container, first: str, second: str
 ) -> tuple[GeoPoint, GeoPoint]:

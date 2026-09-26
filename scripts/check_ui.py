@@ -65,6 +65,9 @@ def main():
         )
         context.route("**/api/v1/examples/trip-plan", lambda r: r.fulfill(json=sample))
         context.route("**/api/v1/cities/validate?*", lambda r: r.fulfill(json={"city": {"title": "Коломна"}, "distance_km": 100}))
+        context.route("**/api/v1/trips/*/share", lambda r: r.fulfill(json={
+            "text": plan["share_text"] + "\nhttps://max.ru/test_bot?startapp=trip_" + "a" * 32,
+        }))
         page = context.new_page()
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
@@ -255,8 +258,9 @@ def main():
             "ИИ подготовил ИИ-программу."
         )
         page.locator("#share-trip").click()
+        page.get_by_role("button", name="Отправить в MAX", exact=True).click()
         assert page.evaluate(
-            "window.WebApp.calls.some(x => x.text === 'ИИ: ИИ-программа. https://example.com/AI')"
+            "window.WebApp.calls.some(x => x.text?.startsWith('ИИ: ИИ-программа. https://example.com/AI') && x.text.includes('?startapp=trip_'))"
         )
         assert len(submissions) == 1
         assert submissions[0]["children_ages"] == [5, 12]
@@ -296,6 +300,7 @@ def main():
             "window.WebApp.calls.some(x => typeof x === 'string' && x.startsWith('https://yandex.ru/maps/'))"
         )
         page.locator("#share-trip").click()
+        page.get_by_role("button", name="Отправить в MAX", exact=True).click()
         assert page.evaluate("window.WebApp.calls.some(x => x.text?.startsWith('ИИ:'))")
         page.locator("#copy-trip").click()
         expect(page.locator("[data-ui~=result-page] > [data-ui~=notice]")).to_be_visible()

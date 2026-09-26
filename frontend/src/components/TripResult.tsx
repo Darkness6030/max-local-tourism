@@ -58,6 +58,9 @@ export function TripResult({
   const [tab, setTab] = useState<Tab>("program");
   const [dayIndex, setDayIndex] = useState(0);
   const [message, setMessage] = useState("");
+  const [shareText, setShareText] = useState("");
+  const [sharing, setSharing] = useState(false);
+  const [shareReady, setShareReady] = useState(false);
   const [manualCopy, setManualCopy] = useState(false);
   const packed = plan.packed_items ?? [];
   const packing = useRef({
@@ -121,13 +124,28 @@ export function TripResult({
       setMessage("Не удалось открыть ссылку.");
     }
   };
+  const prepareShare = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      const result = await api<{ text: string }>(`/trips/${plan.id}/share`, initData, { method: "POST" });
+      setShareText(result.text);
+      setShareReady(true);
+      setMessage("");
+    } catch (err) {
+      setMessage((err as Error).message);
+    } finally {
+      setSharing(false);
+    }
+  };
   const share = () => {
+    setShareReady(false);
     // Keep this synchronous until the Bridge call to retain the user gesture.
     const bridge = window.WebApp;
     if (bridge?.initData && bridge.shareMaxContent) {
       try {
         Promise.resolve(
-          bridge.shareMaxContent({ text: plan.share_text }),
+          bridge.shareMaxContent({ text: shareText }),
         ).catch(() =>
           setMessage(
             "Шеринг недоступен в этом клиенте. Скопируйте план и отправьте его в чат.",
@@ -138,7 +156,7 @@ export function TripResult({
       }
     } else {
       window.open(
-        `https://max.ru/:share?text=${encodeURIComponent(plan.share_text)}`,
+        `https://max.ru/:share?text=${encodeURIComponent(shareText)}`,
         "_blank",
         "noopener,noreferrer",
       );
@@ -149,7 +167,7 @@ export function TripResult({
   };
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(plan.share_text);
+      await navigator.clipboard.writeText(shareText || plan.share_text);
       setMessage("План скопирован. Отправьте его тем, кого берёте с собой.");
     } catch {
       setManualCopy(true);
@@ -238,13 +256,24 @@ export function TripResult({
         </button>
       </section>
       {message && <Notice onClose={() => setMessage("")}>{message}</Notice>}
+      {shareReady && (
+        <div role="dialog" aria-label="Поделиться маршрутом" className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-5">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
+            <h2 className="mb-3 text-xl font-bold">Поделиться маршрутом</h2>
+            <p className="mb-5 text-sm text-muted">В конце сообщения будет ссылка на бота. По ней друзья сохранят маршрут себе и сразу откроют его.</p>
+            <button className={primaryButtonStyles} onClick={share}>Отправить в MAX</button>
+            <button className={textButtonStyles} onClick={() => { setShareReady(false); void copy(); }}>Копировать со ссылкой</button>
+            <button className={textButtonStyles} onClick={() => setShareReady(false)}>Закрыть</button>
+          </div>
+        </div>
+      )}
       {manualCopy && (
         <label data-ui="field-label" className={fieldLabelStyles}>
           Текст поездки
           <textarea
             readOnly
             rows={5}
-            value={plan.share_text}
+            value={shareText || plan.share_text}
             onFocus={(event) => event.target.select()}
           />
         </label>
@@ -833,10 +862,11 @@ export function TripResult({
           id="share-trip"
           data-ui="button primary"
           className={primaryButtonStyles}
-          onClick={share}
+          onClick={prepareShare}
+          disabled={sharing}
         >
           <Share2 size={18} />
-          <span>Позвать с собой</span>
+          <span>{sharing ? "Готовим ссылку…" : "Позвать с собой"}</span>
         </button>
       </div>
     </div>

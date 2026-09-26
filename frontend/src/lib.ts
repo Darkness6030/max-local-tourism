@@ -51,6 +51,7 @@ const displayFields = new Set([
   "notes",
   "packing_list",
   "share_text",
+  "text",
   "message",
   "error",
   "detail",

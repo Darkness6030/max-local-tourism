@@ -1,11 +1,17 @@
 from datetime import datetime, timezone
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import delete, func, select, text, tuple_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from src.database import JobRecord, TripRecord, UserProfileRecord
+from src.database import (
+    JobRecord,
+    SharedTripImportRecord,
+    SharedTripRecord,
+    TripRecord,
+    UserProfileRecord,
+)
 from src.errors import ServiceError
 from src.models import (
     ErrorBody,
@@ -76,6 +82,49 @@ class TripStore:
                 )
             )
             return TripPlan.model_validate(row.payload) if row else None
+
+    async def publish_share(self, trip_id: UUID, owner_id: str) -> UUID | None:
+        async with self.sessions.begin() as session:
+            source = await session.scalar(select(TripRecord).where(
+                TripRecord.id == trip_id, TripRecord.owner_id == owner_id,
+            ).with_for_update())
+            if source is None:
+                return None
+            imported_token = await session.scalar(select(SharedTripImportRecord.token).where(
+                SharedTripImportRecord.trip_id == trip_id,
+                SharedTripImportRecord.owner_id == owner_id,
+            ))
+            if imported_token:
+                return imported_token
+            await session.execute(insert(SharedTripRecord).values(
+                token=uuid4(), source_id=trip_id,
+            ).on_conflict_do_nothing(index_elements=["source_id"]))
+            return await session.scalar(select(SharedTripRecord.token).where(
+                SharedTripRecord.source_id == trip_id,
+            ))
+
+    async def import_share(self, token: UUID, owner_id: str) -> TripPlan | None:
+        async with self.sessions.begin() as session:
+            # Serialize repeated/concurrent imports and imports through forwarded copies.
+            shared = await session.scalar(select(SharedTripRecord).where(
+                SharedTripRecord.token == token,
+            ).with_for_update())
+            if shared is None:
+                return None
+            source = await session.get(TripRecord, shared.source_id)
+            if source.owner_id == owner_id:
+                return TripPlan.model_validate(source.payload)
+            imported = await session.get(SharedTripImportRecord, (token, owner_id))
+            if imported:
+                row = await session.get(TripRecord, imported.trip_id)
+                return TripPlan.model_validate(row.payload)
+            plan = TripPlan.model_validate(source.payload).model_copy(update={
+                "id": uuid4(), "packed_items": [],
+            })
+            await self._put(session, plan, owner_id)
+            session.add(SharedTripImportRecord(token=token, owner_id=owner_id, trip_id=plan.id))
+            # Forwarding a copy uses the same link, avoiding duplicate routes.
+            return plan
 
     async def recent_destinations(self, owner_id: str, limit: int) -> list[str]:
         async with self.sessions() as session:
