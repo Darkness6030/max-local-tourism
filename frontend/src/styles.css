@@ -61,84 +61,33 @@
   body {
     margin: 0;
   }
-  button {
+  button, input, select, textarea {
     font: inherit;
   }
-  input {
-    font: inherit;
-  }
-  select {
-    font: inherit;
-  }
-  textarea {
-    font: inherit;
-  }
-  button {
-    -webkit-tap-highlight-color: transparent;
-  }
-  a {
-    -webkit-tap-highlight-color: transparent;
-  }
-  input {
-    -webkit-tap-highlight-color: transparent;
-  }
-  select {
-    -webkit-tap-highlight-color: transparent;
-  }
-  textarea {
+  button, a, input, select, textarea {
     -webkit-tap-highlight-color: transparent;
   }
   button {
     cursor: pointer;
     color: inherit;
+    border: 0;
   }
   button:disabled {
     cursor: wait;
     opacity: 0.5;
   }
-  button {
+  button, a {
     touch-action: manipulation;
   }
-  a {
-    touch-action: manipulation;
-  }
-  button:focus-visible {
+  button:focus-visible, a:focus-visible, summary:focus-visible {
     outline: 3px solid #a3b1ff;
     outline-offset: 4px;
   }
-  a:focus-visible {
-    outline: 3px solid #a3b1ff;
-    outline-offset: 4px;
-  }
-  summary:focus-visible {
-    outline: 3px solid #a3b1ff;
-    outline-offset: 4px;
-  }
-  input:focus {
+  input:focus, select:focus, textarea:focus {
     outline: 2px solid #a3b1ff;
     outline-offset: 2px;
   }
-  select:focus {
-    outline: 2px solid #a3b1ff;
-    outline-offset: 2px;
-  }
-  textarea:focus {
-    outline: 2px solid #a3b1ff;
-    outline-offset: 2px;
-  }
-  button {
-    border: 0;
-  }
-  h1 {
-    margin: 0;
-  }
-  h2 {
-    margin: 0;
-  }
-  h3 {
-    margin: 0;
-  }
-  p {
+  h1, h2, h3, p {
     margin: 0;
   }
   img {
@@ -151,31 +100,13 @@
   a {
     color: var(--blue);
   }
-  button {
-    min-height: 44px;
-  }
-  input {
-    min-height: 44px;
-  }
-  select {
-    min-height: 44px;
-  }
-  textarea {
-    min-height: 44px;
-  }
-  summary {
+  button, input, select, textarea, summary {
     min-height: 44px;
   }
   h1:focus {
     outline: none;
   }
-  input {
-    min-width: 0;
-  }
-  select {
-    min-width: 0;
-  }
-  textarea {
+  input, select, textarea {
     min-width: 0;
   }
   ::selection {
@@ -203,21 +134,7 @@
     background: var(--blue);
   }
   @media (prefers-reduced-motion: reduce) {
-    * {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *::before {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *::after {
+    *, *::before, *::after {
       animation: none !important;
       transition: none !important;
       scroll-behavior: auto !important;

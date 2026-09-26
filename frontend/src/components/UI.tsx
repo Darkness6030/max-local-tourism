@@ -15,15 +15,49 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 
+
+const noticeStyles = `
+  flex items-center gap-1.5 justify-between bg-[#eef2ff] text-[#4055a0] [border:1px_solid_#dbe3ff]
+  rounded-2xl py-3.5 px-4 text-[12px] leading-[1.7] mb-4.5 wrap-anywhere mobile:text-[11px] mobile:p-3
+  mobile:leading-[1.8] mobile:rounded-[13px] mobile:[[data-ui~=wizard-actions]_&]:mb-3
+  [[data-ui~=screen-loading]_[data-ui~=has-error]_&]:my-3
+  [[data-ui~=screen-loading]_[data-ui~=has-error]_&]:mx-0
+`;
+
+const choiceStyles = `
+  relative flex items-center gap-3.5 [border:1.5px_solid_#e8ebf2] bg-white rounded-[17px] text-left
+  py-4.5 px-[15px] min-h-[83px] w-full [transition:border-color_0.18s,_background_0.18s]
+  mobile:min-h-[89px] mobile:py-[17px] mobile:px-3.5 mobile:rounded-[17px] mobile:bg-white
+  [[data-ui~=group-grid]_&]:items-start [[data-ui~=group-grid]_&]:flex-col
+  [[data-ui~=group-grid]_&]:gap-3.5 [[data-ui~=group-grid]_&]:py-[17px]
+  [[data-ui~=group-grid]_&]:px-[15px] [[data-ui~=group-grid]_&]:min-h-32.5
+  mobile:[[data-ui~=group-grid]_&]:min-h-[141px] mobile:[[data-ui~=group-grid]_&]:py-4.5
+  mobile:[[data-ui~=group-grid]_&]:px-3.5 mobile-type:[[data-ui~=group-grid]_&]:min-h-30
+  short-mobile:[[data-ui~=group-grid]_&]:min-h-26 [[data-ui~=interests-grid]_&]:items-start
+  [[data-ui~=interests-grid]_&]:flex-col [[data-ui~=interests-grid]_&]:py-[17px]
+  [[data-ui~=interests-grid]_&]:px-[15px] [[data-ui~=interests-grid]_&]:min-h-[119px]
+  [[data-ui~=interests-grid]_&]:gap-2 mobile:[[data-ui~=interests-grid]_&]:min-h-29.5
+  mobile:[[data-ui~=interests-grid]_&]:py-4 mobile:[[data-ui~=interests-grid]_&]:px-[13px]
+  mobile-type:[[data-ui~=interests-grid]_&]:min-h-30
+  short-mobile:[[data-ui~=interests-grid]_&]:min-h-26 [[data-ui~=transport-choices]_&]:flex-col
+  [[data-ui~=transport-choices]_&]:items-start [[data-ui~=transport-choices]_&]:py-[15px]
+  [[data-ui~=transport-choices]_&]:px-[13px] [[data-ui~=transport-choices]_&]:min-h-[115px]
+  [[data-ui~=transport-choices]_&]:gap-[7px] mobile:[[data-ui~=transport-choices]_&]:min-h-30
+  mobile:[[data-ui~=transport-choices]_&]:py-4 mobile:[[data-ui~=transport-choices]_&]:px-3.5
+`;
+
 export function Brand() {
   return (
     <span
       data-ui="brand"
-      className="inline-flex items-center gap-[9px] [font-weight:850] text-[30px] tracking-[-1.5px] leading-[1] mobile:text-[28px] mobile:gap-[8px]"
+      className="inline-flex items-center gap-[9px] font-[850] text-[30px] tracking-[-1.5px] leading-none
+        mobile:text-[28px] mobile:gap-2"
     >
       <span
         data-ui="brand-symbol"
-        className="w-[38px] h-[38px] grid place-items-center [background:var(--blue)] text-[white] rounded-[12px] [transform:rotate(-5deg)] mobile:h-[35px] mobile:w-[35px] mobile:rounded-[11px] [&_svg]:[transform:rotate(5deg)] mobile:[&_svg]:w-[23px] mobile:[&_svg]:h-[23px]"
+        className="size-9.5 grid place-items-center bg-brand text-white rounded-xl [transform:rotate(-5deg)]
+          mobile:size-[35px] mobile:rounded-[11px] [&_svg]:[transform:rotate(5deg)]
+          mobile:[&_svg]:size-[23px]"
       >
         <Compass size={25} strokeWidth={1.8} />
       </span>
@@ -88,13 +122,11 @@ export function Notice({
   return (
     <div
       data-ui={`notice ${error ? "error" : ""}`}
-      className={
-        "flex items-center gap-[6px] justify-between [background:#eef2ff] text-[#4055a0] [border:1px_solid_#dbe3ff] rounded-[16px] py-[14px] px-[16px] text-[12px] leading-[1.7] mb-[18px] [overflow-wrap:anywhere] mobile:text-[11px] mobile:p-[12px] mobile:leading-[1.8] mobile:rounded-[13px] mobile:[[data-ui~=wizard-actions]_&]:mb-[12px] [[data-ui~=screen-loading]_[data-ui~=has-error]_&]:my-[12px] [[data-ui~=screen-loading]_[data-ui~=has-error]_&]:mx-0" +
-        " " +
-        (error
-          ? "[[data-ui~=notice]&]:[background:#fff1ed] [[data-ui~=notice]&]:text-[#a34c37] [[data-ui~=notice]&]:[border-color:#f7dacf]"
-          : "")
-      }
+      className={`${noticeStyles} ${
+        error
+          ? "[[data-ui~=notice]&]:bg-[#fff1ed] [[data-ui~=notice]&]:text-[#a34c37] [[data-ui~=notice]&]:border-[#f7dacf]"
+          : ""
+      }`}
       role={error ? "alert" : "status"}
     >
       <span>{children}</span>
@@ -131,36 +163,58 @@ export function Choice({
       type="button"
       aria-pressed={selected}
       data-ui={`choice ${selected ? "selected" : ""}`}
-      className={
-        "relative flex items-center gap-[14px] [border:1.5px_solid_#e8ebf2] [background:#fff] rounded-[17px] text-left py-[18px] px-[15px] min-h-[83px] w-full [transition:border-color_0.18s,_background_0.18s] mobile:min-h-[89px] mobile:py-[17px] mobile:px-[14px] mobile:rounded-[17px] mobile:[background:#fff] [[data-ui~=group-grid]_&]:items-start [[data-ui~=group-grid]_&]:flex-col [[data-ui~=group-grid]_&]:gap-[14px] [[data-ui~=group-grid]_&]:py-[17px] [[data-ui~=group-grid]_&]:px-[15px] [[data-ui~=group-grid]_&]:min-h-[130px] mobile:[[data-ui~=group-grid]_&]:min-h-[141px] mobile:[[data-ui~=group-grid]_&]:py-[18px] mobile:[[data-ui~=group-grid]_&]:px-[14px] mobile-type:[[data-ui~=group-grid]_&]:min-h-[120px] short-mobile:[[data-ui~=group-grid]_&]:min-h-[104px] [[data-ui~=interests-grid]_&]:items-start [[data-ui~=interests-grid]_&]:flex-col [[data-ui~=interests-grid]_&]:py-[17px] [[data-ui~=interests-grid]_&]:px-[15px] [[data-ui~=interests-grid]_&]:min-h-[119px] [[data-ui~=interests-grid]_&]:gap-[8px] mobile:[[data-ui~=interests-grid]_&]:min-h-[118px] mobile:[[data-ui~=interests-grid]_&]:py-[16px] mobile:[[data-ui~=interests-grid]_&]:px-[13px] mobile-type:[[data-ui~=interests-grid]_&]:min-h-[120px] short-mobile:[[data-ui~=interests-grid]_&]:min-h-[104px] [[data-ui~=transport-choices]_&]:flex-col [[data-ui~=transport-choices]_&]:items-start [[data-ui~=transport-choices]_&]:py-[15px] [[data-ui~=transport-choices]_&]:px-[13px] [[data-ui~=transport-choices]_&]:min-h-[115px] [[data-ui~=transport-choices]_&]:gap-[7px] mobile:[[data-ui~=transport-choices]_&]:min-h-[120px] mobile:[[data-ui~=transport-choices]_&]:py-[16px] mobile:[[data-ui~=transport-choices]_&]:px-[14px]" +
-        " " +
-        (selected ? selectedChoiceStyles : "") +
-        " " +
-        className
-      }
+      className={`${choiceStyles} ${selected ? selectedChoiceStyles : ""} ${className}`}
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
     >
       {icon && (
         <span
           data-ui="choice-icon"
-          className="text-[#9ba5b7] grid place-items-center h-[39px] w-[39px] shrink-0 [[data-ui~=choice][data-ui~=selected]_&]:text-brand [[data-ui~=group-grid]_&]:h-[34px] [[data-ui~=group-grid]_&]:w-[30px] [[data-ui~=interests-grid]_&]:h-[34px] [[data-ui~=interests-grid]_&]:w-[30px]"
+          className="text-[#9ba5b7] grid place-items-center size-[39px] shrink-0
+            [[data-ui~=choice][data-ui~=selected]_&]:text-brand [[data-ui~=group-grid]_&]:h-8.5
+            [[data-ui~=group-grid]_&]:w-7.5 [[data-ui~=interests-grid]_&]:h-8.5
+            [[data-ui~=interests-grid]_&]:w-7.5"
         >
           {icon}
         </span>
       )}
       <span
         data-ui="choice-copy"
-        className="[flex:1] min-w-0 [&_strong]:block [&_strong]:text-[12px] [&_strong]:[font-weight:750] mobile:[&_strong]:text-[12px] narrow:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px] [&_small]:block [&_small]:text-[11px] [&_small]:font-medium [&_small]:text-[#959cab] [&_small]:mt-[5px] [&_small]:leading-[1.5] mobile:[&_small]:text-[11px] narrow:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px] mobile-type:[&_small]:leading-[1.6] [[data-ui~=group-grid]_&_strong]:text-[11px] mobile:[[data-ui~=group-grid]_&_strong]:text-[11px] narrow:[[data-ui~=group-grid]_&_strong]:text-[11px] mobile-type:[[data-ui~=group-grid]_&_strong]:text-[13px] [[data-ui~=interests-grid]_&_strong]:text-[11px] mobile:[[data-ui~=interests-grid]_&_strong]:text-[11px] narrow:[[data-ui~=interests-grid]_&_strong]:text-[11px] mobile-type:[[data-ui~=interests-grid]_&_strong]:text-[13px] [[data-ui~=interests-grid]_&_small]:text-[11px] mobile:[[data-ui~=interests-grid]_&_small]:text-[11px] [[data-ui~=transport-choices]_&_strong]:text-[11px] mobile:[[data-ui~=transport-choices]_&_strong]:text-[12px] [[data-ui~=transport-choices]_&_small]:text-[11px] mobile:[[data-ui~=transport-choices]_&_small]:text-[11px] mobile:[[data-ui~=group-grid]_&_small]:text-[11px] narrow:[[data-ui~=group-grid]_&_small]:text-[11px] mobile-type:[[data-ui~=group-grid]_&_small]:text-[12px]"
+        className="flex-1 min-w-0 [&_strong]:block [&_strong]:text-[12px] [&_strong]:font-[750]
+          mobile:[&_strong]:text-[12px] narrow:[&_strong]:text-[11px]
+          mobile-type:[&_strong]:text-[13px] [&_small]:block [&_small]:text-[11px]
+          [&_small]:font-medium [&_small]:text-[#959cab] [&_small]:mt-[5px] [&_small]:leading-[1.5]
+          mobile:[&_small]:text-[11px] narrow:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px]
+          mobile-type:[&_small]:leading-[1.6] [[data-ui~=group-grid]_&_strong]:text-[11px]
+          mobile:[[data-ui~=group-grid]_&_strong]:text-[11px]
+          narrow:[[data-ui~=group-grid]_&_strong]:text-[11px]
+          mobile-type:[[data-ui~=group-grid]_&_strong]:text-[13px]
+          [[data-ui~=interests-grid]_&_strong]:text-[11px]
+          mobile:[[data-ui~=interests-grid]_&_strong]:text-[11px]
+          narrow:[[data-ui~=interests-grid]_&_strong]:text-[11px]
+          mobile-type:[[data-ui~=interests-grid]_&_strong]:text-[13px]
+          [[data-ui~=interests-grid]_&_small]:text-[11px]
+          mobile:[[data-ui~=interests-grid]_&_small]:text-[11px]
+          [[data-ui~=transport-choices]_&_strong]:text-[11px]
+          mobile:[[data-ui~=transport-choices]_&_strong]:text-[12px]
+          [[data-ui~=transport-choices]_&_small]:text-[11px]
+          mobile:[[data-ui~=transport-choices]_&_small]:text-[11px]
+          mobile:[[data-ui~=group-grid]_&_small]:text-[11px]
+          narrow:[[data-ui~=group-grid]_&_small]:text-[11px]
+          mobile-type:[[data-ui~=group-grid]_&_small]:text-[12px]"
       >
         <strong>{title}</strong>
         {subtitle && <small>{subtitle}</small>}
       </span>
       <span
         data-ui="choice-check"
-        className={
-          "w-[18px] h-[18px] shrink-0 [border:1.5px_solid_#e0e4ec] rounded-[50%] grid place-items-center [background:#fff] [[data-ui~=selected]_>_&]:[border-color:var(--blue)] [[data-ui~=selected]_>_&]:[background:var(--blue)] [[data-ui~=selected]_>_&]:text-[#fff] [[data-ui~=group-grid]_&]:absolute [[data-ui~=group-grid]_&]:right-[13px] [[data-ui~=group-grid]_&]:top-[14px] [[data-ui~=interests-grid]_&]:absolute [[data-ui~=interests-grid]_&]:right-[13px] [[data-ui~=interests-grid]_&]:top-[14px] [[data-ui~=transport-choices]_&]:absolute [[data-ui~=transport-choices]_&]:right-[11px] [[data-ui~=transport-choices]_&]:top-[12px]"
-        }
+        className="size-4.5 shrink-0 [border:1.5px_solid_#e0e4ec] rounded-[50%] grid place-items-center
+          bg-white [[data-ui~=selected]_>_&]:border-brand [[data-ui~=selected]_>_&]:bg-brand
+          [[data-ui~=selected]_>_&]:text-white [[data-ui~=group-grid]_&]:absolute
+          [[data-ui~=group-grid]_&]:right-[13px] [[data-ui~=group-grid]_&]:top-3.5
+          [[data-ui~=interests-grid]_&]:absolute [[data-ui~=interests-grid]_&]:right-[13px]
+          [[data-ui~=interests-grid]_&]:top-3.5 [[data-ui~=transport-choices]_&]:absolute
+          [[data-ui~=transport-choices]_&]:right-[11px] [[data-ui~=transport-choices]_&]:top-3"
       >
         {selected && <Check size={13} strokeWidth={3} />}
       </span>
@@ -183,7 +237,12 @@ export function Counter({
   return (
     <div
       data-ui="counter"
-      className="flex items-center gap-[13px] [&_button]:[border:1px_solid_#e7ebf3] [&_button]:grid [&_button]:place-items-center [&_button]:min-h-[40px] [&_button]:h-[40px] [&_button]:w-[40px] [&_button]:rounded-[12px] [&_button]:[background:#fff] [&_button]:text-brand mobile:[&_button]:h-[44px] mobile:[&_button]:min-h-[44px] mobile:[&_button]:w-[44px] mobile:[&_button]:[background:white] [&_button:disabled]:text-[#aeb5c5] [&_button:disabled]:[cursor:default] [&_output]:text-[20px] [&_output]:[font-weight:750] [&_output]:min-w-[22px] [&_output]:text-center"
+      className="flex items-center gap-[13px] [&_button]:[border:1px_solid_#e7ebf3] [&_button]:grid
+        [&_button]:place-items-center [&_button]:min-h-10 [&_button]:size-10 [&_button]:rounded-xl
+        [&_button]:bg-white [&_button]:text-brand mobile:[&_button]:min-h-11 mobile:[&_button]:size-11
+        mobile:[&_button]:bg-white [&_button:disabled]:text-[#aeb5c5]
+        [&_button:disabled]:cursor-default [&_output]:text-[20px] [&_output]:font-[750]
+        [&_output]:min-w-5.5 [&_output]:text-center"
     >
       <button
         type="button"

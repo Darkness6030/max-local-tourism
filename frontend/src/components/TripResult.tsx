@@ -177,13 +177,14 @@ export function TripResult({
   return (
     <div
       data-ui="result-page"
-      className="max-w-[1000px] my-0 mx-auto pb-0 mobile:pb-0"
+      className="max-w-250 my-0 mx-auto pb-0 mobile:pb-0"
     >
       <div
         data-ui="result-top"
-        className={
-          "flex items-center justify-between mt-[-8px] mx-0 mb-[20px] mobile:h-[73px] mobile:my-0 mobile:mx-[-7px] mobile:pt-[env(safe-area-inset-top)] [&_>_span]:text-[11px] [&_>_span]:[font-weight:750] [&_>_span]:tracking-[1.2px] [&_>_span]:text-[#929bad] mobile:[&_>_span]:text-[11px] mobile:[&_>_span]:tracking-[1px]"
-        }
+        className="flex items-center justify-between -mt-2 mx-0 mb-5 mobile:h-[73px] mobile:my-0
+          mobile:mx-[-7px] mobile:pt-[env(safe-area-inset-top)] [&_>_span]:text-[11px]
+          [&_>_span]:font-[750] [&_>_span]:tracking-[1.2px] [&_>_span]:text-[#929bad]
+          mobile:[&_>_span]:text-[11px] mobile:[&_>_span]:tracking-[1px]"
       >
         <button
           data-ui="icon-button"
@@ -212,15 +213,19 @@ export function TripResult({
       )}
       <section
         data-ui="result-hero"
-        className={
-          "pt-0 px-[8px] pb-[8px] mobile:pt-0 mobile:px-[1px] [&_h1]:text-[38px] [&_h1]:tracking-[-1.6px] [&_h1]:font-extrabold [&_h1]:leading-[1.24] [&_h1]:max-w-[760px] [&_h1]:mt-[13px] [&_h1]:mx-0 [&_h1]:mb-[18px] [&_h1]:[overflow-wrap:anywhere] tablet:[&_h1]:text-[32px] mobile:[&_h1]:text-[28px] mobile:[&_h1]:tracking-[-1px] mobile:[&_h1]:leading-[1.28] mobile:[&_h1]:mt-[13px] mobile:[&_h1]:mx-0 mobile:[&_h1]:mb-[17px] narrow:[&_h1]:text-[26px] [&_>_p]:text-[12px] [&_>_p]:leading-[1.9] [&_>_p]:max-w-[720px] [&_>_p]:mt-[18px] [&_>_p]:mx-0 [&_>_p]:mb-[5px] mobile:[&_>_p]:text-[11px] mobile:[&_>_p]:leading-[1.9] mobile:[&_>_p]:mt-[16px] [&_>_p]:text-[#687389] mobile-copy:[&_>_p]:text-[14px]"
-        }
+        className="pt-0 px-2 pb-2 mobile:pt-0 mobile:px-[1px] [&_h1]:text-[38px] [&_h1]:tracking-[-1.6px]
+          [&_h1]:font-extrabold [&_h1]:leading-[1.24] [&_h1]:max-w-190 [&_h1]:mt-[13px] [&_h1]:mx-0
+          [&_h1]:mb-4.5 [&_h1]:wrap-anywhere tablet:[&_h1]:text-[32px] mobile:[&_h1]:text-[28px]
+          mobile:[&_h1]:tracking-[-1px] mobile:[&_h1]:leading-[1.28] mobile:[&_h1]:mt-[13px]
+          mobile:[&_h1]:mx-0 mobile:[&_h1]:mb-[17px] narrow:[&_h1]:text-[26px] [&_>_p]:text-[12px]
+          [&_>_p]:leading-[1.9] [&_>_p]:max-w-180 [&_>_p]:mt-4.5 [&_>_p]:mx-0 [&_>_p]:mb-[5px]
+          mobile:[&_>_p]:text-[11px] mobile:[&_>_p]:leading-[1.9] mobile:[&_>_p]:mt-4
+          [&_>_p]:text-[#687389] mobile-copy:[&_>_p]:text-[14px]"
       >
         <span
           data-ui="result-route"
-          className={
-            "flex items-center gap-[9px] text-[11px] [font-weight:650] text-[#8994af] mobile:text-[11px] mobile:gap-[6px] mobile-type:flex-wrap [&_>_svg]:text-brand"
-          }
+          className="flex items-center gap-[9px] text-[11px] font-[650] text-[#8994af] mobile:text-[11px]
+            mobile:gap-1.5 mobile-type:flex-wrap [&_>_svg]:text-brand"
         >
           <MapPin size={15} />
           {plan.origin.title}
@@ -230,9 +235,12 @@ export function TripResult({
         <h1 id="result-title">{plan.title}</h1>
         <div
           data-ui="result-facts"
-          className={
-            "flex flex-wrap gap-[9px] mobile:gap-[6px] mobile-type:text-[12px] [&_>_span]:flex [&_>_span]:items-center [&_>_span]:gap-[6px] [&_>_span]:text-[11px] [&_>_span]:[background:white] [&_>_span]:[border:1px_solid_var(--line)] [&_>_span]:rounded-[9px] [&_>_span]:py-[7px] [&_>_span]:px-[10px] [&_>_span]:text-[#7e89a2] mobile:[&_>_span]:text-[11px] mobile:[&_>_span]:py-[7px] mobile:[&_>_span]:px-[8px] mobile:[&_>_span]:gap-[5px] [&_>_span_>_svg]:text-[#a1acc2] mobile:[&_>_span_>_svg]:h-[12px] mobile:[&_>_span_>_svg]:w-[12px]"
-          }
+          className="flex flex-wrap gap-[9px] mobile:gap-1.5 mobile-type:text-[12px] [&_>_span]:flex
+            [&_>_span]:items-center [&_>_span]:gap-1.5 [&_>_span]:text-[11px] [&_>_span]:bg-white
+            [&_>_span]:[border:1px_solid_var(--line)] [&_>_span]:rounded-[9px] [&_>_span]:py-[7px]
+            [&_>_span]:px-2.5 [&_>_span]:text-[#7e89a2] mobile:[&_>_span]:text-[11px]
+            mobile:[&_>_span]:py-[7px] mobile:[&_>_span]:px-2 mobile:[&_>_span]:gap-[5px]
+            [&_>_span_>_svg]:text-[#a1acc2] mobile:[&_>_span_>_svg]:size-3"
         >
           <span>
             <CalendarDays size={15} />
@@ -280,14 +288,23 @@ export function TripResult({
       )}
       <div
         data-ui="result-columns"
-        className="grid grid-cols-[minmax(0,_1.7fr)_minmax(0,_1fr)] gap-[24px] [align-items:start] tablet:gap-[20px] tablet:grid-cols-[1.6fr_1fr] mobile:flex mobile:flex-col mobile:gap-[24px] mobile-spacing:gap-[24px]"
+        className="grid grid-cols-[minmax(0,_1.7fr)_minmax(0,_1fr)] gap-6 [align-items:start] tablet:gap-5
+          tablet:grid-cols-[1.6fr_1fr] mobile:flex mobile:flex-col mobile:gap-6 mobile-spacing:gap-6"
       >
         <div data-ui="result-main" className="mobile:w-full">
           <div
             data-ui="result-tabs"
-            className={
-              "relative flex gap-[4px] [background:#eef1f8] rounded-[14px] p-[5px] mb-[25px] mobile:sticky mobile:top-[6px] mobile:z-[10] mobile:mb-[22px] mobile:p-[4px] mobile:rounded-[13px] mobile:[background:#ecf0f9] mobile:[box-shadow:0_0_0_6px_#f8f9fc] [&_>_button]:flex [&_>_button]:justify-center [&_>_button]:items-center [&_>_button]:gap-[7px] [&_>_button]:[flex:1] [&_>_button]:relative [&_>_button]:[background:transparent] [&_>_button]:text-[#8b94a9] [&_>_button]:text-[11px] [&_>_button]:min-h-[43px] [&_>_button]:rounded-[10px] [&_>_button]:z-0 mobile:[&_>_button]:text-[11px] mobile:[&_>_button]:gap-[6px] mobile:[&_>_button]:min-h-[43px] mobile:[&_>_button_>_svg]:w-[15px] mobile:[&_>_button_>_svg]:h-[15px] mobile-type:[&_button]:text-[12px] mobile-type:[&_button]:py-[12px] mobile-type:[&_button]:px-[7px] mobile-type:[&_button]:gap-[6px]"
-            }
+            className="relative flex gap-1 bg-[#eef1f8] rounded-[14px] p-[5px] mb-[25px] mobile:sticky
+              mobile:top-1.5 mobile:z-[10] mobile:mb-5.5 mobile:p-1 mobile:rounded-[13px]
+              mobile:bg-[#ecf0f9] mobile:[box-shadow:0_0_0_6px_#f8f9fc] [&_>_button]:flex
+              [&_>_button]:justify-center [&_>_button]:items-center [&_>_button]:gap-[7px]
+              [&_>_button]:flex-1 [&_>_button]:relative [&_>_button]:bg-transparent
+              [&_>_button]:text-[#8b94a9] [&_>_button]:text-[11px] [&_>_button]:min-h-[43px]
+              [&_>_button]:rounded-[10px] [&_>_button]:z-0 mobile:[&_>_button]:text-[11px]
+              mobile:[&_>_button]:gap-1.5 mobile:[&_>_button]:min-h-[43px]
+              mobile:[&_>_button_>_svg]:size-[15px] mobile-type:[&_button]:text-[12px]
+              mobile-type:[&_button]:py-3 mobile-type:[&_button]:px-[7px]
+              mobile-type:[&_button]:gap-1.5"
             role="tablist"
             aria-label="Информация о поездке"
             onKeyDown={(event) => {
@@ -323,7 +340,8 @@ export function TripResult({
                   <motion.span
                     layoutId="result-tab"
                     data-ui="tab-highlight"
-                    className="absolute top-0 right-0 bottom-0 left-0 rounded-[10px] [background:white] [box-shadow:0_2px_6px_#26355409] z-[-1]"
+                    className="absolute top-0 right-0 bottom-0 left-0 rounded-[10px] bg-white
+                      [box-shadow:0_2px_6px_#26355409] z-[-1]"
                   />
                 )}
               </button>
@@ -345,9 +363,11 @@ export function TripResult({
                   {plan.itinerary.length > 1 && (
                     <div
                       data-ui="day-selector"
-                      className={
-                        "flex gap-[7px] mb-[20px] [&_>_button]:py-[9px] [&_>_button]:px-[15px] [&_>_button]:rounded-[11px] [&_>_button]:[border:1px_solid_var(--line)] [&_>_button]:[background:white] [&_>_button]:text-[11px] [&_>_button]:text-[#9099ac] [&_>_button_>_span]:block [&_>_button_>_span]:text-[11px] [&_>_button_>_span]:mt-[4px]"
-                      }
+                      className="flex gap-[7px] mb-5 [&_>_button]:py-[9px] [&_>_button]:px-[15px]
+                        [&_>_button]:rounded-[11px] [&_>_button]:[border:1px_solid_var(--line)]
+                        [&_>_button]:bg-white [&_>_button]:text-[11px] [&_>_button]:text-[#9099ac]
+                        [&_>_button_>_span]:block [&_>_button_>_span]:text-[11px]
+                        [&_>_button_>_span]:mt-1"
                     >
                       {plan.itinerary.map((day, i) => (
                         <button
@@ -369,18 +389,20 @@ export function TripResult({
                   )}
                   <div
                     data-ui="timeline-heading"
-                    className={
-                      "pt-0 px-[5px] pb-[20px] mobile:pb-[17px] [&_>_span]:text-[11px] [&_>_span]:font-extrabold [&_>_span]:tracking-[1.3px] [&_>_span]:text-[#a3adc0] mobile:[&_>_span]:text-[11px] [&_>_p]:text-[15px] [&_>_p]:[font-weight:750] [&_>_p]:leading-[1.6] [&_>_p]:mt-[6px] mobile:[&_>_p]:text-[14px] mobile:[&_>_p]:leading-[1.6]"
-                    }
+                    className="pt-0 px-[5px] pb-5 mobile:pb-[17px] [&_>_span]:text-[11px]
+                      [&_>_span]:font-extrabold [&_>_span]:tracking-[1.3px] [&_>_span]:text-[#a3adc0]
+                      mobile:[&_>_span]:text-[11px] [&_>_p]:text-[15px] [&_>_p]:font-[750]
+                      [&_>_p]:leading-[1.6] [&_>_p]:mt-1.5 mobile:[&_>_p]:text-[14px]
+                      mobile:[&_>_p]:leading-[1.6]"
                   >
                     <span>ДЕНЬ {dayIndex + 1}</span>
                     <p>{plan.itinerary[dayIndex].title}</p>
                   </div>
-                  <div data-ui="timeline" className="grid gap-[14px]">
+                  <div data-ui="timeline" className="grid gap-3.5">
                     {plan.itinerary[dayIndex].items.map((item, i) => (
                       <motion.article
                         data-ui="timeline-item"
-                        className="flex gap-[14px] relative mobile:gap-[10px]"
+                        className="flex gap-3.5 relative mobile:gap-2.5"
                         key={`${dayIndex}-${i}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -388,23 +410,36 @@ export function TripResult({
                       >
                         <div
                           data-ui="timeline-rail"
-                          className={
-                            "flex justify-center relative w-[28px] shrink-0 pt-[20px] mobile:w-[22px] mobile:pt-[18px] [&::after]:[content:''] [&::after]:h-[calc(100%_-_20px)] [&::after]:absolute [&::after]:top-[48px] [&::after]:w-[1px] [&::after]:[background:#e0e5f1] mobile:[&::after]:top-[45px] mobile:[&::after]:h-[calc(100%_-_16px)] [[data-ui~=timeline-item]:last-child_&::after]:hidden [&_>_span]:grid [&_>_span]:place-items-center [&_>_span]:h-[27px] [&_>_span]:w-[27px] [&_>_span]:[border:1px_solid_#e1e6f4] [&_>_span]:rounded-[50%] [&_>_span]:text-[11px] [&_>_span]:font-bold [&_>_span]:text-[#8c9bb9] [&_>_span]:[background:#f8f9fc] [&_>_span]:relative [&_>_span]:z-[1] mobile:[&_>_span]:w-[23px] mobile:[&_>_span]:h-[23px] mobile:[&_>_span]:text-[11px]"
-                          }
+                          className="flex justify-center relative w-7 shrink-0 pt-5 mobile:w-5.5 mobile:pt-4.5
+                            [&::after]:[content:''] [&::after]:h-[calc(100%_-_20px)]
+                            [&::after]:absolute [&::after]:top-12 [&::after]:w-[1px]
+                            [&::after]:bg-[#e0e5f1] mobile:[&::after]:top-[45px]
+                            mobile:[&::after]:h-[calc(100%_-_16px)]
+                            [[data-ui~=timeline-item]:last-child_&::after]:hidden [&_>_span]:grid
+                            [&_>_span]:place-items-center [&_>_span]:size-[27px]
+                            [&_>_span]:[border:1px_solid_#e1e6f4] [&_>_span]:rounded-[50%]
+                            [&_>_span]:text-[11px] [&_>_span]:font-bold [&_>_span]:text-[#8c9bb9]
+                            [&_>_span]:bg-[#f8f9fc] [&_>_span]:relative [&_>_span]:z-[1]
+                            mobile:[&_>_span]:size-[23px] mobile:[&_>_span]:text-[11px]"
                         >
                           <span>{String(i + 1).padStart(2, "0")}</span>
                         </div>
                         <div
                           data-ui="activity-card"
-                          className={
-                            "[border:1px_solid_var(--line)] [background:#fff] rounded-[20px] [flex:1] py-[19px] px-[21px] min-w-0 tablet:p-[17px] mobile:py-[16px] mobile:px-[15px] mobile:rounded-[18px] narrow:py-[14px] narrow:px-[12px] [&_h3]:text-[15px] [&_h3]:[font-weight:750] [&_h3]:leading-[1.5] [&_h3]:mt-[10px] [&_h3]:mx-0 [&_h3]:mb-[7px] [&_h3]:tracking-[-0.3px] [&_h3]:[overflow-wrap:anywhere] mobile:[&_h3]:text-[14px] mobile:[&_h3]:leading-[1.5] mobile:[&_h3]:mt-[11px] mobile:[&_h3]:mx-0 mobile:[&_h3]:mb-[7px]"
-                          }
+                          className="[border:1px_solid_var(--line)] bg-white rounded-[20px] flex-1 py-[19px]
+                            px-[21px] min-w-0 tablet:p-[17px] mobile:py-4 mobile:px-[15px]
+                            mobile:rounded-[18px] narrow:py-3.5 narrow:px-3 [&_h3]:text-[15px]
+                            [&_h3]:font-[750] [&_h3]:leading-[1.5] [&_h3]:mt-2.5 [&_h3]:mx-0
+                            [&_h3]:mb-[7px] [&_h3]:tracking-[-0.3px] [&_h3]:wrap-anywhere
+                            mobile:[&_h3]:text-[14px] mobile:[&_h3]:leading-[1.5]
+                            mobile:[&_h3]:mt-[11px] mobile:[&_h3]:mx-0 mobile:[&_h3]:mb-[7px]"
                         >
                           <div
                             data-ui="activity-top"
-                            className={
-                              "flex justify-between items-center gap-[10px] mobile:gap-[8px] mobile-type:flex-wrap [&_>_time]:text-[11px] [&_>_time]:[font-weight:750] [&_>_time]:text-brand mobile:[&_time]:text-[11px] mobile-type:[&_time]:text-[12px]"
-                            }
+                            className="flex justify-between items-center gap-2.5 mobile:gap-2
+                              mobile-type:flex-wrap [&_>_time]:text-[11px] [&_>_time]:font-[750]
+                              [&_>_time]:text-brand mobile:[&_time]:text-[11px]
+                              mobile-type:[&_time]:text-[12px]"
                           >
                             <time>
                               {item.start_time} — {item.end_time}
@@ -412,10 +447,10 @@ export function TripResult({
                             <span
                               data-ui={`location-tag ${item.indoor ? "indoor" : ""}`}
                               className={
-                                "text-[11px] text-[#7d9777] [background:#eff5e9] rounded-[5px] py-[4px] px-[6px] whitespace-nowrap mobile:text-[11px] mobile:py-[4px] mobile:px-[6px] mobile-type:text-[10px]" +
+                                "text-[11px] text-[#7d9777] bg-[#eff5e9] rounded-[5px] py-1 px-1.5 whitespace-nowrap mobile:text-[11px] mobile:py-1 mobile:px-1.5 mobile-type:text-[10px]" +
                                 " " +
                                 (item.indoor
-                                  ? "[[data-ui~=location-tag]&]:[background:#f2effc] [[data-ui~=location-tag]&]:text-[#9a88b6]"
+                                  ? "[[data-ui~=location-tag]&]:bg-[#f2effc] [[data-ui~=location-tag]&]:text-[#9a88b6]"
                                   : "")
                               }
                             >
@@ -425,17 +460,18 @@ export function TripResult({
                           <h3>{item.title}</h3>
                           <span
                             data-ui="activity-place"
-                            className={
-                              "flex gap-[4px] items-center text-[#9ca6b8] text-[11px] mobile:text-[11px] mobile:items-start mobile:leading-[1.7] mobile:gap-[5px] mobile-type:text-[12px] mobile:[&_>_svg]:h-[12px] mobile:[&_>_svg]:w-[12px] mobile:[&_>_svg]:mt-[1px]"
-                            }
+                            className="flex gap-1 items-center text-[#9ca6b8] text-[11px] mobile:text-[11px]
+                              mobile:items-start mobile:leading-[1.7] mobile:gap-[5px]
+                              mobile-type:text-[12px] mobile:[&_>_svg]:size-3
+                              mobile:[&_>_svg]:mt-[1px]"
                           >
                             <MapPin size={13} />
                             {item.place}
                           </span>
                           <p
-                            className={`mt-[10px] mx-0 text-[11px] leading-[1.9] text-[#687389] mobile:mt-[9px] mobile-type:text-[14px] ${
+                            className={`mt-2.5 mx-0 text-[11px] leading-[1.9] text-[#687389] mobile:mt-[9px] mobile-type:text-[14px] ${
                               item.estimated_cost_rub > 0
-                                ? "mb-[10px] mobile:mb-[9px]"
+                                ? "mb-2.5 mobile:mb-[9px]"
                                 : "mb-0"
                             }`}
                           >
@@ -444,7 +480,8 @@ export function TripResult({
                           {item.estimated_cost_rub > 0 && (
                             <span
                               data-ui="activity-price"
-                              className="text-[11px] [font-weight:650] text-[#7e89a1] mobile:text-[11px] mobile-type:text-[12px]"
+                              className="text-[11px] font-[650] text-[#7e89a1] mobile:text-[11px]
+                                mobile-type:text-[12px]"
                             >
                               ≈ {money(item.estimated_cost_rub)}
                             </span>
@@ -461,11 +498,14 @@ export function TripResult({
                   )}
                   <section
                     data-ui="packing-card"
-                    className="mt-[24px] pt-[22px] px-[22px] [border:1px_solid_var(--line)] rounded-[20px] [background:white] mobile:pt-[19px] mobile:px-[19px] mobile:mt-[16px] mobile:rounded-[18px] pb-[14px]"
+                    className="mt-6 pt-5.5 px-5.5 [border:1px_solid_var(--line)] rounded-[20px] bg-white
+                      mobile:pt-[19px] mobile:px-[19px] mobile:mt-4 mobile:rounded-[18px] pb-3.5"
                   >
                     <div
                       data-ui="section-title"
-                      className="flex gap-[12px] items-center [&_h2]:text-[14px] [&_h2]:[font-weight:750] mobile:[&_h2]:text-[13px] mobile-type:[&_h2]:text-[13px] [&_p]:text-[11px] [&_p]:text-[#9a9fb0] [&_p]:mt-[5px] mobile:[&_p]:text-[11px]"
+                      className="flex gap-3 items-center [&_h2]:text-[14px] [&_h2]:font-[750]
+                        mobile:[&_h2]:text-[13px] mobile-type:[&_h2]:text-[13px] [&_p]:text-[11px]
+                        [&_p]:text-[#9a9fb0] [&_p]:mt-[5px] mobile:[&_p]:text-[11px]"
                     >
                       <span
                         data-ui="soft-icon lavender"
@@ -510,9 +550,10 @@ export function TripResult({
               {tab === "transport" && (
                 <section
                   data-ui="transport-panel"
-                  className={
-                    "[&_>_h2]:text-[20px] [&_>_h2]:tracking-[-0.6px] [&_>_h2]:[font-weight:750] [&_>_h2]:mb-[10px] mobile:[&_>_h2]:text-[20px] mobile:[&_>_h2]:leading-[1.4] [&_>_p]:text-[11px] [&_>_p]:leading-[1.9] [&_>_p]:mb-[20px] mobile:[&_>_p]:text-[11px] mobile-type:[&_>_p]:text-[14px]"
-                  }
+                  className="[&_>_h2]:text-[20px] [&_>_h2]:tracking-[-0.6px] [&_>_h2]:font-[750]
+                    [&_>_h2]:mb-2.5 mobile:[&_>_h2]:text-[20px] mobile:[&_>_h2]:leading-[1.4]
+                    [&_>_p]:text-[11px] [&_>_p]:leading-[1.9] [&_>_p]:mb-5 mobile:[&_>_p]:text-[11px]
+                    mobile-type:[&_>_p]:text-[14px]"
                 >
                   <h2>Дорога — часть путешествия</h2>
                   <p
@@ -532,9 +573,12 @@ export function TripResult({
                     <button
                       id="map-link"
                       data-ui="map-button"
-                      className={
-                        "w-full flex items-center gap-[13px] p-[16px] [border:1px_solid_#e0e6f7] [background:#f3f6ff] rounded-[18px] text-left text-brand mobile:p-[14px] mobile:gap-[10px] [&_>_span:nth-child(2)]:[flex:1] [&_strong]:block [&_strong]:text-[11px] mobile:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px] [&_small]:block [&_small]:text-[11px] [&_small]:mt-[5px] [&_small]:text-[#8f9cb9] mobile:[&_small]:text-[11px]"
-                      }
+                      className="w-full flex items-center gap-[13px] p-4 [border:1px_solid_#e0e6f7]
+                        bg-[#f3f6ff] rounded-[18px] text-left text-brand mobile:p-3.5 mobile:gap-2.5
+                        [&_>_span:nth-child(2)]:flex-1 [&_strong]:block [&_strong]:text-[11px]
+                        mobile:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px]
+                        [&_small]:block [&_small]:text-[11px] [&_small]:mt-[5px]
+                        [&_small]:text-[#8f9cb9] mobile:[&_small]:text-[11px]"
                       onClick={() => external(plan.map_url!)}
                     >
                       <span
@@ -561,9 +605,8 @@ export function TripResult({
                         <div
                           key={title}
                           data-ui="transport-direction"
-                          className={
-                            "[&_>_h3]:text-[14px] [&_>_h3]:[font-weight:750] [&_>_h3]:mt-[25px] [&_>_h3]:mx-0 [&_>_h3]:mb-[13px] [&_>_p]:text-[11px]"
-                          }
+                          className="[&_>_h3]:text-[14px] [&_>_h3]:font-[750] [&_>_h3]:mt-[25px] [&_>_h3]:mx-0
+                            [&_>_h3]:mb-[13px] [&_>_p]:text-[11px]"
                         >
                           <h3>{title}</h3>
                           {!options.length && (
@@ -577,12 +620,15 @@ export function TripResult({
                           {options.map((option, i) => (
                             <div
                               data-ui="train-card"
-                              className="[border:1px_solid_var(--line)] rounded-[18px] pt-[19px] px-[19px] pb-0 [background:white] mt-[12px] mobile:pt-[17px] mobile:px-[17px] mobile:pb-0"
+                              className="[border:1px_solid_var(--line)] rounded-[18px] pt-[19px] px-[19px] pb-0
+                                bg-white mt-3 mobile:pt-[17px] mobile:px-[17px] mobile:pb-0"
                               key={i}
                             >
                               <div
                                 data-ui="train-card-top"
-                                className="flex items-center gap-[8px] text-[11px] text-[#8e9ab1] mobile:text-[11px] mobile-type:gap-[8px] [&_small]:ml-auto [&_small]:text-[11px] [&_svg]:text-[#8295bf]"
+                                className="flex items-center gap-2 text-[11px] text-[#8e9ab1]
+                                  mobile:text-[11px] mobile-type:gap-2 [&_small]:ml-auto
+                                  [&_small]:text-[11px] [&_svg]:text-[#8295bf]"
                               >
                                 <TrainFront size={18} />
                                 <span>
@@ -594,9 +640,14 @@ export function TripResult({
                               </div>
                               <div
                                 data-ui="train-times"
-                                className={
-                                  "flex justify-between gap-[15px] items-start my-[18px] mx-0 [&_>_div]:[flex:1] [&_>_div]:min-w-0 [&_>_div:last-child]:text-right [&_strong]:text-[23px] [&_strong]:[font-weight:650] [&_strong]:tracking-[-0.5px] mobile:[&_strong]:text-[23px] [&_span]:block [&_span]:text-[11px] [&_span]:text-[#a2aabd] [&_span]:mt-[3px] [&_small]:block [&_small]:text-[11px] [&_small]:text-[#8b96aa] [&_small]:leading-[1.6] [&_small]:mt-[7px] mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[13px]"
-                                }
+                                className="flex justify-between gap-[15px] items-start my-4.5 mx-0
+                                  [&_>_div]:flex-1 [&_>_div]:min-w-0 [&_>_div:last-child]:text-right
+                                  [&_strong]:text-[23px] [&_strong]:font-[650]
+                                  [&_strong]:tracking-[-0.5px] mobile:[&_strong]:text-[23px]
+                                  [&_span]:block [&_span]:text-[11px] [&_span]:text-[#a2aabd]
+                                  [&_span]:mt-[3px] [&_small]:block [&_small]:text-[11px]
+                                  [&_small]:text-[#8b96aa] [&_small]:leading-[1.6] [&_small]:mt-[7px]
+                                  mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[13px]"
                               >
                                 <div>
                                   <strong>{timeLabel(option.departure)}</strong>
@@ -610,9 +661,16 @@ export function TripResult({
                                 </div>
                                 <span
                                   data-ui="train-line"
-                                  className={
-                                    "[[data-ui~=train-times]_>_&]:[flex:0.6] [[data-ui~=train-times]_>_&]:h-[1px] [[data-ui~=train-times]_>_&]:mt-[17px] [[data-ui~=train-times]_>_&]:[background:#dce2ef] [[data-ui~=train-times]_>_&]:relative [&::before]:[content:''] [&::before]:h-[4px] [&::before]:w-[4px] [&::before]:rounded-[50%] [&::before]:[background:#bcc6de] [&::before]:absolute [&::before]:top-[-1.5px] [&::after]:[content:''] [&::after]:h-[4px] [&::after]:w-[4px] [&::after]:rounded-[50%] [&::after]:[background:#bcc6de] [&::after]:absolute [&::after]:top-[-1.5px] [&::after]:right-0"
-                                  }
+                                  className="[[data-ui~=train-times]_>_&]:[flex:0.6]
+                                    [[data-ui~=train-times]_>_&]:h-[1px]
+                                    [[data-ui~=train-times]_>_&]:mt-[17px]
+                                    [[data-ui~=train-times]_>_&]:bg-[#dce2ef]
+                                    [[data-ui~=train-times]_>_&]:relative [&::before]:[content:'']
+                                    [&::before]:size-1 [&::before]:rounded-[50%]
+                                    [&::before]:bg-[#bcc6de] [&::before]:absolute
+                                    [&::before]:top-[-1.5px] [&::after]:[content:''] [&::after]:size-1
+                                    [&::after]:rounded-[50%] [&::after]:bg-[#bcc6de]
+                                    [&::after]:absolute [&::after]:top-[-1.5px] [&::after]:right-0"
                                 />
                                 <div>
                                   <strong>{timeLabel(option.arrival)}</strong>
@@ -627,9 +685,9 @@ export function TripResult({
                               </div>
                               <div
                                 data-ui="train-bottom"
-                                className={
-                                  "flex justify-between items-center [border-top:1px_dashed_#e5e9f2] py-[8px] px-0 gap-[10px] [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6] mobile:[&_>_span]:text-[11px] mobile-type:[&_>_span]:text-[12px]"
-                                }
+                                className="flex justify-between items-center [border-top:1px_dashed_#e5e9f2]
+                                  py-2 px-0 gap-2.5 [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6]
+                                  mobile:[&_>_span]:text-[11px] mobile-type:[&_>_span]:text-[12px]"
                               >
                                 <span>
                                   {option.price_rub == null
@@ -652,9 +710,9 @@ export function TripResult({
                   ) : (
                     <div
                       data-ui="empty-inline"
-                      className={
-                        "text-center py-[36px] px-[15px] text-[#a0acc2] [&_>_svg]:mt-auto [&_>_svg]:mx-auto [&_>_svg]:mb-[14px] [&_h3]:text-[14px] [&_h3]:[font-weight:650] [&_p]:text-[11px] [&_p]:leading-[1.8] [&_p]:mt-[9px]"
-                      }
+                      className="text-center py-9 px-[15px] text-[#a0acc2] [&_>_svg]:mt-auto [&_>_svg]:mx-auto
+                        [&_>_svg]:mb-3.5 [&_h3]:text-[14px] [&_h3]:font-[650] [&_p]:text-[11px]
+                        [&_p]:leading-[1.8] [&_p]:mt-[9px]"
                     >
                       <TrainFront size={30} />
                       <h3>Расписание не найдено</h3>
@@ -670,16 +728,16 @@ export function TripResult({
                 <section
                   id="budget"
                   data-ui="budget-panel"
-                  className={
-                    "[background:#fff] [border:1px_solid_var(--line)] rounded-[23px] p-[27px] mobile:py-[23px] mobile:px-[20px] mobile:rounded-[20px] [&_>_p]:text-[11px]"
-                  }
+                  className="bg-white [border:1px_solid_var(--line)] rounded-[23px] p-[27px] mobile:py-[23px]
+                    mobile:px-5 mobile:rounded-[20px] [&_>_p]:text-[11px]"
                 >
                   <span data-ui="eyebrow" className={eyebrowStyles}>
                     ПРИМЕРНАЯ СТОИМОСТЬ НА ВСЕХ
                   </span>
                   <div
                     data-ui="total-cost"
-                    className="text-[42px] [font-weight:750] tracking-[-1.7px] mt-[15px] mx-0 mb-[7px] mobile:text-[38px]"
+                    className="text-[42px] font-[750] tracking-[-1.7px] mt-[15px] mx-0 mb-[7px]
+                      mobile:text-[38px]"
                   >
                     {money(plan.budget.estimated_total_rub)}
                   </div>
@@ -691,9 +749,8 @@ export function TripResult({
                   </p>
                   <div
                     data-ui="budget-meter"
-                    className={
-                      "h-[7px] rounded-[10px] [background:#edf0f7] mt-[24px] overflow-hidden [&_>_span]:block [&_>_span]:h-full [&_>_span]:[background:#6d87e8] [&_>_span]:rounded-[10px]"
-                    }
+                    className="h-[7px] rounded-[10px] bg-[#edf0f7] mt-6 overflow-hidden [&_>_span]:block
+                      [&_>_span]:h-full [&_>_span]:bg-[#6d87e8] [&_>_span]:rounded-[10px]"
                   >
                     <span
                       style={{
@@ -702,14 +759,16 @@ export function TripResult({
                       data-ui={!plan.budget.within_budget ? "exceeded" : ""}
                       className={
                         !plan.budget.within_budget
-                          ? "[[data-ui~=budget-meter]_>_span&]:[background:#e6a576]"
+                          ? "[[data-ui~=budget-meter]_>_span&]:bg-[#e6a576]"
                           : ""
                       }
                     />
                   </div>
                   <div
                     data-ui="budget-limit"
-                    className="flex justify-between gap-[10px] text-[11px] text-[#99a2b5] mt-[11px] mobile:text-[11px] mobile-type:text-[12px] [&_strong]:[font-weight:650] [&_strong]:text-[#7e8ba4]"
+                    className="flex justify-between gap-2.5 text-[11px] text-[#99a2b5] mt-[11px]
+                      mobile:text-[11px] mobile-type:text-[12px] [&_strong]:font-[650]
+                      [&_strong]:text-[#7e8ba4]"
                   >
                     <span>
                       {plan.budget.within_budget
@@ -720,9 +779,14 @@ export function TripResult({
                   </div>
                   <div
                     data-ui="budget-items"
-                    className={
-                      "mt-[24px] [&_>_div]:flex [&_>_div]:justify-between [&_>_div]:[align-items:start] [&_>_div]:gap-[20px] [&_>_div]:py-[16px] [&_>_div]:px-0 [&_>_div]:[border-bottom:1px_solid_var(--line)] [&_strong]:block [&_strong]:text-[11px] [&_strong]:[font-weight:650] mobile:[&_strong]:text-[11px] mobile-type:[&_strong]:text-[13px] [&_small]:text-[11px] [&_small]:leading-[1.7] [&_small]:text-[#a1a9ba] [&_small]:block [&_small]:mt-[5px] mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px] [&_b]:text-[12px] [&_b]:whitespace-nowrap mobile:[&_b]:text-[11px]"
-                    }
+                    className="mt-6 [&_>_div]:flex [&_>_div]:justify-between [&_>_div]:[align-items:start]
+                      [&_>_div]:gap-5 [&_>_div]:py-4 [&_>_div]:px-0
+                      [&_>_div]:[border-bottom:1px_solid_var(--line)] [&_strong]:block
+                      [&_strong]:text-[11px] [&_strong]:font-[650] mobile:[&_strong]:text-[11px]
+                      mobile-type:[&_strong]:text-[13px] [&_small]:text-[11px] [&_small]:leading-[1.7]
+                      [&_small]:text-[#a1a9ba] [&_small]:block [&_small]:mt-[5px]
+                      mobile:[&_small]:text-[11px] mobile-type:[&_small]:text-[12px] [&_b]:text-[12px]
+                      [&_b]:whitespace-nowrap mobile:[&_b]:text-[11px]"
                   >
                     {budgetItems.map((item, i) => (
                       <div key={i}>
@@ -747,15 +811,21 @@ export function TripResult({
           {weather && (
             <section
               data-ui="weather-card"
-              className={
-                "p-[25px] rounded-[23px] [background:#edf3fa] text-[#6d84a0] tablet:p-[20px] mobile:p-[21px] mobile:rounded-[20px] [&_>_strong]:block [&_>_strong]:text-[40px] [&_>_strong]:text-[#415975] [&_>_strong]:[font-weight:650] [&_>_strong]:tracking-[-1.8px] tablet:[&_>_strong]:text-[32px] mobile:[&_>_strong]:text-[35px] [&_h3]:text-[12px] [&_h3]:mt-[6px] [&_h3]:[font-weight:650] mobile:[&_h3]:text-[12px] mobile-type:[&_h3]:text-[12px] [&_>_p]:text-[11px] [&_>_p]:mt-[7px] [&_>_p]:text-[#91a3b9] mobile:[&_>_p]:text-[11px] mobile-type:[&_>_p]:text-[12px] [&_>_small]:block [&_>_small]:text-[11px] [&_>_small]:text-[#9bacbf] [&_>_small]:mt-[14px]"
-              }
+              className="p-[25px] rounded-[23px] bg-[#edf3fa] text-[#6d84a0] tablet:p-5 mobile:p-[21px]
+                mobile:rounded-[20px] [&_>_strong]:block [&_>_strong]:text-[40px]
+                [&_>_strong]:text-[#415975] [&_>_strong]:font-[650] [&_>_strong]:tracking-[-1.8px]
+                tablet:[&_>_strong]:text-[32px] mobile:[&_>_strong]:text-[35px] [&_h3]:text-[12px]
+                [&_h3]:mt-1.5 [&_h3]:font-[650] mobile:[&_h3]:text-[12px]
+                mobile-type:[&_h3]:text-[12px] [&_>_p]:text-[11px] [&_>_p]:mt-[7px]
+                [&_>_p]:text-[#91a3b9] mobile:[&_>_p]:text-[11px] mobile-type:[&_>_p]:text-[12px]
+                [&_>_small]:block [&_>_small]:text-[11px] [&_>_small]:text-[#9bacbf]
+                [&_>_small]:mt-3.5"
             >
               <div
                 data-ui="weather-top"
-                className={
-                  "flex items-center justify-between mb-[6px] [&_>_span]:text-[11px] [&_>_span]:tracking-[1.3px] [&_>_span]:[font-weight:750] mobile:[&_>_span]:text-[11px] [&_>_svg]:text-[#c6a86f]"
-                }
+                className="flex items-center justify-between mb-1.5 [&_>_span]:text-[11px]
+                  [&_>_span]:tracking-[1.3px] [&_>_span]:font-[750] mobile:[&_>_span]:text-[11px]
+                  [&_>_svg]:text-[#c6a86f]"
               >
                 <span>ПОГОДА В ПОЕЗДКЕ</span>
                 <CloudSun size={34} strokeWidth={1.5} />
@@ -772,7 +842,8 @@ export function TripResult({
               </p>
               <div
                 data-ui="weather-advice"
-                className="[border-top:1px_solid_#dce6f3] mt-[19px] pt-[17px] text-[11px] leading-[1.8] mobile:text-[11px] mobile:leading-[1.9] mobile-type:text-[14px]"
+                className="[border-top:1px_solid_#dce6f3] mt-[19px] pt-[17px] text-[11px] leading-[1.8]
+                  mobile:text-[11px] mobile:leading-[1.9] mobile-type:text-[14px]"
               >
                 {plan.weather_advice}
               </div>
@@ -781,7 +852,10 @@ export function TripResult({
           )}
           <div
             data-ui="travel-note"
-            className="[background:#f4f0e5] rounded-[22px] p-[25px] mt-[20px] mobile:hidden [&_h3]:text-[19px] [&_h3]:[font-weight:750] [&_h3]:tracking-[-0.6px] [&_h3]:leading-[1.5] [&_h3]:text-[#7a7058] [&_h3]:mt-[7px] [&_h3]:mx-0 [&_h3]:mb-[12px] [&_p]:text-[11px] [&_p]:text-[#a5997b] [&_p]:leading-[1.9]"
+            className="bg-[#f4f0e5] rounded-[22px] p-[25px] mt-5 mobile:hidden [&_h3]:text-[19px]
+              [&_h3]:font-[750] [&_h3]:tracking-[-0.6px] [&_h3]:leading-[1.5] [&_h3]:text-[#7a7058]
+              [&_h3]:mt-[7px] [&_h3]:mx-0 [&_h3]:mb-3 [&_p]:text-[11px] [&_p]:text-[#a5997b]
+              [&_p]:leading-[1.9]"
           >
             <span data-ui="note-spark" className="text-[#ae9b68] text-[26px]">
               ✦
@@ -797,12 +871,15 @@ export function TripResult({
       </div>
       <section
         data-ui="source-details"
-        className="[border-top:1px_solid_var(--line)] mt-[28px] pt-[8px] px-[3px] pb-0 text-[#919cb1] text-[11px] mobile:text-[11px] mobile:mt-[22px] mobile-type:text-[12px] mobile-spacing:mt-[24px] [&_ul]:py-0 [&_ul]:pr-0 [&_ul]:pl-[20px] [&_ul]:leading-[1.9] [&_li]:mb-[7px] [&_p]:text-[11px] [&_p]:leading-[1.8] mobile:[&_p]:text-[11px]"
+        className="[border-top:1px_solid_var(--line)] mt-7 pt-2 px-[3px] pb-0 text-[#919cb1] text-[11px]
+          mobile:text-[11px] mobile:mt-5.5 mobile-type:text-[12px] mobile-spacing:mt-6 [&_ul]:py-0
+          [&_ul]:pr-0 [&_ul]:pl-5 [&_ul]:leading-[1.9] [&_li]:mb-[7px] [&_p]:text-[11px]
+          [&_p]:leading-[1.8] mobile:[&_p]:text-[11px]"
       >
         <button
           data-ui="source-toggle"
           className={
-            '[[data-ui~=source-details]_&]:flex [[data-ui~=source-details]_&]:items-center [[data-ui~=source-details]_&]:gap-[8px] [[data-ui~=source-details]_&]:[cursor:pointer] [[data-ui~=source-details]_&]:[list-style:none] [[data-ui~=source-details]_&]:text-[11px] [[data-ui~=source-details]_&]:[font-weight:650] mobile:[[data-ui~=source-details]_&]:text-[11px] mobile-type:[[data-ui~=source-details]_&]:text-[12px] [[data-ui~=source-details]_&]:w-full [[data-ui~=source-details]_&]:min-h-[44px] [[data-ui~=source-details]_&]:p-0 [[data-ui~=source-details]_&]:[background:transparent] [[data-ui~=source-details]_&]:text-[inherit] [[data-ui~=source-details]_&]:text-left [[data-ui~=source-details]_&_>_svg:last-child]:ml-auto [&_>_svg]:shrink-0 [&_>_svg:last-child]:[transition:transform_0.28s_ease] reduce-loading:[&_>_svg:last-child]:[transition:none] [&[aria-expanded="true"]_>_svg:last-child]:[transform:rotate(180deg)]'
+            '[[data-ui~=source-details]_&]:flex [[data-ui~=source-details]_&]:items-center [[data-ui~=source-details]_&]:gap-2 [[data-ui~=source-details]_&]:cursor-pointer [[data-ui~=source-details]_&]:[list-style:none] [[data-ui~=source-details]_&]:text-[11px] [[data-ui~=source-details]_&]:font-[650] mobile:[[data-ui~=source-details]_&]:text-[11px] mobile-type:[[data-ui~=source-details]_&]:text-[12px] [[data-ui~=source-details]_&]:w-full [[data-ui~=source-details]_&]:min-h-11 [[data-ui~=source-details]_&]:p-0 [[data-ui~=source-details]_&]:bg-transparent [[data-ui~=source-details]_&]:text-[inherit] [[data-ui~=source-details]_&]:text-left [[data-ui~=source-details]_&_>_svg:last-child]:ml-auto [&_>_svg]:shrink-0 [&_>_svg:last-child]:[transition:transform_0.28s_ease] reduce-loading:[&_>_svg:last-child]:[transition:none] [&[aria-expanded="true"]_>_svg:last-child]:[transform:rotate(180deg)]'
           }
           type="button"
           aria-expanded={checksOpen}
@@ -829,7 +906,7 @@ export function TripResult({
         >
           <div
             data-ui="source-content-inner"
-            className="pt-[8px] px-0 pb-[4px] [&_ul]:mt-0 [&_ul]:mx-0 [&_ul]:mb-[12px] [&_p]:m-0"
+            className="pt-2 px-0 pb-1 [&_ul]:mt-0 [&_ul]:mx-0 [&_ul]:mb-3 [&_p]:m-0"
           >
             <ul>
               {tripNotices(plan).map((item, i) => (
@@ -845,14 +922,33 @@ export function TripResult({
       </section>
       <div
         data-ui="result-sticky"
-        className="fixed z-[20] bottom-[18px] left-[50%] [transform:translateX(-50%)] flex gap-[9px] [background:#ffffffef] [backdrop-filter:blur(15px)] [border:1px_solid_var(--line)] rounded-[23px] p-[9px] [box-shadow:0_8px_30px_#3443710e] max-w-[calc(100%_-_24px)] w-[424px] mobile:left-0 mobile:right-0 mobile:bottom-0 mobile:[transform:none] mobile:max-w-[none] mobile:w-full mobile:pt-[12px] mobile:px-[24px] mobile:pb-[calc(12px_+_env(safe-area-inset-bottom))] mobile:rounded-[20px_20px_0_0] mobile:[border-left:0] mobile:[border-right:0] mobile:[border-bottom:0] mobile:gap-[9px] mobile:[box-shadow:0_-4px_24px_#34437107] narrow:px-[17px] narrow-spacing:px-[20px] mobile:[&_svg]:h-[17px] mobile:[&_svg]:w-[17px]"
+        className="fixed z-[20] bottom-4.5 left-[50%] [transform:translateX(-50%)] flex gap-[9px]
+          bg-[#ffffffef] [backdrop-filter:blur(15px)] [border:1px_solid_var(--line)] rounded-[23px]
+          p-[9px] [box-shadow:0_8px_30px_#3443710e] max-w-[calc(100%_-_24px)] w-106 mobile:left-0
+          mobile:right-0 mobile:bottom-0 mobile:[transform:none] mobile:max-w-none mobile:w-full
+          mobile:pt-3 mobile:px-6 mobile:pb-[calc(12px_+_env(safe-area-inset-bottom))]
+          mobile:rounded-[20px_20px_0_0] mobile:[border-left:0] mobile:[border-right:0]
+          mobile:[border-bottom:0] mobile:gap-[9px] mobile:[box-shadow:0_-4px_24px_#34437107]
+          narrow:px-[17px] narrow-spacing:px-5 mobile:[&_svg]:size-[17px]"
       >
         <button
           id="copy-trip"
           data-ui="button secondary"
-          className={
-            "min-h-[54px] inline-flex items-center justify-center gap-[12px] py-[15px] px-[22px] rounded-[17px] text-[14px] [font-weight:750] no-underline [transition:background_0.18s,_box-shadow_0.18s] mobile:min-h-[53px] mobile:text-[13px] mobile:rounded-[15px] mobile-type:text-[14px] [[data-ui~=button]&]:[background:#eff1fb] [[data-ui~=button]&]:text-brand [[data-ui~=result-sticky]_>_&]:text-[11px] [[data-ui~=result-sticky]_>_&]:p-[13px] [[data-ui~=result-sticky]_>_&]:gap-[7px] mobile:[[data-ui~=result-sticky]_>_&]:text-[11px] mobile:[[data-ui~=result-sticky]_>_&]:min-h-[51px] mobile:[[data-ui~=result-sticky]_>_&]:py-[13px] mobile:[[data-ui~=result-sticky]_>_&]:px-[14px] mobile:[[data-ui~=result-sticky]_>_&]:rounded-[14px] narrow:[[data-ui~=result-sticky]_>_&]:text-[11px] mobile-type:[[data-ui~=result-sticky]_>_&]:text-[14px] narrow-type:[[data-ui~=result-sticky]_>_&]:[flex:0_0_51px] narrow-type:[[data-ui~=result-sticky]_>_&]:p-[12px] narrow-type:[[data-ui~=result-sticky]_>_&_>_span]:hidden"
-          }
+          className="min-h-13.5 inline-flex items-center justify-center gap-3 py-[15px] px-5.5 rounded-[17px]
+            text-[14px] font-[750] no-underline [transition:background_0.18s,_box-shadow_0.18s]
+            mobile:min-h-[53px] mobile:text-[13px] mobile:rounded-[15px] mobile-type:text-[14px]
+            [[data-ui~=button]&]:bg-[#eff1fb] [[data-ui~=button]&]:text-brand
+            [[data-ui~=result-sticky]_>_&]:text-[11px] [[data-ui~=result-sticky]_>_&]:p-[13px]
+            [[data-ui~=result-sticky]_>_&]:gap-[7px] mobile:[[data-ui~=result-sticky]_>_&]:text-[11px]
+            mobile:[[data-ui~=result-sticky]_>_&]:min-h-[51px]
+            mobile:[[data-ui~=result-sticky]_>_&]:py-[13px]
+            mobile:[[data-ui~=result-sticky]_>_&]:px-3.5
+            mobile:[[data-ui~=result-sticky]_>_&]:rounded-[14px]
+            narrow:[[data-ui~=result-sticky]_>_&]:text-[11px]
+            mobile-type:[[data-ui~=result-sticky]_>_&]:text-[14px]
+            narrow-type:[[data-ui~=result-sticky]_>_&]:[flex:0_0_51px]
+            narrow-type:[[data-ui~=result-sticky]_>_&]:p-3
+            narrow-type:[[data-ui~=result-sticky]_>_&_>_span]:hidden"
           onClick={copy}
         >
           <Copy size={18} />
@@ -883,12 +979,12 @@ function DestinationPhoto({
   const [failed, setFailed] = useState(false);
   if (failed || !safeUrl(photo.url)) return null;
   return (
-    <figure className="m-0 mb-[24px]">
+    <figure className="m-0 mb-6">
       <img
         src={safeUrl(photo.url)!}
         alt={`Вид города ${city}`}
         onError={() => setFailed(true)}
-        className="block h-[280px] mobile:h-[190px] w-full rounded-[24px] object-cover"
+        className="block h-70 mobile:h-47.5 w-full rounded-3xl object-cover"
         referrerPolicy="no-referrer"
       />
     </figure>

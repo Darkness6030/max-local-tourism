@@ -34,7 +34,7 @@ export function PresetCards({
   return (
     <section
       data-ui="preset-section"
-      className="mt-[32px] preset-mobile:mt-[24px]"
+      className="mt-8 preset-mobile:mt-6"
       aria-labelledby="preset-heading"
     >
       <div data-ui="section-heading" className={sectionHeadingStyles}>
@@ -50,21 +50,27 @@ export function PresetCards({
       </div>
       <div
         data-ui="preset-grid"
-        className="grid grid-cols-[repeat(2,_minmax(0,_1fr))] gap-[16px] preset-tablet:grid-cols-[repeat(2,_minmax(0,_1fr))] preset-mobile:gap-[12px]"
+        className="grid grid-cols-[repeat(2,_minmax(0,_1fr))] gap-4
+          preset-tablet:grid-cols-[repeat(2,_minmax(0,_1fr))] preset-mobile:gap-3"
       >
         {tripPresets
           .filter((preset) => preset.origin === origin)
           .map((preset) => (
             <button
               data-ui="preset-card"
-              className="flex flex-col p-0 text-left [border:1px_solid_var(--line)] rounded-[22px] [background:white] overflow-hidden [transition:box-shadow_0.2s,_border-color_0.2s] preset-mobile:rounded-[18px] [&:hover]:[border-color:#c7d1ff] [&:hover]:[box-shadow:0_8px_24px_#30426b10] [&:hover_img]:[transform:scale(1.035)]"
+              className="flex flex-col p-0 text-left [border:1px_solid_var(--line)] rounded-[22px] bg-white
+                overflow-hidden [transition:box-shadow_0.2s,_border-color_0.2s]
+                preset-mobile:rounded-[18px] [&:hover]:border-[#c7d1ff]
+                [&:hover]:[box-shadow:0_8px_24px_#30426b10] [&:hover_img]:[transform:scale(1.035)]"
               key={preset.id}
               onClick={() => onOpen(preset)}
               aria-label={`Открыть маршрут: ${preset.city}`}
             >
               <span
                 data-ui="preset-card-photo"
-                className="relative block w-full overflow-hidden [&_img]:w-full [&_img]:h-auto [&_img]:max-h-[240px] [&_img]:[aspect-ratio:1.55] [&_img]:object-cover [&_img]:object-[center_60%] [&_img]:[transition:transform_0.35s]"
+                className="relative block w-full overflow-hidden [&_img]:w-full [&_img]:h-auto [&_img]:max-h-60
+                  [&_img]:[aspect-ratio:1.55] [&_img]:object-cover [&_img]:object-[center_60%]
+                  [&_img]:[transition:transform_0.35s]"
               >
                 <img
                   src={preset.photo}
@@ -76,7 +82,8 @@ export function PresetCards({
                 />
                 <span
                   data-ui="preset-duration"
-                  className="absolute bottom-[10px] left-[10px] flex items-center gap-[5px] py-[6px] px-[9px] rounded-[20px] [background:#fffffff2] text-[10px] [font-weight:750]"
+                  className="absolute bottom-2.5 left-2.5 flex items-center gap-[5px] py-1.5 px-[9px]
+                    rounded-[20px] bg-[#fffffff2] text-[10px] font-[750]"
                 >
                   <CalendarDays size={12} />
                   {preset.days.length === 1 ? "1 день" : "2 дня"}
@@ -84,9 +91,11 @@ export function PresetCards({
               </span>
               <span
                 data-ui="preset-card-copy"
-                className={
-                  "flex [flex:1] flex-col p-[16px] preset-mobile:p-[12px] [&_>_small]:text-muted [&_>_small]:text-[10px] [&_>_strong]:block [&_>_strong]:mt-[6px] [&_>_strong]:mx-0 [&_>_strong]:mb-[8px] [&_>_strong]:text-[19px] [&_>_strong]:font-extrabold [&_>_strong]:tracking-[-0.5px] [&_>_strong]:leading-[1.3] preset-mobile:[&_>_strong]:text-[17px]"
-                }
+                className="flex flex-1 flex-col p-4 preset-mobile:p-3 [&_>_small]:text-muted
+                  [&_>_small]:text-[10px] [&_>_strong]:block [&_>_strong]:mt-1.5 [&_>_strong]:mx-0
+                  [&_>_strong]:mb-2 [&_>_strong]:text-[19px] [&_>_strong]:font-extrabold
+                  [&_>_strong]:tracking-[-0.5px] [&_>_strong]:leading-[1.3]
+                  preset-mobile:[&_>_strong]:text-[17px]"
               >
                 <small>
                   Из {preset.origin === "Москва" ? "Москвы" : "Петербурга"}
@@ -95,9 +104,13 @@ export function PresetCards({
                 <span>{preset.tagline}</span>
                 <span
                   data-ui="preset-card-link"
-                  className={
-                    "[[data-ui~=preset-card-copy]_>_span:not(&)]:text-[12px] [[data-ui~=preset-card-copy]_>_span:not(&)]:leading-[1.7] [[data-ui~=preset-card-copy]_>_span:not(&)]:text-[#687389] [[data-ui~=preset-card-copy]_>_span:not(&)]:mb-[16px] preset-mobile:[[data-ui~=preset-card-copy]_>_span:not(&)]:text-[11px] flex items-center justify-between gap-[4px] mt-auto text-[11px] [font-weight:750] text-brand preset-mobile:text-[10px]"
-                  }
+                  className="[[data-ui~=preset-card-copy]_>_span:not(&)]:text-[12px]
+                    [[data-ui~=preset-card-copy]_>_span:not(&)]:leading-[1.7]
+                    [[data-ui~=preset-card-copy]_>_span:not(&)]:text-[#687389]
+                    [[data-ui~=preset-card-copy]_>_span:not(&)]:mb-4
+                    preset-mobile:[[data-ui~=preset-card-copy]_>_span:not(&)]:text-[11px] flex
+                    items-center justify-between gap-1 mt-auto text-[11px] font-[750] text-brand
+                    preset-mobile:text-[10px]"
                 >
                   Смотреть план <ArrowUpRight size={17} />
                 </span>
@@ -132,12 +145,11 @@ export function PresetDetail({
     }
   };
   return (
-    <article data-ui="preset-detail" className="max-w-[950px] m-auto">
+    <article data-ui="preset-detail" className="max-w-237.5 m-auto">
       <div
         data-ui="preset-top"
-        className={
-          "flex items-center justify-between h-[68px] gap-[12px] preset-mobile:h-[60px] [&_>_span]:text-[10px] [&_>_span]:[font-weight:750] [&_>_span]:text-muted [&_>_span]:tracking-[0.6px]"
-        }
+        className="flex items-center justify-between h-17 gap-3 preset-mobile:h-15 [&_>_span]:text-[10px]
+          [&_>_span]:font-[750] [&_>_span]:text-muted [&_>_span]:tracking-[0.6px]"
       >
         <button
           data-ui="icon-button"
@@ -150,16 +162,15 @@ export function PresetDetail({
         <span>ГОТОВЫЙ МАРШРУТ</span>
         <span
           data-ui="preset-top-days"
-          className={
-            "[[data-ui~=preset-top]_>_span&]:text-brand [[data-ui~=preset-top]_>_span&]:tracking-[0]"
-          }
+          className="[[data-ui~=preset-top]_>_span&]:text-brand [[data-ui~=preset-top]_>_span&]:tracking-[0]"
         >
           {preset.days.length === 1 ? "1 день" : "2 дня"}
         </span>
       </div>
       <img
         data-ui="preset-cover"
-        className="w-full h-[300px] object-cover object-[center_60%] rounded-[26px] preset-mobile:h-[220px] preset-mobile:rounded-[22px] preset-short:h-[190px]"
+        className="w-full h-75 object-cover object-[center_60%] rounded-[26px] preset-mobile:h-55
+          preset-mobile:rounded-[22px] preset-short:h-47.5"
         src={preset.photo}
         alt={preset.photoAlt}
         width={1280}
@@ -167,9 +178,10 @@ export function PresetDetail({
       />
       <header
         data-ui="preset-intro"
-        className={
-          "py-[24px] px-0 preset-mobile:py-[20px] preset-mobile:px-0 [&_h1]:my-[12px] [&_h1]:mx-0 [&_h1]:text-[34px] [&_h1]:tracking-[-1.3px] [&_h1]:leading-[1.25] preset-mobile:[&_h1]:text-[28px] preset-mobile:[&_h1]:tracking-[-0.9px] [&_>_p]:max-w-[690px] [&_>_p]:text-[#687389] [&_>_p]:text-[14px] [&_>_p]:leading-[1.8]"
-        }
+        className="py-6 px-0 preset-mobile:py-5 preset-mobile:px-0 [&_h1]:my-3 [&_h1]:mx-0 [&_h1]:text-[34px]
+          [&_h1]:tracking-[-1.3px] [&_h1]:leading-[1.25] preset-mobile:[&_h1]:text-[28px]
+          preset-mobile:[&_h1]:tracking-[-0.9px] [&_>_p]:max-w-172.5 [&_>_p]:text-[#687389]
+          [&_>_p]:text-[14px] [&_>_p]:leading-[1.8]"
       >
         <span data-ui="eyebrow" className={eyebrowStyles}>
           {preset.origin} → {preset.city}
@@ -178,9 +190,8 @@ export function PresetDetail({
         <p>{preset.summary}</p>
         <div
           data-ui="preset-facts"
-          className={
-            "flex flex-wrap gap-[10px_18px] mt-[18px] [&_>_span]:flex [&_>_span]:items-center [&_>_span]:gap-[6px] [&_>_span]:text-[11px] [&_>_span]:text-[#687389] [&_svg]:text-brand"
-          }
+          className="flex flex-wrap gap-[10px_18px] mt-4.5 [&_>_span]:flex [&_>_span]:items-center
+            [&_>_span]:gap-1.5 [&_>_span]:text-[11px] [&_>_span]:text-[#687389] [&_svg]:text-brand"
         >
           <span>
             <CalendarDays size={15} />
@@ -203,16 +214,17 @@ export function PresetDetail({
       )}
       <div
         data-ui="preset-columns"
-        className="grid grid-cols-[minmax(0,_1.5fr)_minmax(0,_1fr)] gap-[28px] [align-items:start] preset-mobile:grid-cols-[minmax(0,_1fr)] preset-mobile:gap-[24px]"
+        className="grid grid-cols-[minmax(0,_1.5fr)_minmax(0,_1fr)] gap-7 [align-items:start]
+          preset-mobile:grid-cols-[minmax(0,_1fr)] preset-mobile:gap-6"
       >
         <div
           data-ui="preset-program"
-          className={"[&_>_h2]:text-[22px] [&_>_h2]:tracking-[-0.7px]"}
+          className="[&_>_h2]:text-[22px] [&_>_h2]:tracking-[-0.7px]"
         >
           <h2>План уже есть</h2>
           <p
             data-ui="preset-help"
-            className="mt-[8px] mx-0 mb-[20px] text-muted text-[12px] leading-[1.7]"
+            className="mt-2 mx-0 mb-5 text-muted text-[12px] leading-[1.7]"
           >
             Время — ориентир для прогулки. Сеансы и билеты выбирайте на свою
             дату.
@@ -220,22 +232,34 @@ export function PresetDetail({
           {preset.days.map((day, index) => (
             <section
               data-ui="preset-day"
-              className="mt-[24px]"
+              className="mt-6"
               key={day.title}
               aria-labelledby={`preset-day-${index}`}
             >
               <div
                 data-ui="preset-day-heading"
-                className={
-                  "flex items-center gap-[12px] mb-[20px] [&_>_span]:w-[34px] [&_>_span]:h-[34px] [&_>_span]:shrink-0 [&_>_span]:grid [&_>_span]:place-items-center [&_>_span]:rounded-[11px] [&_>_span]:[background:#eaf0ff] [&_>_span]:text-brand [&_>_span]:text-[12px] [&_>_span]:font-extrabold [&_h3]:text-[16px] [&_h3]:leading-[1.5]"
-                }
+                className="flex items-center gap-3 mb-5 [&_>_span]:size-8.5 [&_>_span]:shrink-0 [&_>_span]:grid
+                  [&_>_span]:place-items-center [&_>_span]:rounded-[11px] [&_>_span]:bg-[#eaf0ff]
+                  [&_>_span]:text-brand [&_>_span]:text-[12px] [&_>_span]:font-extrabold
+                  [&_h3]:text-[16px] [&_h3]:leading-[1.5]"
               >
                 <span>0{index + 1}</span>
                 <h3 id={`preset-day-${index}`}>{day.title}</h3>
               </div>
               <ol
                 data-ui="preset-timeline"
-                className="[list-style:none] py-0 pr-0 pl-[14px] m-0 [&_li]:relative [&_li]:[border-left:1px_solid_#dfe5f4] [&_li]:pt-0 [&_li]:pr-0 [&_li]:pb-[24px] [&_li]:pl-[22px] [&_li::before]:[content:''] [&_li::before]:absolute [&_li::before]:top-[5px] [&_li::before]:left-[-4px] [&_li::before]:w-[7px] [&_li::before]:h-[7px] [&_li::before]:[background:var(--blue)] [&_li::before]:rounded-[50%] [&_li::before]:[box-shadow:0_0_0_4px_#f8f9fc] [&_li:last-child]:[border-color:transparent] [&_li:last-child]:pb-0 [&_time]:text-brand [&_time]:text-[11px] [&_time]:[font-weight:750] [&_h4]:text-[16px] [&_h4]:my-[8px] [&_h4]:mx-0 [&_h4]:leading-[1.4] [&_p]:text-[13px] [&_p]:leading-[1.8] [&_p]:text-[#687389] preset-mobile:[&_p]:text-[14px] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-[6px] [&_a]:min-h-[44px] [&_a]:py-[8px] [&_a]:px-0 [&_a]:text-[11px] [&_a]:leading-[1.5] [&_a]:no-underline preset-mobile:[&_a]:text-[12px]"
+                className="[list-style:none] py-0 pr-0 pl-3.5 m-0 [&_li]:relative
+                  [&_li]:[border-left:1px_solid_#dfe5f4] [&_li]:pt-0 [&_li]:pr-0 [&_li]:pb-6
+                  [&_li]:pl-5.5 [&_li::before]:[content:''] [&_li::before]:absolute
+                  [&_li::before]:top-[5px] [&_li::before]:-left-1 [&_li::before]:size-[7px]
+                  [&_li::before]:bg-brand [&_li::before]:rounded-[50%]
+                  [&_li::before]:[box-shadow:0_0_0_4px_#f8f9fc] [&_li:last-child]:border-[transparent]
+                  [&_li:last-child]:pb-0 [&_time]:text-brand [&_time]:text-[11px] [&_time]:font-[750]
+                  [&_h4]:text-[16px] [&_h4]:my-2 [&_h4]:mx-0 [&_h4]:leading-[1.4] [&_p]:text-[13px]
+                  [&_p]:leading-[1.8] [&_p]:text-[#687389] preset-mobile:[&_p]:text-[14px]
+                  [&_a]:inline-flex [&_a]:items-center [&_a]:gap-1.5 [&_a]:min-h-11 [&_a]:py-2
+                  [&_a]:px-0 [&_a]:text-[11px] [&_a]:leading-[1.5] [&_a]:no-underline
+                  preset-mobile:[&_a]:text-[12px]"
               >
                 {day.stops.map((stop) => (
                   <li key={stop.time}>
@@ -259,7 +283,7 @@ export function PresetDetail({
             </section>
           ))}
         </div>
-        <aside data-ui="preset-sidebar" className="grid gap-[16px]">
+        <aside data-ui="preset-sidebar" className="grid gap-4">
           <section data-ui="preset-info-card" className={presetInfoCardStyles}>
             <span data-ui="soft-icon blue" className={softBlueIconStyles}>
               <Wallet size={22} />
@@ -267,7 +291,7 @@ export function PresetDetail({
             <h2>Бюджет на месте</h2>
             <strong
               data-ui="preset-budget"
-              className="block text-[28px] mb-[8px] tracking-[-1px]"
+              className="block text-[28px] mb-2 tracking-[-1px]"
             >
               ≈ {money(preset.budgetRub)}
             </strong>
@@ -296,16 +320,22 @@ export function PresetDetail({
             <p>{preset.travel}</p>
             <p
               data-ui="preset-tip"
-              className="mt-[16px] pt-[16px] [border-top:1px_solid_var(--line)]"
+              className="mt-4 pt-4 [border-top:1px_solid_var(--line)]"
             >
               {preset.tip}
             </p>
           </section>
           <section
             data-ui="preset-info-card preset-packing-card"
-            className={
-              "p-[22px] [background:#fff] [border:1px_solid_var(--line)] rounded-[22px] [&_>_h2]:text-[17px] [&_>_h2]:mt-[16px] [&_>_h2]:mx-0 [&_>_h2]:mb-[12px] [&_>_h2]:tracking-[-0.3px] [&_p]:text-[12px] [&_p]:leading-[1.8] [&_p]:text-[#687389] [&_small]:text-[12px] [&_small]:leading-[1.8] [&_small]:text-[#687389] [&_dl]:my-[16px] [&_dl]:mx-0 [&_dl]:py-[12px] [&_dl]:px-0 [&_dl]:[border-block:1px_solid_var(--line)] [&_dl_>_div]:flex [&_dl_>_div]:justify-between [&_dl_>_div]:gap-[12px] [&_dl_>_div]:py-[7px] [&_dl_>_div]:px-0 [&_dl_>_div]:text-[12px] [&_dl_>_div]:leading-[1.5] [&_dd]:m-0 [&_dd]:whitespace-nowrap [&_dd]:[font-weight:750] [[data-ui~=preset-info-card]&]:pb-[12px] [[data-ui~=preset-info-card]&_>_h2]:mb-[4px]"
-            }
+            className="p-5.5 bg-white [border:1px_solid_var(--line)] rounded-[22px] [&_>_h2]:text-[17px]
+              [&_>_h2]:mt-4 [&_>_h2]:mx-0 [&_>_h2]:mb-3 [&_>_h2]:tracking-[-0.3px] [&_p]:text-[12px]
+              [&_p]:leading-[1.8] [&_p]:text-[#687389] [&_small]:text-[12px] [&_small]:leading-[1.8]
+              [&_small]:text-[#687389] [&_dl]:my-4 [&_dl]:mx-0 [&_dl]:py-3 [&_dl]:px-0
+              [&_dl]:[border-block:1px_solid_var(--line)] [&_dl_>_div]:flex
+              [&_dl_>_div]:justify-between [&_dl_>_div]:gap-3 [&_dl_>_div]:py-[7px] [&_dl_>_div]:px-0
+              [&_dl_>_div]:text-[12px] [&_dl_>_div]:leading-[1.5] [&_dd]:m-0 [&_dd]:whitespace-nowrap
+              [&_dd]:font-[750] [[data-ui~=preset-info-card]&]:pb-3
+              [[data-ui~=preset-info-card]&_>_h2]:mb-1"
           >
             <span data-ui="soft-icon blue" className={softBlueIconStyles}>
               <Backpack size={22} />
@@ -348,35 +378,40 @@ export function PresetDetail({
       </div>
       <section
         data-ui="preset-sources"
-        className={
-          "[&_>_h2]:text-[22px] [&_>_h2]:tracking-[-0.7px] [border-top:1px_solid_var(--line)] mt-[20px] pt-[20px]"
-        }
+        className="[&_>_h2]:text-[22px] [&_>_h2]:tracking-[-0.7px] [border-top:1px_solid_var(--line)] mt-5 pt-5"
       >
         <h2>Места и билеты</h2>
         <p
           data-ui="preset-help"
-          className="mt-[8px] mx-0 mb-[20px] text-muted text-[12px] leading-[1.7]"
+          className="mt-2 mx-0 mb-5 text-muted text-[12px] leading-[1.7]"
         >
           Выберите время посещения и проверьте билеты на сайте места.
         </p>
         <ul
           data-ui="venue-list"
-          className={
-            "grid gap-[10px] m-0 p-0 [list-style:none] [&_>_li]:flex [&_>_li]:items-center [&_>_li]:gap-[12px] [&_>_li]:p-[14px] [&_>_li]:[background:white] [&_>_li]:[border:1px_solid_var(--line)] [&_>_li]:rounded-[18px] loading-narrow:[&_>_li]:gap-[8px] loading-narrow:[&_>_li]:p-[10px] [&_a]:flex [&_a]:items-center [&_a]:justify-center [&_a]:gap-[4px] [&_a]:shrink-0 [&_a]:min-h-[44px] [&_a]:py-0 [&_a]:px-[10px] [&_a]:rounded-[12px] [&_a]:[background:#f2f5ff] [&_a]:text-brand [&_a]:text-[12px] [&_a]:font-bold [&_a]:no-underline [&_a]:[transition:background_0.2s] [&_a:hover]:[background:#e6ecff]"
-          }
+          className="grid gap-2.5 m-0 p-0 [list-style:none] [&_>_li]:flex [&_>_li]:items-center [&_>_li]:gap-3
+            [&_>_li]:p-3.5 [&_>_li]:bg-white [&_>_li]:[border:1px_solid_var(--line)]
+            [&_>_li]:rounded-[18px] loading-narrow:[&_>_li]:gap-2 loading-narrow:[&_>_li]:p-2.5
+            [&_a]:flex [&_a]:items-center [&_a]:justify-center [&_a]:gap-1 [&_a]:shrink-0
+            [&_a]:min-h-11 [&_a]:py-0 [&_a]:px-2.5 [&_a]:rounded-xl [&_a]:bg-[#f2f5ff]
+            [&_a]:text-brand [&_a]:text-[12px] [&_a]:font-bold [&_a]:no-underline
+            [&_a]:[transition:background_0.2s] [&_a:hover]:bg-[#e6ecff]"
         >
           {preset.sources.map((source) => (
             <li key={source.url}>
               <span
                 data-ui="venue-icon"
-                className="grid place-items-center w-[38px] h-[38px] rounded-[12px] text-brand [background:#edf1ff] shrink-0 loading-narrow:w-[30px] loading-narrow:h-[30px] loading-narrow:rounded-[10px]"
+                className="grid place-items-center size-9.5 rounded-xl text-brand bg-[#edf1ff] shrink-0
+                  loading-narrow:size-7.5 loading-narrow:rounded-[10px]"
                 aria-hidden="true"
               >
                 <MapPin size={19} />
               </span>
               <div
                 data-ui="venue-name"
-                className="[flex:1] min-w-0 [&_strong]:block [&_strong]:text-[13px] [&_strong]:leading-[1.5] [&_small]:block [&_small]:mt-[4px] [&_small]:text-[11px] [&_small]:text-muted [&_small]:[overflow-wrap:anywhere]"
+                className="flex-1 min-w-0 [&_strong]:block [&_strong]:text-[13px] [&_strong]:leading-[1.5]
+                  [&_small]:block [&_small]:mt-1 [&_small]:text-[11px] [&_small]:text-muted
+                  [&_small]:wrap-anywhere"
               >
                 <strong>{source.name}</strong>
                 <small>
@@ -399,9 +434,15 @@ export function PresetDetail({
       </section>
       <div
         data-ui="preset-actions"
-        className={
-          "fixed z-[20] bottom-[16px] left-[50%] [transform:translateX(-50%)] w-[min(520px,_calc(100%_-_48px))] py-[12px] px-[16px] [background:#fffffff5] [border:1px_solid_var(--line)] rounded-[22px] [backdrop-filter:blur(16px)] [box-shadow:0_4px_24px_#30426b0a] preset-mobile:left-0 preset-mobile:right-0 preset-mobile:bottom-0 preset-mobile:[transform:none] preset-mobile:w-auto preset-mobile:rounded-[22px_22px_0_0] preset-mobile:pt-[12px] preset-mobile:px-[24px] preset-mobile:pb-[max(10px,_env(safe-area-inset-bottom))] [&_>_span]:block [&_>_span]:text-center [&_>_span]:text-[10px] [&_>_span]:text-muted [&_>_span]:leading-[1.6] [&_>_span]:mt-[8px]"
-        }
+        className="fixed z-[20] bottom-4 left-[50%] [transform:translateX(-50%)]
+          w-[min(520px,_calc(100%_-_48px))] py-3 px-4 bg-[#fffffff5] [border:1px_solid_var(--line)]
+          rounded-[22px] [backdrop-filter:blur(16px)] [box-shadow:0_4px_24px_#30426b0a]
+          preset-mobile:left-0 preset-mobile:right-0 preset-mobile:bottom-0
+          preset-mobile:[transform:none] preset-mobile:w-auto preset-mobile:rounded-[22px_22px_0_0]
+          preset-mobile:pt-3 preset-mobile:px-6
+          preset-mobile:pb-[max(10px,_env(safe-area-inset-bottom))] [&_>_span]:block
+          [&_>_span]:text-center [&_>_span]:text-[10px] [&_>_span]:text-muted [&_>_span]:leading-[1.6]
+          [&_>_span]:mt-2"
       >
         <Primary id="use-preset" onClick={onUse}>
           {hasActiveJob ? "Вернуться к генерации" : "Настроить поездку"}

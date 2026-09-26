@@ -73,6 +73,15 @@ const interests = [
   ["Музеи", Coffee, "Искусство и открытия"],
 ] as const;
 
+
+const durationCardStyles = `
+  [border:1.5px_solid_#e9ecf3] bg-white rounded-[17px] py-5 px-1.5 flex items-center flex-col
+  mobile:py-5 mobile:px-1.5 mobile:min-h-33.5 [&_>_span]:text-[27px] [&_>_span]:text-[#a0aec7]
+  [&_>_span]:leading-[1.4] [&_>_span]:mb-[9px] mobile:[&_>_span]:text-[28px] [&_strong]:text-[12px]
+  [&_strong]:font-[750] mobile:[&_strong]:text-[12px] [&_small]:text-[11px] [&_small]:text-[#a0a6b6]
+  [&_small]:mt-[5px] mobile:[&_small]:text-[11px]
+`;
+
 export function Wizard({
   draft,
   initData,
@@ -177,13 +186,21 @@ export function Wizard({
   return (
     <div
       data-ui="wizard-layout"
-      className="grid grid-cols-[1fr_1.25fr] gap-[48px] max-w-[950px] my-0 mx-auto desktop-fit:gap-[45px] tablet:gap-[35px] tablet:grid-cols-[0.8fr_1.2fr] mobile:block mobile:m-0"
+      className="grid grid-cols-[1fr_1.25fr] gap-12 max-w-237.5 my-0 mx-auto desktop-fit:gap-[45px]
+        tablet:gap-[35px] tablet:grid-cols-[0.8fr_1.2fr] mobile:block mobile:m-0"
     >
       <aside
         data-ui="wizard-aside"
-        className={
-          "py-[32px] px-0 mobile:hidden short:pt-[20px] [&_h2]:text-[36px] [&_h2]:leading-[1.23] [&_h2]:tracking-[-1.5px] [&_h2]:mt-[20px] [&_h2]:mx-0 [&_h2]:mb-[16px] [&_h2]:font-extrabold tablet:[&_h2]:text-[31px] short:[&_h2]:text-[30px] short:[&_h2]:my-[16px] short:[&_h2]:mx-0 [&_h2_span]:text-brand [&_>_p]:max-w-[285px] [&_>_p]:text-[13px] [&_>_p]:text-muted [&_>_p]:leading-[1.9] [&_ol]:[list-style:none] [&_ol]:p-0 [&_ol]:my-[36px] [&_ol]:mx-0 [&_ol]:grid [&_ol]:gap-[22px] short:[&_ol]:my-[24px] short:[&_ol]:mx-0 short:[&_ol]:gap-[16px] [&_li]:flex [&_li]:items-center [&_li]:gap-[14px] [&_li]:text-[#a2a7b6] [&_li]:text-[12px] [&_li_>_span]:h-[31px] [&_li_>_span]:w-[31px] [&_li_>_span]:[border:1px_solid_#e0e4ee] [&_li_>_span]:rounded-[50%] [&_li_>_span]:grid [&_li_>_span]:place-items-center [&_li_>_span]:text-[11px]"
-        }
+        className="py-8 px-0 mobile:hidden short:pt-5 [&_h2]:text-[36px] [&_h2]:leading-[1.23]
+          [&_h2]:tracking-[-1.5px] [&_h2]:mt-5 [&_h2]:mx-0 [&_h2]:mb-4 [&_h2]:font-extrabold
+          tablet:[&_h2]:text-[31px] short:[&_h2]:text-[30px] short:[&_h2]:my-4 short:[&_h2]:mx-0
+          [&_h2_span]:text-brand [&_>_p]:max-w-[285px] [&_>_p]:text-[13px] [&_>_p]:text-muted
+          [&_>_p]:leading-[1.9] [&_ol]:[list-style:none] [&_ol]:p-0 [&_ol]:my-9 [&_ol]:mx-0
+          [&_ol]:grid [&_ol]:gap-5.5 short:[&_ol]:my-6 short:[&_ol]:mx-0 short:[&_ol]:gap-4
+          [&_li]:flex [&_li]:items-center [&_li]:gap-3.5 [&_li]:text-[#a2a7b6] [&_li]:text-[12px]
+          [&_li_>_span]:size-[31px] [&_li_>_span]:[border:1px_solid_#e0e4ee]
+          [&_li_>_span]:rounded-[50%] [&_li_>_span]:grid [&_li_>_span]:place-items-center
+          [&_li_>_span]:text-[11px]"
       >
         <span data-ui="eyebrow" className={eyebrowStyles}>
           ПУТЕШЕСТВИЕ НАЧИНАЕТСЯ
@@ -208,7 +225,7 @@ export function Wizard({
         </ol>
         <div
           data-ui="aside-note"
-          className="flex gap-[10px] items-center text-[11px] text-[#828baa] leading-[1.8]"
+          className="flex gap-2.5 items-center text-[11px] text-[#828baa] leading-[1.8]"
         >
           <Sparkles size={18} />
           <span>
@@ -220,13 +237,17 @@ export function Wizard({
       </aside>
       <div
         data-ui="wizard"
-        className="[background:#fff] [border:1px_solid_var(--line)] rounded-[28px] overflow-hidden mobile:[background:#f8f9fc] mobile:[border:0] mobile:rounded-none mobile:min-h-[100dvh] mobile:overflow-visible short:overflow-clip"
+        className="bg-white [border:1px_solid_var(--line)] rounded-[28px] overflow-hidden mobile:bg-[#f8f9fc]
+          mobile:[border:0] mobile:rounded-none mobile:min-h-[100dvh] mobile:overflow-visible
+          short:overflow-clip"
       >
         <header
           data-ui="wizard-top"
-          className={
-            "flex justify-between items-center h-[73px] py-0 px-[17px] mobile:pt-[env(safe-area-inset-top)] mobile:px-[14px] mobile:pb-0 mobile:h-[73px] short:h-[60px] [&_>_span]:flex [&_>_span]:gap-[12px] [&_>_span]:text-[11px] [&_>_span]:font-bold [&_>_span]:text-muted mobile:[&_>_span]:text-[11px] [&_b]:text-brand [&_b_span]:text-[#b0b5c3] [&_b_span]:font-medium"
-          }
+          className="flex justify-between items-center h-[73px] py-0 px-[17px]
+            mobile:pt-[env(safe-area-inset-top)] mobile:px-3.5 mobile:pb-0 mobile:h-[73px] short:h-15
+            [&_>_span]:flex [&_>_span]:gap-3 [&_>_span]:text-[11px] [&_>_span]:font-bold
+            [&_>_span]:text-muted mobile:[&_>_span]:text-[11px] [&_b]:text-brand
+            [&_b_span]:text-[#b0b5c3] [&_b_span]:font-medium"
         >
           <button
             data-ui="icon-button"
@@ -254,9 +275,9 @@ export function Wizard({
         </header>
         <div
           data-ui="step-progress"
-          className={
-            "flex gap-[5px] py-0 px-[28px] mobile:py-0 mobile:px-[24px] mobile:gap-[6px] narrow-spacing:px-[20px] [&_>_span]:h-[4px] [&_>_span]:[flex:1] [&_>_span]:rounded-[3px] [&_>_span]:[background:#edf0f7] [&_>_span]:[transition:background_0.25s] mobile:[&_>_span]:h-[4px]"
-          }
+          className="flex gap-[5px] py-0 px-7 mobile:py-0 mobile:px-6 mobile:gap-1.5 narrow-spacing:px-5
+            [&_>_span]:h-1 [&_>_span]:flex-1 [&_>_span]:rounded-[3px] [&_>_span]:bg-[#edf0f7]
+            [&_>_span]:[transition:background_0.25s] mobile:[&_>_span]:h-1"
           aria-label={`Шаг ${step + 1} из 5`}
         >
           {stepNames.map((_, i) => (
@@ -278,7 +299,8 @@ export function Wizard({
             <motion.div
               key={step}
               data-ui="step-content"
-              className="pt-[24px] px-[24px] pb-[16px] tablet:px-[24px] mobile:pt-[24px] mobile:px-[24px] mobile:pb-[16px] narrow:px-[21px] narrow-spacing:px-[20px] short:pt-[20px]"
+              className="pt-6 px-6 pb-4 tablet:px-6 mobile:pt-6 mobile:px-6 mobile:pb-4 narrow:px-[21px]
+                narrow-spacing:px-5 short:pt-5"
               initial={{ opacity: 0, x: direction * 18 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction * -18 }}
@@ -286,9 +308,16 @@ export function Wizard({
             >
               <div
                 data-ui="step-heading"
-                className={
-                  "mb-[24px] mobile:mb-[24px] mobile-spacing:mb-[24px] short:mb-[20px] [&_h1]:text-[29px] [&_h1]:tracking-[-1.2px] [&_h1]:leading-[1.27] [&_h1]:mt-[11px] [&_h1]:mx-0 [&_h1]:mb-[12px] [&_h1]:font-extrabold tablet:[&_h1]:text-[26px] mobile:[&_h1]:text-[29px] mobile:[&_h1]:leading-[1.27] mobile:[&_h1]:tracking-[-1.2px] mobile:[&_h1]:mt-[10px] mobile:[&_h1]:mx-0 mobile:[&_h1]:mb-[13px] mobile:[&_h1]:max-w-[325px] narrow:[&_h1]:text-[27px] mobile-spacing:[&_h1]:mt-[8px] mobile-spacing:[&_h1]:mx-0 mobile-spacing:[&_h1]:mb-[12px] [&_>_p]:text-muted [&_>_p]:text-[12px] [&_>_p]:leading-[1.85] [&_>_p]:max-w-[340px] mobile:[&_>_p]:text-[11px] mobile:[&_>_p]:leading-[1.85] mobile:[&_>_p]:max-w-[310px] mobile-type:[&_p]:text-[14px] mobile-type:[&_p]:leading-[1.8] [&_p]:text-[#687389]"
-                }
+                className="mb-6 mobile:mb-6 mobile-spacing:mb-6 short:mb-5 [&_h1]:text-[29px]
+                  [&_h1]:tracking-[-1.2px] [&_h1]:leading-[1.27] [&_h1]:mt-[11px] [&_h1]:mx-0
+                  [&_h1]:mb-3 [&_h1]:font-extrabold tablet:[&_h1]:text-[26px]
+                  mobile:[&_h1]:text-[29px] mobile:[&_h1]:leading-[1.27]
+                  mobile:[&_h1]:tracking-[-1.2px] mobile:[&_h1]:mt-2.5 mobile:[&_h1]:mx-0
+                  mobile:[&_h1]:mb-[13px] mobile:[&_h1]:max-w-[325px] narrow:[&_h1]:text-[27px]
+                  mobile-spacing:[&_h1]:mt-2 mobile-spacing:[&_h1]:mx-0 mobile-spacing:[&_h1]:mb-3
+                  [&_>_p]:text-muted [&_>_p]:text-[12px] [&_>_p]:leading-[1.85] [&_>_p]:max-w-85
+                  mobile:[&_>_p]:text-[11px] mobile:[&_>_p]:leading-[1.85] mobile:[&_>_p]:max-w-77.5
+                  mobile-type:[&_p]:text-[14px] mobile-type:[&_p]:leading-[1.8] [&_p]:text-[#687389]"
               >
                 <span data-ui="eyebrow" className={eyebrowStyles}>
                   ШАГ 0{step + 1}
@@ -333,7 +362,7 @@ export function Wizard({
                   </span>
                   <div
                     data-ui="choice-stack"
-                    className="grid gap-[11px] mt-[11px] mobile:gap-[12px]"
+                    className="grid gap-[11px] mt-[11px] mobile:gap-3"
                   >
                     <Choice
                       selected={draft.destinationMode === "ai"}
@@ -353,7 +382,7 @@ export function Wizard({
                   {draft.destinationMode === "manual" && (
                     <motion.label
                       data-ui="field-label spaced"
-                      className="block mt-[24px] text-[13px] font-semibold leading-[20px]"
+                      className="block mt-6 text-[13px] font-semibold leading-[20px]"
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                     >
@@ -361,7 +390,12 @@ export function Wizard({
                       <input
                         autoFocus
                         name="destination"
-                        className="mt-[9px] block h-[54px] w-full rounded-[13px] border border-solid border-[#e6e9f0] bg-white px-[14px] py-0 text-[13px] mobile:text-[14px] font-medium leading-[20px] text-ink placeholder:text-[length:inherit] placeholder:leading-[20px] placeholder:text-[#a3a9b8] placeholder:opacity-100 aria-invalid:border-[#d86868] aria-invalid:bg-[#fff8f8] aria-invalid:focus:[outline-color:#d86868]"
+                        className="mt-[9px] block h-13.5 w-full rounded-[13px] border border-solid
+                          border-[#e6e9f0] bg-white px-3.5 py-0 text-[13px] mobile:text-[14px]
+                          font-medium leading-[20px] text-ink placeholder:text-[length:inherit]
+                          placeholder:leading-[20px] placeholder:text-[#a3a9b8]
+                          placeholder:opacity-100 aria-invalid:border-[#d86868]
+                          aria-invalid:bg-[#fff8f8] aria-invalid:focus:[outline-color:#d86868]"
                         aria-describedby={
                           cityError ? "destination-help" : undefined
                         }
@@ -377,7 +411,7 @@ export function Wizard({
                         <span
                           id="destination-help"
                           role="alert"
-                          className="mt-[8px] block text-[11px] font-medium leading-[1.6] text-[#b94444]"
+                          className="mt-2 block text-[11px] font-medium leading-[1.6] text-[#b94444]"
                         >
                           {cityError}
                         </span>
@@ -423,7 +457,11 @@ export function Wizard({
                   </div>
                   <div
                     data-ui="quick-chips"
-                    className="flex flex-wrap gap-[7px] mt-[11px] [&_button]:[border:1px_solid_#e8ebf3] [&_button]:rounded-[11px] [&_button]:[background:#fff] [&_button]:text-[#8a92a3] [&_button]:py-[7px] [&_button]:px-[14px] [&_button]:text-[11px] [&_button]:min-h-[38px] mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-[40px] mobile:[&_button]:py-[8px] mobile:[&_button]:px-[14px] mobile:[&_button]:[background:white]"
+                    className="flex flex-wrap gap-[7px] mt-[11px] [&_button]:[border:1px_solid_#e8ebf3]
+                      [&_button]:rounded-[11px] [&_button]:bg-white [&_button]:text-[#8a92a3]
+                      [&_button]:py-[7px] [&_button]:px-3.5 [&_button]:text-[11px]
+                      [&_button]:min-h-9.5 mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-10
+                      mobile:[&_button]:py-2 mobile:[&_button]:px-3.5 mobile:[&_button]:bg-white"
                   >
                     {[
                       ["Завтра", config.default_date],
@@ -451,7 +489,7 @@ export function Wizard({
                   </span>
                   <div
                     data-ui="duration-grid"
-                    className="grid grid-cols-[repeat(3,_1fr)] gap-[9px] mt-[12px] mobile:gap-[10px]"
+                    className="grid grid-cols-[repeat(3,_1fr)] gap-[9px] mt-3 mobile:gap-2.5"
                   >
                     {[1, 2, 3].map((days) => (
                       <button
@@ -459,11 +497,7 @@ export function Wizard({
                         key={days}
                         aria-pressed={draft.days === days}
                         data-ui={`duration-card ${draft.days === days ? "selected" : ""}`}
-                        className={
-                          "[border:1.5px_solid_#e9ecf3] [background:white] rounded-[17px] py-[20px] px-[6px] flex items-center flex-col mobile:py-[20px] mobile:px-[6px] mobile:min-h-[134px] [&_>_span]:text-[27px] [&_>_span]:text-[#a0aec7] [&_>_span]:leading-[1.4] [&_>_span]:mb-[9px] mobile:[&_>_span]:text-[28px] [&_strong]:text-[12px] [&_strong]:[font-weight:750] mobile:[&_strong]:text-[12px] [&_small]:text-[11px] [&_small]:text-[#a0a6b6] [&_small]:mt-[5px] mobile:[&_small]:text-[11px]" +
-                          " " +
-                          (draft.days === days ? selectedChoiceStyles : "")
-                        }
+                        className={`${durationCardStyles} ${draft.days === days ? selectedChoiceStyles : ""}`}
                         onClick={() => {
                           const last = addDays(config.last_trip_date, 1 - days);
                           update({
@@ -489,7 +523,11 @@ export function Wizard({
                   </div>
                   <div
                     data-ui="trip-date-preview"
-                    className="mt-[27px] rounded-[15px] [background:#f6f7fc] p-[18px] flex gap-[13px] items-center text-[#919fbe] mobile:[background:#eef2fb] mobile:p-[17px] mobile:mt-[16px] [&_strong]:text-[12px] [&_strong]:block [&_strong]:text-[#59647e] mobile:[&_strong]:text-[12px] [&_span]:text-[11px] [&_span]:block [&_span]:mt-[5px] [&_span]:text-[#929caf] mobile:[&_span]:text-[11px]"
+                    className="mt-[27px] rounded-[15px] bg-[#f6f7fc] p-4.5 flex gap-[13px] items-center
+                      text-[#919fbe] mobile:bg-[#eef2fb] mobile:p-[17px] mobile:mt-4
+                      [&_strong]:text-[12px] [&_strong]:block [&_strong]:text-[#59647e]
+                      mobile:[&_strong]:text-[12px] [&_span]:text-[11px] [&_span]:block
+                      [&_span]:mt-[5px] [&_span]:text-[#929caf] mobile:[&_span]:text-[11px]"
                   >
                     <CalendarDays size={22} />
                     <div>
@@ -508,7 +546,8 @@ export function Wizard({
                   </div>
                   <p
                     data-ui="field-hint"
-                    className="text-[11px] leading-[1.85] text-[#99a0b2] mt-[12px] mobile:text-[11px] mobile-type:text-[12px]"
+                    className="text-[11px] leading-[1.85] text-[#99a0b2] mt-3 mobile:text-[11px]
+                      mobile-type:text-[12px]"
                   >
                     Даты доступны до {dateLabel(config.last_trip_date)} — чтобы
                     учесть актуальный прогноз.
@@ -571,7 +610,8 @@ export function Wizard({
                   </div>
                   <div
                     data-ui="counter-row"
-                    className="flex justify-between items-center my-[26px] mx-0 mobile:py-[5px] mobile:px-0 [&_strong]:text-[12px] [&_p]:text-[11px] [&_p]:text-muted [&_p]:mt-[5px]"
+                    className="flex justify-between items-center my-6.5 mx-0 mobile:py-[5px] mobile:px-0
+                      [&_strong]:text-[12px] [&_p]:text-[11px] [&_p]:text-muted [&_p]:mt-[5px]"
                   >
                     <div>
                       <strong>Сколько нас?</strong>
@@ -602,7 +642,8 @@ export function Wizard({
                       </label>
                       <p
                         data-ui="field-hint"
-                        className="text-[11px] leading-[1.85] text-[#99a0b2] mt-[12px] mobile:text-[11px] mobile-type:text-[12px]"
+                        className="text-[11px] leading-[1.85] text-[#99a0b2] mt-3 mobile:text-[11px]
+                          mobile-type:text-[12px]"
                       >
                         Через запятую. Если едут только взрослые, оставьте
                         пустым.
@@ -615,7 +656,7 @@ export function Wizard({
                 <>
                   <div
                     data-ui="interests-grid"
-                    className="grid grid-cols-[1fr_1fr] gap-[11px] mobile:gap-[10px]"
+                    className="grid grid-cols-[1fr_1fr] gap-[11px] mobile:gap-2.5"
                   >
                     {interests.map(([name, Icon, hint]) => (
                       <Choice
@@ -641,7 +682,11 @@ export function Wizard({
                     Есть особые пожелания?
                     <span
                       data-ui="optional"
-                      className="[[data-ui~=field-label]_&]:font-medium [[data-ui~=field-label]_&]:text-[#a0a7b8] [[data-ui~=field-label]_&]:text-[11px] [[data-ui~=field-label]_&]:[float:right] mobile:[[data-ui~=field-label]_&]:text-[11px]"
+                      className="[[data-ui~=field-label]_&]:font-medium
+                        [[data-ui~=field-label]_&]:text-[#a0a7b8]
+                        [[data-ui~=field-label]_&]:text-[11px]
+                        [[data-ui~=field-label]_&]:[float:right]
+                        mobile:[[data-ui~=field-label]_&]:text-[11px]"
                     >
                       Необязательно
                     </span>
@@ -664,7 +709,10 @@ export function Wizard({
                   </span>
                   <div
                     data-ui="segmented"
-                    className="flex gap-[4px] p-[5px] [background:#f2f4f9] rounded-[14px] mt-[10px] mobile:[background:#eaf0f9] [&_button]:[flex:1] [&_button]:[background:none] [&_button]:text-[11px] [&_button]:text-[#9299ab] [&_button]:rounded-[10px] [&_button]:min-h-[39px] [&_button]:p-[7px] mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-[42px]"
+                    className="flex gap-1 p-[5px] bg-[#f2f4f9] rounded-[14px] mt-2.5 mobile:bg-[#eaf0f9]
+                      [&_button]:flex-1 [&_button]:[background:none] [&_button]:text-[11px]
+                      [&_button]:text-[#9299ab] [&_button]:rounded-[10px] [&_button]:min-h-[39px]
+                      [&_button]:p-[7px] mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-10.5"
                   >
                     {(
                       [
@@ -691,9 +739,22 @@ export function Wizard({
                 <>
                   <div
                     data-ui="budget-input"
-                    className={
-                      "py-[24px] px-[20px] [background:#f5f7ff] rounded-[20px] text-center mobile:[background:#eef2ff] mobile:py-[24px] mobile:px-[15px] [&_label]:text-[11px] [&_label]:text-[#8b95af] mobile:[&_label]:text-[11px] [&_>_div]:flex [&_>_div]:justify-center [&_>_div]:items-center [&_>_div]:mt-[12px] [&_>_div]:mx-0 [&_>_div]:mb-[8px] [&_>_div]:gap-[4px] [&_input]:[appearance:textfield] [&_input]:[-moz-appearance:textfield] [&_input]:[background:none] [&_input]:[border:0] [&_input]:[outline:none] [&_input]:text-[37px] [&_input]:tracking-[-1.5px] [&_input]:text-right [&_input]:font-extrabold [&_input]:w-[155px] [&_input]:text-ink [&_input]:p-0 [&_input]:min-h-[48px] mobile:[&_input]:text-[39px] mobile:[&_input]:w-[162px] [&_input::-webkit-inner-spin-button]:[-webkit-appearance:none] [&_input::-webkit-inner-spin-button]:m-0 [&_input::-webkit-outer-spin-button]:[-webkit-appearance:none] [&_input::-webkit-outer-spin-button]:m-0 [&_>_div_>_span]:text-[31px] [&_>_div_>_span]:text-[#98a5c9] [&_small]:text-[11px] [&_small]:text-[#99a2b7] mobile:[&_small]:text-[11px]"
-                    }
+                    className="py-6 px-5 bg-[#f5f7ff] rounded-[20px] text-center mobile:bg-[#eef2ff]
+                      mobile:py-6 mobile:px-[15px] [&_label]:text-[11px] [&_label]:text-[#8b95af]
+                      mobile:[&_label]:text-[11px] [&_>_div]:flex [&_>_div]:justify-center
+                      [&_>_div]:items-center [&_>_div]:mt-3 [&_>_div]:mx-0 [&_>_div]:mb-2
+                      [&_>_div]:gap-1 [&_input]:[appearance:textfield]
+                      [&_input]:[-moz-appearance:textfield] [&_input]:[background:none]
+                      [&_input]:[border:0] [&_input]:[outline:none] [&_input]:text-[37px]
+                      [&_input]:tracking-[-1.5px] [&_input]:text-right [&_input]:font-extrabold
+                      [&_input]:w-[155px] [&_input]:text-ink [&_input]:p-0 [&_input]:min-h-12
+                      mobile:[&_input]:text-[39px] mobile:[&_input]:w-40.5
+                      [&_input::-webkit-inner-spin-button]:[-webkit-appearance:none]
+                      [&_input::-webkit-inner-spin-button]:m-0
+                      [&_input::-webkit-outer-spin-button]:[-webkit-appearance:none]
+                      [&_input::-webkit-outer-spin-button]:m-0 [&_>_div_>_span]:text-[31px]
+                      [&_>_div_>_span]:text-[#98a5c9] [&_small]:text-[11px] [&_small]:text-[#99a2b7]
+                      mobile:[&_small]:text-[11px]"
                   >
                     <label htmlFor="budget">Бюджет на всю компанию</label>
                     <div>
@@ -721,7 +782,23 @@ export function Wizard({
                   </div>
                   <div
                     data-ui="quick-chips budget-chips"
-                    className="flex flex-wrap gap-[7px] mt-[11px] [&_button]:[border:1px_solid_#e8ebf3] [&_button]:rounded-[11px] [&_button]:[background:#fff] [&_button]:text-[#8a92a3] [&_button]:py-[7px] [&_button]:px-[14px] [&_button]:text-[11px] [&_button]:min-h-[38px] mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-[40px] mobile:[&_button]:py-[8px] mobile:[&_button]:px-[14px] mobile:[&_button]:[background:white] [[data-ui~=quick-chips]&]:justify-center [[data-ui~=quick-chips]&]:gap-[6px] mobile:[[data-ui~=quick-chips]&]:flex-nowrap mobile:[[data-ui~=quick-chips]&]:gap-[6px] mobile-type:[[data-ui~=quick-chips]&]:flex-wrap [[data-ui~=quick-chips]&_button]:py-[8px] [[data-ui~=quick-chips]&_button]:px-[11px] [[data-ui~=quick-chips]&_button]:text-[11px] mobile:[[data-ui~=quick-chips]&_button]:py-[9px] mobile:[[data-ui~=quick-chips]&_button]:px-[6px] mobile:[[data-ui~=quick-chips]&_button]:[flex:1] mobile:[[data-ui~=quick-chips]&_button]:text-[11px] mobile:[[data-ui~=quick-chips]&_button]:whitespace-nowrap narrow:[[data-ui~=quick-chips]&_button]:text-[11px]"
+                    className="flex flex-wrap gap-[7px] mt-[11px] [&_button]:[border:1px_solid_#e8ebf3]
+                      [&_button]:rounded-[11px] [&_button]:bg-white [&_button]:text-[#8a92a3]
+                      [&_button]:py-[7px] [&_button]:px-3.5 [&_button]:text-[11px]
+                      [&_button]:min-h-9.5 mobile:[&_button]:text-[11px] mobile:[&_button]:min-h-10
+                      mobile:[&_button]:py-2 mobile:[&_button]:px-3.5 mobile:[&_button]:bg-white
+                      [[data-ui~=quick-chips]&]:justify-center [[data-ui~=quick-chips]&]:gap-1.5
+                      mobile:[[data-ui~=quick-chips]&]:flex-nowrap
+                      mobile:[[data-ui~=quick-chips]&]:gap-1.5
+                      mobile-type:[[data-ui~=quick-chips]&]:flex-wrap
+                      [[data-ui~=quick-chips]&_button]:py-2 [[data-ui~=quick-chips]&_button]:px-[11px]
+                      [[data-ui~=quick-chips]&_button]:text-[11px]
+                      mobile:[[data-ui~=quick-chips]&_button]:py-[9px]
+                      mobile:[[data-ui~=quick-chips]&_button]:px-1.5
+                      mobile:[[data-ui~=quick-chips]&_button]:flex-1
+                      mobile:[[data-ui~=quick-chips]&_button]:text-[11px]
+                      mobile:[[data-ui~=quick-chips]&_button]:whitespace-nowrap
+                      narrow:[[data-ui~=quick-chips]&_button]:text-[11px]"
                   >
                     {[5000, 12000, 20000, 30000].map((amount) => (
                       <button
@@ -745,7 +822,7 @@ export function Wizard({
                   </span>
                   <div
                     data-ui="transport-choices"
-                    className="grid grid-cols-[1fr_1fr] gap-[10px] mt-[11px]"
+                    className="grid grid-cols-[1fr_1fr] gap-2.5 mt-[11px]"
                   >
                     <Choice
                       selected={!draft.has_car}
@@ -764,16 +841,22 @@ export function Wizard({
                   </div>
                   <details
                     data-ui="travel-options"
-                    className={
-                      "[border-top:1px_solid_var(--line)] [border-bottom:1px_solid_var(--line)] mt-[24px] pb-0 [&[open]]:pb-[17px] [&_summary]:[cursor:pointer] [&_summary]:flex [&_summary]:items-center [&_summary]:gap-[8px] [&_summary]:text-[11px] [&_summary]:[font-weight:650] [&_summary]:py-[17px] [&_summary]:px-0 [&_summary]:[list-style:none] mobile:[&_summary]:text-[11px] [&_summary::-webkit-details-marker]:hidden [&_summary_>_span]:ml-auto [&_summary_>_span]:text-[#939db0] [&_summary_>_span]:text-[11px] [&_summary_>_span]:font-medium mobile:[&_summary_>_span]:text-[11px]"
-                    }
+                    className="[border-top:1px_solid_var(--line)] [border-bottom:1px_solid_var(--line)] mt-6
+                      pb-0 [&[open]]:pb-[17px] [&_summary]:cursor-pointer [&_summary]:flex
+                      [&_summary]:items-center [&_summary]:gap-2 [&_summary]:text-[11px]
+                      [&_summary]:font-[650] [&_summary]:py-[17px] [&_summary]:px-0
+                      [&_summary]:[list-style:none] mobile:[&_summary]:text-[11px]
+                      [&_summary::-webkit-details-marker]:hidden [&_summary_>_span]:ml-auto
+                      [&_summary_>_span]:text-[#939db0] [&_summary_>_span]:text-[11px]
+                      [&_summary_>_span]:font-medium mobile:[&_summary_>_span]:text-[11px]"
                   >
                     <summary>
                       <Clock3 size={18} /> Время в дороге <span>Настроить</span>
                     </summary>
                     <div
                       data-ui="fields-pair"
-                      className="grid grid-cols-[1fr_1fr] gap-[12px] mobile:[&_input]:p-[10px] mobile:[&_input]:min-w-0 mobile:[&_input]:text-[16px]"
+                      className="grid grid-cols-[1fr_1fr] gap-3 mobile:[&_input]:p-2.5 mobile:[&_input]:min-w-0
+                        mobile:[&_input]:text-[16px]"
                     >
                       <label data-ui="field-label" className={fieldLabelStyles}>
                         Выезд не раньше
@@ -833,7 +916,13 @@ export function Wizard({
           </AnimatePresence>
           <div
             data-ui="wizard-actions"
-            className="py-[16px] px-[24px] [border-top:1px_solid_#f0f2f7] [background:#fff] tablet:px-[24px] mobile:sticky mobile:bottom-0 mobile:pt-[12px] mobile:px-[24px] mobile:pb-[calc(12px_+_env(safe-area-inset-bottom))] mobile:[border-top:1px_solid_#e9edf6] mobile:[background:#f8f9fcf5] mobile:[backdrop-filter:blur(16px)] mobile:z-[15] narrow:px-[21px] narrow-spacing:px-[20px] short:sticky short:bottom-0 short:z-[15] short:pt-[12px] short:pb-[calc(12px_+_env(safe-area-inset-bottom))]"
+            className="py-4 px-6 [border-top:1px_solid_#f0f2f7] bg-white tablet:px-6 mobile:sticky
+              mobile:bottom-0 mobile:pt-3 mobile:px-6
+              mobile:pb-[calc(12px_+_env(safe-area-inset-bottom))]
+              mobile:[border-top:1px_solid_#e9edf6] mobile:bg-[#f8f9fcf5]
+              mobile:[backdrop-filter:blur(16px)] mobile:z-[15] narrow:px-[21px] narrow-spacing:px-5
+              short:sticky short:bottom-0 short:z-[15] short:pt-3
+              short:pb-[calc(12px_+_env(safe-area-inset-bottom))]"
           >
             {(error || serverError) && (
               <Notice error>{error || serverError}</Notice>
@@ -851,7 +940,8 @@ export function Wizard({
             </Primary>
             <span
               data-ui="action-caption"
-              className="block text-center text-[11px] text-[#a1a7b6] mt-[11px] leading-[1.7] mobile:text-[11px] mobile:mt-[10px] mobile-type:text-[10px]"
+              className="block text-center text-[11px] text-[#a1a7b6] mt-[11px] leading-[1.7]
+                mobile:text-[11px] mobile:mt-2.5 mobile-type:text-[10px]"
             >
               {step === 4
                 ? "ИИ соберёт программу, сервисы проверят погоду и дорогу"

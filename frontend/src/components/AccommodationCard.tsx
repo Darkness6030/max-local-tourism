@@ -16,9 +16,10 @@ export function AccommodationCard({
   return (
     <section
       data-ui="accommodation-card"
-      className="mt-[24px] rounded-[20px] border border-solid border-[var(--line)] bg-white p-[22px] mobile:mt-[16px] mobile:rounded-[18px] mobile:p-[19px]"
+      className="mt-6 rounded-[20px] border border-solid border-[var(--line)] bg-white p-5.5 mobile:mt-4
+        mobile:rounded-[18px] mobile:p-[19px]"
     >
-      <div className="flex items-center gap-[12px]">
+      <div className="flex items-center gap-3">
         <span className="grid h-[39px] w-[39px] shrink-0 place-items-center rounded-[13px] bg-[#ecf0ff] text-brand">
           <BedDouble size={22} />
         </span>
@@ -30,7 +31,7 @@ export function AccommodationCard({
           </p>
         </div>
       </div>
-      <div className="mt-[18px] rounded-[13px] bg-[#f5f7fb] px-[14px] py-[12px] text-[12px] leading-[1.8]">
+      <div className="mt-4.5 rounded-[13px] bg-[#f5f7fb] px-3.5 py-3 text-[12px] leading-[1.8]">
         <p>
           Ориентир: <strong>≈ {money(stay.estimated_room_night_rub)}</strong> за
           номер / ночь
@@ -44,17 +45,17 @@ export function AccommodationCard({
           размещение детей уточняйте.
         </p>
       </div>
-      <p className="mt-[12px] text-[11px] leading-[1.8] text-muted">
+      <p className="mt-3 text-[11px] leading-[1.8] text-muted">
         {ACCOMMODATION_DISCLAIMER}
       </p>
-      <div className={`mt-[8px] divide-x-0 divide-y divide-solid divide-[var(--line)] ${stay.hotels.length ? "mb-[14px] border-x-0 border-t-0 border-b border-solid border-[var(--line)]" : ""}`}>
+      <div className={`mt-2 divide-x-0 divide-y divide-solid divide-[var(--line)] ${stay.hotels.length ? "mb-3.5 border-x-0 border-t-0 border-b border-solid border-[var(--line)]" : ""}`}>
         {stay.hotels.map((hotel) => (
           <article
             key={hotel.id}
             data-ui="hotel-card"
-            className="py-[14px] first:pt-[10px]"
+            className="py-3.5 first:pt-2.5"
           >
-            <h3 className="text-[13px] font-bold leading-[1.6] [overflow-wrap:anywhere]">
+            <h3 className="text-[13px] font-bold leading-[1.6] wrap-anywhere">
               {hotel.name}
             </h3>
             <p className="mt-[3px] text-[11px] leading-[1.8] text-muted">
@@ -62,11 +63,11 @@ export function AccommodationCard({
               {hotel.distance_km.toLocaleString("ru-RU")} км от центра по прямой
             </p>
             {hotel.address && (
-              <p className="mt-[4px] text-[12px] leading-[1.7] text-[#687389] [overflow-wrap:anywhere]">
+              <p className="mt-1 text-[12px] leading-[1.7] text-[#687389] wrap-anywhere">
                 {hotel.address}
               </p>
             )}
-            <div className="mt-[4px] flex flex-wrap items-center gap-x-[18px]">
+            <div className="mt-1 flex flex-wrap items-center gap-x-4.5">
               <a
                 className={linkStyles}
                 href={safeUrl(hotel.map_url)}
@@ -100,7 +101,7 @@ export function AccommodationCard({
       {!stay.hotels.length && (
         <p
           data-ui="hotel-empty"
-          className="mt-[14px] text-[12px] leading-[1.8] text-[#687389]"
+          className="mt-3.5 text-[12px] leading-[1.8] text-[#687389]"
         >
           {stay.status === "empty"
             ? "В каталоге пока нет гостиниц рядом с центром города."
