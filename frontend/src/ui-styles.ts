@@ -104,8 +104,8 @@ export const sectionHeadingStyles = [
 export const tripsPageStyles = [
   "max-w-172.5 my-3 mx-auto mobile:my-0.5 mobile:mx-0 [&_>_h1]:text-[37px]",
   "[&_>_h1]:leading-[1.3] [&_>_h1]:tracking-[-1.4px] [&_>_h1]:font-extrabold [&_>_h1]:mt-3.5",
-  "[&_>_h1]:mx-0 [&_>_h1]:mb-[25px] mobile:[&_>_h1]:text-[29px] mobile:[&_>_h1]:tracking-[-1.1px]",
-  "mobile:[&_>_h1]:mt-3 mobile:[&_>_h1]:mx-0 mobile:[&_>_h1]:mb-5.5",
+  "[&_>_h1]:mx-0 mobile:[&_>_h1]:text-[29px] mobile:[&_>_h1]:tracking-[-1.1px]",
+  "mobile:[&_>_h1]:mt-3 mobile:[&_>_h1]:mx-0",
 ].join(" ");
 
 export const activeStyles = [
@@ -280,3 +280,23 @@ export const selectedChoiceStyles = [
 export const softLavenderIconStyles = `${softIconStyles} [[data-ui~=soft-icon]&]:bg-[#f2edff] [[data-ui~=soft-icon]&]:text-[#8a64d6]`;
 
 export const wizardFieldLabelStyles = `${fieldStyles} mobile:[&_select]:text-[16px] [[data-ui~=field-label]&]:mt-6`;
+
+export const programDayHeadingStyles = `
+  flex items-center gap-3 mb-5 [&_>_span]:size-8.5 [&_>_span]:shrink-0 [&_>_span]:grid
+  [&_>_span]:place-items-center [&_>_span]:rounded-[11px] [&_>_span]:bg-[#eaf0ff]
+  [&_>_span]:text-brand [&_>_span]:text-[12px] [&_>_span]:font-extrabold [&_h3]:text-[16px]
+  [&_h3]:leading-[1.5]
+`;
+
+export const programTimelineStyles = `
+  [list-style:none] py-0 pr-0 pl-3.5 m-0 [&_li]:relative [&_li]:[border-left:1px_solid_#dfe5f4]
+  [&_li]:pt-0 [&_li]:pr-0 [&_li]:pb-6 [&_li]:pl-5.5 [&_li::before]:[content:'']
+  [&_li::before]:absolute [&_li::before]:top-[5px] [&_li::before]:-left-1 [&_li::before]:size-[7px]
+  [&_li::before]:bg-brand [&_li::before]:rounded-[50%] [&_li::before]:[box-shadow:0_0_0_4px_#f8f9fc]
+  [&_li:last-child]:border-[transparent] [&_li:last-child]:pb-0 [&_time]:text-brand
+  [&_time]:text-[11px] [&_time]:font-[750] [&_h4]:text-[16px] [&_h4]:my-2 [&_h4]:mx-0
+  [&_h4]:leading-[1.4] [&_p]:text-[13px] [&_p]:leading-[1.8] [&_p]:text-[#687389]
+  preset-mobile:[&_p]:text-[14px] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-1.5 [&_a]:min-h-11
+  [&_a]:py-2 [&_a]:px-0 [&_a]:text-[11px] [&_a]:leading-[1.5] [&_a]:no-underline
+  preset-mobile:[&_a]:text-[12px]
+`;

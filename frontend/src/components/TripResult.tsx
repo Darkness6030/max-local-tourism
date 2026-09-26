@@ -8,6 +8,8 @@ import {
   packingCheckboxStyles,
   packingListStyles,
   primaryButtonStyles,
+  programDayHeadingStyles,
+  programTimelineStyles,
   softBlueIconStyles,
   softLavenderIconStyles,
   textButtonStyles,
@@ -387,109 +389,60 @@ export function TripResult({
                       ))}
                     </div>
                   )}
-                  <div
-                    data-ui="timeline-heading"
-                    className="pt-0 px-[5px] pb-5 mobile:pb-[17px] [&_>_span]:text-[11px]
-                      [&_>_span]:font-extrabold [&_>_span]:tracking-[1.3px] [&_>_span]:text-[#a3adc0]
-                      mobile:[&_>_span]:text-[11px] [&_>_p]:text-[15px] [&_>_p]:font-[750]
-                      [&_>_p]:leading-[1.6] [&_>_p]:mt-1.5 mobile:[&_>_p]:text-[14px]
-                      mobile:[&_>_p]:leading-[1.6]"
-                  >
-                    <span>ДЕНЬ {dayIndex + 1}</span>
-                    <p>{plan.itinerary[dayIndex].title}</p>
+                  <div data-ui="timeline-heading" className={programDayHeadingStyles}>
+                    <span>{String(dayIndex + 1).padStart(2, "0")}</span>
+                    <h3 id="program-day-title">{plan.itinerary[dayIndex].title}</h3>
                   </div>
-                  <div data-ui="timeline" className="grid gap-3.5">
+                  <ol
+                    data-ui="timeline"
+                    className={programTimelineStyles}
+                    aria-labelledby="program-day-title"
+                  >
                     {plan.itinerary[dayIndex].items.map((item, i) => (
-                      <motion.article
+                      <motion.li
                         data-ui="timeline-item"
-                        className="flex gap-3.5 relative mobile:gap-2.5"
                         key={`${dayIndex}-${i}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(i * 0.055, 0.3) }}
                       >
-                        <div
-                          data-ui="timeline-rail"
-                          className="flex justify-center relative w-7 shrink-0 pt-5 mobile:w-5.5 mobile:pt-4.5
-                            [&::after]:[content:''] [&::after]:h-[calc(100%_-_20px)]
-                            [&::after]:absolute [&::after]:top-12 [&::after]:w-[1px]
-                            [&::after]:bg-[#e0e5f1] mobile:[&::after]:top-[45px]
-                            mobile:[&::after]:h-[calc(100%_-_16px)]
-                            [[data-ui~=timeline-item]:last-child_&::after]:hidden [&_>_span]:grid
-                            [&_>_span]:place-items-center [&_>_span]:size-[27px]
-                            [&_>_span]:[border:1px_solid_#e1e6f4] [&_>_span]:rounded-[50%]
-                            [&_>_span]:text-[11px] [&_>_span]:font-bold [&_>_span]:text-[#8c9bb9]
-                            [&_>_span]:bg-[#f8f9fc] [&_>_span]:relative [&_>_span]:z-[1]
-                            mobile:[&_>_span]:size-[23px] mobile:[&_>_span]:text-[11px]"
-                        >
-                          <span>{String(i + 1).padStart(2, "0")}</span>
-                        </div>
-                        <div
-                          data-ui="activity-card"
-                          className="[border:1px_solid_var(--line)] bg-white rounded-[20px] flex-1 py-[19px]
-                            px-[21px] min-w-0 tablet:p-[17px] mobile:py-4 mobile:px-[15px]
-                            mobile:rounded-[18px] narrow:py-3.5 narrow:px-3 [&_h3]:text-[15px]
-                            [&_h3]:font-[750] [&_h3]:leading-[1.5] [&_h3]:mt-2.5 [&_h3]:mx-0
-                            [&_h3]:mb-[7px] [&_h3]:tracking-[-0.3px] [&_h3]:wrap-anywhere
-                            mobile:[&_h3]:text-[14px] mobile:[&_h3]:leading-[1.5]
-                            mobile:[&_h3]:mt-[11px] mobile:[&_h3]:mx-0 mobile:[&_h3]:mb-[7px]"
-                        >
-                          <div
-                            data-ui="activity-top"
-                            className="flex justify-between items-center gap-2.5 mobile:gap-2
-                              mobile-type:flex-wrap [&_>_time]:text-[11px] [&_>_time]:font-[750]
-                              [&_>_time]:text-brand mobile:[&_time]:text-[11px]
-                              mobile-type:[&_time]:text-[12px]"
-                          >
-                            <time>
-                              {item.start_time} — {item.end_time}
-                            </time>
-                            <span
-                              data-ui={`location-tag ${item.indoor ? "indoor" : ""}`}
-                              className={
-                                "text-[11px] text-[#7d9777] bg-[#eff5e9] rounded-[5px] py-1 px-1.5 whitespace-nowrap mobile:text-[11px] mobile:py-1 mobile:px-1.5 mobile-type:text-[10px]" +
-                                " " +
-                                (item.indoor
-                                  ? "[[data-ui~=location-tag]&]:bg-[#f2effc] [[data-ui~=location-tag]&]:text-[#9a88b6]"
-                                  : "")
-                              }
-                            >
-                              {item.indoor ? "Внутри" : "На воздухе"}
-                            </span>
-                          </div>
-                          <h3>{item.title}</h3>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <time>{item.start_time} — {item.end_time}</time>
                           <span
-                            data-ui="activity-place"
-                            className="flex gap-1 items-center text-[#9ca6b8] text-[11px] mobile:text-[11px]
-                              mobile:items-start mobile:leading-[1.7] mobile:gap-[5px]
-                              mobile-type:text-[12px] mobile:[&_>_svg]:size-3
-                              mobile:[&_>_svg]:mt-[1px]"
-                          >
-                            <MapPin size={13} />
-                            {item.place}
-                          </span>
-                          <p
-                            className={`mt-2.5 mx-0 text-[11px] leading-[1.9] text-[#687389] mobile:mt-[9px] mobile-type:text-[14px] ${
-                              item.estimated_cost_rub > 0
-                                ? "mb-2.5 mobile:mb-[9px]"
-                                : "mb-0"
+                            data-ui="location-tag"
+                            className={`rounded-[5px] px-1.5 py-1 text-[10px] whitespace-nowrap ${
+                              item.indoor
+                                ? "bg-[#f2effc] text-[#9a88b6]"
+                                : "bg-[#eff5e9] text-[#7d9777]"
                             }`}
                           >
-                            {item.description}
-                          </p>
-                          {item.estimated_cost_rub > 0 && (
-                            <span
-                              data-ui="activity-price"
-                              className="text-[11px] font-[650] text-[#7e89a1] mobile:text-[11px]
-                                mobile-type:text-[12px]"
-                            >
-                              ≈ {money(item.estimated_cost_rub)}
-                            </span>
-                          )}
+                            {item.indoor ? "Внутри" : "На воздухе"}
+                          </span>
                         </div>
-                      </motion.article>
+                        <h4>{item.title}</h4>
+                        <p>{item.description}</p>
+                        <a
+                          href={`https://yandex.ru/maps/?text=${encodeURIComponent(item.place + ", " + plan.destination.title)}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            external(event.currentTarget.href);
+                          }}
+                        >
+                          <MapPin size={14} />
+                          <span>{item.place}</span>
+                          <ArrowUpRight size={14} />
+                        </a>
+                        {item.estimated_cost_rub > 0 && (
+                          <span
+                            data-ui="activity-price"
+                            className="block text-[11px] font-[650] text-[#7e89a1] mobile:text-[12px]"
+                          >
+                            ≈ {money(item.estimated_cost_rub)}
+                          </span>
+                        )}
+                      </motion.li>
                     ))}
-                  </div>
+                  </ol>
                   {plan.request.days > 1 && plan.accommodation && (
                     <AccommodationCard
                       stay={plan.accommodation}
