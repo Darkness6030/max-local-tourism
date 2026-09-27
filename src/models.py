@@ -32,10 +32,6 @@ def current_date() -> date:
     return datetime.now(MSK_TIMEZONE).date()
 
 
-class UserProfile(BaseModel):
-    onboarding_completed: bool
-
-
 class GroupType(StrEnum):
     SOLO = "solo"
     COUPLE = "couple"
@@ -52,6 +48,34 @@ class Pace(StrEnum):
 class OriginCity(StrEnum):
     MOSCOW = "Москва"
     SAINT_PETERSBURG = "Санкт-Петербург"
+
+
+class ProfilePreferences(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    display_name: str = Field(default="", max_length=60)
+    avatar_style: Literal["max", "initials", "compass", "mountain", "sun"] = "max"
+    avatar_color: Literal["lavender", "sage", "peach", "sky"] = "lavender"
+    origin: OriginCity = OriginCity.MOSCOW
+    pace: Pace = Pace.BALANCED
+    interests: list[Literal["Природа", "История", "Местная кухня", "Прогулки", "Активный отдых", "Музеи"]] = Field(
+        default_factory=lambda: ["Прогулки", "Местная кухня"], max_length=6)
+
+    @field_validator("display_name")
+    @classmethod
+    def name_without_controls(cls, value: str) -> str:
+        if any(ord(char) < 32 for char in value):
+            raise ValueError("Имя не должно содержать управляющие символы")
+        return value
+
+    @field_validator("interests")
+    @classmethod
+    def unique_interests(cls, value: list[str]) -> list[str]:
+        return list(dict.fromkeys(value))
+
+
+class UserProfile(BaseModel):
+    onboarding_completed: bool
+    preferences: ProfilePreferences = Field(default_factory=ProfilePreferences)
 
 
 class TripParameters(BaseModel):
@@ -223,6 +247,8 @@ class GeneratedTripContent(BaseModel):
     summary: str = Field(min_length=20, max_length=1200)
     itinerary: list[ItineraryDay] = Field(min_length=1, max_length=3)
     budget_items: list[BudgetItem] = Field(min_length=1, max_length=10)
+    outbound_fare_rub: int | None = Field(ge=0, description="Оценка билета туда на одного человека, без льгот; null, если оценить нельзя")
+    return_fare_rub: int | None = Field(ge=0, description="Оценка обратного билета на одного человека, без льгот; null, если оценить нельзя")
     lodging_nightly_rub: int | None = Field(default=None, ge=0)
     weather_advice: str = Field(min_length=10, max_length=800)
     packing_list: list[str] = Field(min_length=1, max_length=20)

@@ -15,6 +15,7 @@ from src.models import (
     JobState,
     OriginCity,
     PackingUpdate,
+    ProfilePreferences,
     TransportOptions,
     TripJobCreated,
     TripJobStatus,
@@ -48,6 +49,13 @@ ContainerDep = Annotated[Container, Depends(get_container)]
 @router.get("/profile", response_model=UserProfile, tags=["profile"])
 async def profile(identity: IdentityDep, container: ContainerDep) -> UserProfile:
     return await container.store.get_profile(identity.owner_id)
+
+
+@router.put("/profile", response_model=UserProfile, tags=["profile"])
+async def update_profile(
+    payload: ProfilePreferences, identity: IdentityDep, container: ContainerDep,
+) -> UserProfile:
+    return await container.store.update_profile(identity.owner_id, payload)
 
 
 @router.put("/profile/onboarding", response_model=UserProfile, tags=["profile"])

@@ -90,7 +90,7 @@ def main():
         expect(switches).to_have_count(4)
         expect(panel.get_by_text("Рейс уже отправился", exact=True)).to_have_count(2)
         expect(switches.nth(0)).to_be_enabled()
-        expect(panel.get_by_role("button", name="Расписание")).to_have_count(0)
+        expect(panel.get_by_role("button", name="Расписание")).to_have_count(2)
         intro = panel.get_by_text("Время рейсов из расписаний.", exact=False)
         assert intro.evaluate("el => Math.abs(parseFloat(getComputedStyle(el).lineHeight) / parseFloat(getComputedStyle(el).fontSize) - 1.7) < .01")
         control["hold"] = True

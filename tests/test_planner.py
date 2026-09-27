@@ -126,6 +126,7 @@ class FakeAI:
                 )
             ],
             budget_items=[BudgetItem(category="Еда", amount_rub=2000)],
+            outbound_fare_rub=None, return_fare_rub=None,
             weather_advice="Погода подходит для длительной прогулки.",
             packing_list=["Вода", "Удобная обувь"],
         )

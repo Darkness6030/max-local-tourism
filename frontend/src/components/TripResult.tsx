@@ -37,7 +37,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { TransportOption, TripPlan } from "../types";
-import { api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
+import { addDays, api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
 import { AccommodationCard } from "./AccommodationCard";
 import { Notice } from "./UI";
 import { shareTrip } from "../trip-share";
@@ -527,13 +527,33 @@ export function TripResult({
                     mobile-type:[&_>_p]:text-[14px]"
                 >
                   <h2>Дорога — часть путешествия</h2>
-                  <p
-                    data-ui="muted"
-                    className="text-muted [[data-ui~=text-button]&]:text-muted"
-                  >
-                    Время рейсов из расписаний. Перед отправлением проверьте
-                    изменения у перевозчика.
-                  </p>
+                  <div data-ui="schedule-notice" className="rounded-[18px] border border-[#e2e7f1] bg-white p-4 mb-5">
+                    <p className="text-muted text-[12px] mobile-type:text-[14px] leading-[1.7]">
+                      Время рейсов из расписаний. Перед отправлением проверьте изменения у перевозчика.
+                    </p>
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3">
+                      {([false, true] as const).map((returning) => {
+                        const options = returning ? plan.transport?.return_trip : plan.transport?.outbound;
+                        const params = new URLSearchParams({
+                          fromName: returning ? plan.destination.title : plan.request.origin,
+                          toName: returning ? plan.request.origin : plan.destination.title,
+                          when: returning ? addDays(plan.request.start_date, plan.request.days - 1) : plan.request.start_date,
+                        });
+                        const url = options?.find((option) => safeUrl(option.buy_url))?.buy_url
+                          || `https://rasp.yandex.ru/search/?${params}`;
+                        return <button key={String(returning)} type="button" className={`${textButtonStyles} !text-[12px] flex items-center gap-1`}
+                          onClick={() => external(url)}>{returning ? "Расписание обратно" : "Расписание туда"}<ArrowUpRight size={15} /></button>;
+                      })}
+                    </div>
+                  </div>
+                  {plan.request.origin === "Москва" && (
+                    <div data-ui="moscow-ticket-note" className="rounded-[18px] bg-[#edf2e9] p-4 mb-5 text-[12px] leading-[1.7] text-[#63745f]">
+                      <strong className="block mb-1">Если едете на электричке из Москвы</strong>
+                      Билет можно записать на «Тройку», а льготный — на социальную карту москвича.
+                      Студентам очной формы обучения доступна скидка 50% с 1 сентября по 15 июня
+                      при подтверждённом праве на льготу. Возможность записи билета и условия для конкретного рейса уточните у перевозчика.
+                    </div>
+                  )}
                   {reminders.error && (
                     <div role="alert" className="text-[13px] text-muted mb-4">
                       {reminders.error}
@@ -813,9 +833,7 @@ export function TripResult({
                 tablet:[&_>_strong]:text-[32px] mobile:[&_>_strong]:text-[35px] [&_h3]:text-[12px]
                 [&_h3]:mt-1.5 [&_h3]:font-[650] mobile:[&_h3]:text-[12px]
                 mobile-type:[&_h3]:text-[12px] [&_>_p]:text-[11px] [&_>_p]:mt-[7px]
-                [&_>_p]:text-[#91a3b9] mobile:[&_>_p]:text-[11px] mobile-type:[&_>_p]:text-[12px]
-                [&_>_small]:block [&_>_small]:text-[11px] [&_>_small]:text-[#9bacbf]
-                [&_>_small]:mt-3.5"
+                [&_>_p]:text-[#91a3b9] mobile:[&_>_p]:text-[11px] mobile-type:[&_>_p]:text-[12px]"
             >
               <div
                 data-ui="weather-top"
@@ -843,7 +861,6 @@ export function TripResult({
               >
                 {plan.weather_advice}
               </div>
-              <small>{plan.weather.provider}</small>
             </section>
           )}
           <div

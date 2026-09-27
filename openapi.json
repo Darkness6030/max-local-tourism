@@ -56,6 +56,50 @@
             "MaxInitData": []
           }
         ]
+      },
+      "put": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Update Profile",
+        "operationId": "update_profile_api_v1_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilePreferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ]
       }
     },
     "/api/v1/profile/onboarding": {
@@ -1659,6 +1703,66 @@
         ],
         "title": "PackingUpdate"
       },
+      "ProfilePreferences": {
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Display Name",
+            "default": ""
+          },
+          "avatar_style": {
+            "type": "string",
+            "enum": [
+              "max",
+              "initials",
+              "compass",
+              "mountain",
+              "sun"
+            ],
+            "title": "Avatar Style",
+            "default": "max"
+          },
+          "avatar_color": {
+            "type": "string",
+            "enum": [
+              "lavender",
+              "sage",
+              "peach",
+              "sky"
+            ],
+            "title": "Avatar Color",
+            "default": "lavender"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/OriginCity",
+            "default": "Москва"
+          },
+          "pace": {
+            "$ref": "#/components/schemas/Pace",
+            "default": "balanced"
+          },
+          "interests": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "Природа",
+                "История",
+                "Местная кухня",
+                "Прогулки",
+                "Активный отдых",
+                "Музеи"
+              ]
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Interests"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ProfilePreferences"
+      },
       "ProgressEvent": {
         "properties": {
           "progress": {
@@ -2600,6 +2704,9 @@
           "onboarding_completed": {
             "type": "boolean",
             "title": "Onboarding Completed"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/ProfilePreferences"
           }
         },
         "type": "object",

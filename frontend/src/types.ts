@@ -1,5 +1,15 @@
 export interface UserProfile {
   onboarding_completed: boolean;
+  preferences?: ProfilePreferences;
+}
+
+export interface ProfilePreferences {
+  display_name: string;
+  avatar_style: "max" | "initials" | "compass" | "mountain" | "sun";
+  avatar_color: "lavender" | "sage" | "peach" | "sky";
+  origin: string;
+  pace: "relaxed" | "balanced" | "intensive";
+  interests: string[];
 }
 
 export interface Identity {
@@ -142,7 +152,7 @@ export interface Job {
   error: { error: string } | null;
 }
 export type Screen =
-  "home" | "wizard" | "loading" | "result" | "preset" | "trips" | "about";
+  "home" | "wizard" | "loading" | "result" | "preset" | "trips" | "about" | "profile";
 export interface Bridge {
   platform?: "ios" | "android" | "desktop" | "web";
   version?: string;

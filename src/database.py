@@ -16,6 +16,12 @@ class UserProfileRecord(SQLModel, table=True):
     onboarding_completed_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
 
 
+class ProfilePreferencesRecord(SQLModel, table=True):
+    __tablename__ = "profile_preferences"
+    owner_id: str = Field(sa_column=Column(String(80), primary_key=True))
+    payload: dict = Field(sa_column=Column(JSONB, nullable=False))
+
+
 class TripRecord(SQLModel, table=True):
     __tablename__ = "trips"
     __table_args__ = (Index("ix_trips_owner_created_id", "owner_id", "created_at", "id"),)

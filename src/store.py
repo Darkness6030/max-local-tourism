@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from src.database import (
     JobRecord,
+    ProfilePreferencesRecord,
     SharedTripImportRecord,
     SharedTripRecord,
     TransportReminderRecord,
@@ -17,6 +18,7 @@ from src.errors import ServiceError
 from src.models import (
     ErrorBody,
     JobState,
+    ProfilePreferences,
     TripJobStatus,
     TripPage,
     TripPlan,
@@ -36,7 +38,9 @@ class TripStore:
     async def get_profile(self, owner_id: str) -> UserProfile:
         async with self.sessions() as session:
             row = await session.get(UserProfileRecord, owner_id)
-            return UserProfile(onboarding_completed=row is not None)
+            preferences = await session.get(ProfilePreferencesRecord, owner_id)
+            return UserProfile(onboarding_completed=row is not None,
+                               preferences=ProfilePreferences.model_validate(preferences.payload) if preferences else ProfilePreferences())
 
     async def complete_onboarding(self, owner_id: str) -> UserProfile:
         async with self.sessions.begin() as session:
@@ -45,7 +49,14 @@ class TripStore:
                 .values(owner_id=owner_id, onboarding_completed_at=datetime.now(timezone.utc))
                 .on_conflict_do_nothing(index_elements=["owner_id"])
             )
-        return UserProfile(onboarding_completed=True)
+        return await self.get_profile(owner_id)
+
+    async def update_profile(self, owner_id: str, preferences: ProfilePreferences) -> UserProfile:
+        async with self.sessions.begin() as session:
+            payload = preferences.model_dump(mode="json")
+            await session.execute(insert(ProfilePreferencesRecord).values(owner_id=owner_id, payload=payload)
+                                  .on_conflict_do_update(index_elements=["owner_id"], set_={"payload": payload}))
+        return await self.get_profile(owner_id)
 
     @staticmethod
     async def _put(session, plan: TripPlan, owner_id: str):

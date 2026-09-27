@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ChevronRight,
   CloudSun,
+  Coffee,
   Compass,
   Heart,
   House,
@@ -48,6 +49,8 @@ import type {
   UserProfile,
 } from "./types";
 import { ProfileAvatar } from "./components/ProfileAvatar";
+import { Profile } from "./components/Profile";
+import { profileColors } from "./profile";
 import { Brand, Notice, Primary } from "./components/UI";
 import { Onboarding } from "./components/Onboarding";
 import { Wizard } from "./components/Wizard";
@@ -111,6 +114,7 @@ export default function App() {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [screen, setScreen] = useState<Screen>("home");
+  const profileReturn = useRef<Screen>("home");
   const [homeRevision, setHomeRevision] = useState(0);
   const [preset, setPreset] = useState<TripPreset | null>(null);
   const [welcomeEntry, setWelcomeEntry] = useState(false);
@@ -139,6 +143,10 @@ export default function App() {
   const update = (patch: Partial<Draft>) => {
     setDraft((old) => (old ? { ...old, ...patch } : old));
     setSubmitError("");
+  };
+  const openProfile = () => {
+    if (screen !== "profile") profileReturn.current = screen;
+    navigate("profile");
   };
   const changeOrigin = (origin: string) => {
     if (!draft || !config?.origins.includes(origin) || origin === draft.origin)
@@ -207,7 +215,14 @@ export default function App() {
         setConfig(settings);
         setDraft(
           restoreDraft(
-            readStorage<Partial<Draft> | null>(prefix.current + "draft", null),
+            {
+              ...(userProfile.preferences && {
+                origin: userProfile.preferences.origin,
+                pace: userProfile.preferences.pace,
+                interests: userProfile.preferences.interests,
+              }),
+              ...readStorage<Partial<Draft> | null>(prefix.current + "draft", null),
+            },
             settings,
           ),
         );
@@ -329,6 +344,7 @@ export default function App() {
 
   const back = useCallback(() => {
     if (screen === "wizard" && step > 0) setStep(step - 1);
+    else if (screen === "profile") navigate(profileReturn.current);
     else navigate("home");
   }, [navigate, screen, step]);
   useEffect(() => {
@@ -400,6 +416,8 @@ export default function App() {
     );
   }
   const navVisible = ["home", "trips", "about"].includes(screen);
+  const avatarColor = profileColors[profile?.preferences?.avatar_color ?? "lavender"];
+  const avatarColorStyle = { background: avatarColor.background, color: avatarColor.color };
   return (
     <>
       {!booting && !onboarded ? (
@@ -453,10 +471,11 @@ export default function App() {
               <button
                 data-ui="avatar"
                 className={avatarStyles}
-                aria-label="О сервисе и вашем профиле"
-                onClick={() => navigate("about")}
+                style={avatarColorStyle}
+                aria-label="Открыть профиль"
+                onClick={openProfile}
               >
-                <ProfileAvatar user={identity?.user} />
+                <ProfileAvatar user={identity?.user} preferences={profile?.preferences} />
               </button>
             </div>
           </header>
@@ -647,7 +666,7 @@ export default function App() {
                           <h2>
                             Далеко ехать
                             <br />
-                            не обязательно.
+                            необязательно.
                           </h2>
                           <p>
                             Новые места, местная кухня и целый день
@@ -819,6 +838,23 @@ export default function App() {
                               </span>
                               <ArrowUpRight size={18} />
                             </button>
+                            {([
+                              { title: "За местным вкусом", subtitle: "Уютные кафе и новые вкусы", Icon: Coffee,
+                                interests: ["Местная кухня", "Прогулки"], pace: "relaxed", color: "#eee9f7", ink: "#9482b0" },
+                              { title: "Больше движения", subtitle: "Тропы и маленькие открытия", Icon: Route,
+                                interests: ["Активный отдых", "Природа"], pace: "intensive", color: "#e5eef6", ink: "#7b9bb6" },
+                            ] as const).map((mood) => <button key={mood.title} data-ui="mood-card"
+                              className="flex flex-col relative overflow-hidden rounded-[21px] py-[19px] px-4 text-left min-h-50.5
+                                mobile:min-h-[183px] mobile:py-[17px] mobile:px-[15px] mobile:rounded-[18px]
+                                narrow:px-3 mobile-type:min-h-48.5 transition-transform hover:-translate-y-[3px]"
+                              style={{ background: mood.color }} onClick={() => { setStep(0); start({ interests: [...mood.interests], pace: mood.pace }); }}>
+                              <span className="h-25 mobile:h-22 flex items-center pl-3" aria-hidden="true">
+                                <mood.Icon size={65} strokeWidth={1.25} style={{ color: mood.ink }} />
+                              </span>
+                              <span className="mt-auto"><strong className="block text-[12px] font-extrabold leading-[1.4] mobile-type:text-[13px] narrow-type:text-[12px]">{mood.title}</strong>
+                                <small className="block text-[11px] mt-1.5 leading-[1.6]" style={{ color: mood.ink }}>{mood.subtitle}</small></span>
+                              <ArrowUpRight size={18} className="absolute right-3.5 top-3.5" style={{ color: mood.ink }} />
+                            </button>)}
                           </div>
                         </section>
                         <section
@@ -988,6 +1024,14 @@ export default function App() {
                     />
                   </div>
                 )}
+                {screen === "profile" && profile && (
+                  <Profile user={identity.user} profile={profile} config={config}
+                    initData={initData.current} onBack={back} onSave={(next) => {
+                      setProfile(next);
+                      if (next.preferences) update({ origin: next.preferences.origin,
+                        pace: next.preferences.pace, interests: next.preferences.interests });
+                    }} />
+                )}
                 {screen === "about" && (
                   <div data-ui="about-page" className={tripsPageStyles}>
                     <span data-ui="eyebrow" className={eyebrowStyles}>
@@ -995,7 +1039,7 @@ export default function App() {
                     </span>
                     <h1 className="mb-3">
                       {identity.mode === "max"
-                        ? `${identity.user.first_name}, поехали?`
+                        ? `${profile?.preferences?.display_name || identity.user.first_name}, поехали?`
                         : "Большие открытия рядом."}
                     </h1>
                     <p
@@ -1006,21 +1050,23 @@ export default function App() {
                       Помогаем придумать поездку выходного дня — с вниманием к
                       вашему времени, интересам и бюджету.
                     </p>
-                    <div
+                    <button
                       data-ui="about-profile"
-                      className="flex gap-[13px] items-center p-4 rounded-[20px] bg-white
+                      onClick={openProfile}
+                      aria-label="Открыть профиль из раздела о сервисе"
+                      className="w-full text-left flex gap-[13px] items-center p-4 rounded-[20px] bg-white
                         [border:1px_solid_var(--line)] my-4 mx-0 mobile:p-3.5 mobile:my-3.5
                         mobile:mx-0 [&_>_div]:flex-1 [&_>_div]:min-w-0 [&_>_div]:wrap-anywhere
                         [&_strong]:text-[12px] [&_strong]:block [&_#session-label]:text-[12px]
                         [&_#session-label]:leading-[1.55] [&_#session-label]:text-muted
                         [&_#session-label]:block [&_#session-label]:mt-[5px] [&_>_svg]:text-[#88a189]"
                     >
-                      <span data-ui="avatar" className={avatarStyles}>
-                        <ProfileAvatar user={identity.user} />
+                      <span data-ui="avatar" className={avatarStyles} style={avatarColorStyle}>
+                        <ProfileAvatar user={identity.user} preferences={profile?.preferences} />
                       </span>
                       <div>
                         <strong>
-                          {[identity.user.first_name, identity.user.last_name]
+                          {profile?.preferences?.display_name || [identity.user.first_name, identity.user.last_name]
                             .filter(Boolean)
                             .join(" ")}
                         </strong>
@@ -1033,8 +1079,8 @@ export default function App() {
                             : "Локальный режим"}
                         </span>
                       </div>
-                      <Check size={19} />
-                    </div>
+                      <ChevronRight size={19} />
+                    </button>
                     <section
                       data-ui="about-info"
                       className="bg-white [border:1px_solid_var(--line)] rounded-[23px] p-[25px]

@@ -9,6 +9,7 @@ export const ITINERARY_DISCLAIMER =
   "Время программы рекомендательное. Время отправления и прибытия проверяйте в блоке транспорта; часы работы мест не подтверждены.";
 
 export function budgetItemCopy(item: TripPlan["budget"]["items"][number], plan: TripPlan) {
+  if (item.category === "intercity_transport") return { ...item, category: "Дорога туда и обратно" };
   // Russian labels are supported for trips saved before the presentation moved here.
   if (item.category === "lodging" || item.category === "Проживание") {
     const stay = plan.accommodation;
@@ -40,7 +41,7 @@ export function tripNotices(plan: TripPlan): string[] {
     plan.estimated_travel_minutes != null &&
     plan.estimated_travel_minutes > plan.request.max_travel_minutes
   ) {
-    notes.push("Расстояние по прямой может не уложиться в желаемое время дороги; проверьте маршрут.");
+    notes.push("Дорога может занять больше желаемого времени; проверьте маршрут.");
   }
 
   if (!plan.budget.within_budget) {

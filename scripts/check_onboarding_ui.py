@@ -54,9 +54,9 @@ async def check(base):
             await expect(onboarding).to_have_count(0)
             ready.set()
             if completed:
-                await expect(page.get_by_role("button", name="О сервисе и вашем профиле", exact=True)).to_be_visible()
+                await expect(page.get_by_role("button", name="Открыть профиль", exact=True)).to_be_visible()
                 await expect(onboarding).to_have_count(0)
-                await page.get_by_role("button", name="О сервисе и вашем профиле", exact=True).click()
+                await page.get_by_role("button", name="О сервисе", exact=True).click()
                 await page.get_by_role("button", name="Посмотреть знакомство ещё раз").click()
                 await expect(onboarding).to_be_visible()
                 before = len(writes)

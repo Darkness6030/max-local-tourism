@@ -145,8 +145,11 @@ class TripPlanner:
 
         budget, accommodation = build_budget(
             generated, request, destination,
-            None if isinstance(catalog, BaseException) else catalog,
+            None if isinstance(catalog, BaseException) else catalog, transport,
         )
+        if not request.has_car and any(item.category == "intercity_transport" and item.amount_rub == 0
+                                       and "неизвестна" in (item.comment or "") for item in budget.items):
+            warnings.append("Стоимость дороги туда и обратно не определена: итоговый бюджет неполный.")
         map_url = _plan_map_url(
             origin,
             destination,
