@@ -687,7 +687,7 @@ export function TripResult({
                                     aria-checked={reminders.state?.[direction] === i}
                                     disabled={reminders.saving || !reminders.state?.available}
                                     className="inline-flex items-center gap-2 bg-transparent text-brand text-[12px]
-                                      font-bold py-2 px-0 min-h-11 disabled:opacity-45"
+                                      font-bold px-0 disabled:opacity-45"
                                     onClick={() => void reminders.toggle(direction, i)}
                                   >
                                     Напомнить
