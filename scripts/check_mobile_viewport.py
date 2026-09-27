@@ -30,7 +30,7 @@ def main():
         for width in (320, 390):
             context = browser.new_context(
                 viewport={"width": width, "height": 844}, is_mobile=True,
-                has_touch=True, reduced_motion="no-preference",
+                has_touch=True, reduced_motion="no-preference", locale="en-US",
             )
             mock_profile(context, completed=True)
             context.route("https://st.max.ru/**", lambda r: r.fulfill(
@@ -81,7 +81,7 @@ def main():
                     "[data-ui~=bottom-nav]": 6,
                     "[data-ui~=preset-actions]": 10,
                 }.get(selector, 12)
-                inset = 0 if args.max_platform == "ios" else args.safe_bottom
+                inset = args.safe_bottom / 2 if args.max_platform == "ios" else args.safe_bottom
                 assert bar.evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)") == max(base_padding, inset), selector
 
             check_bar("[data-ui~=bottom-nav]")
@@ -133,7 +133,7 @@ def main():
             destination.fill("Коломна")
             for step in range(5):
                 expect(page.get_by_label(f"Шаг {step + 1} из 5", exact=True)).to_be_visible()
-                inset = 0 if args.max_platform == "ios" else args.safe_bottom
+                inset = args.safe_bottom / 2 if args.max_platform == "ios" else args.safe_bottom
                 assert page.locator("[data-ui~=wizard-actions]").evaluate(
                     "el => parseFloat(getComputedStyle(el).paddingBottom)"
                 ) == max(12, inset)
@@ -167,9 +167,25 @@ def main():
                         field.fill(value)
                         field.blur()
                         expect(field).to_have_value(value)
+                        field.evaluate("el => el.scrollIntoView({block: 'center', behavior: 'instant'})")
+                        page.wait_for_timeout(100)
+                        metrics = field.evaluate("""el => {
+                            const s = getComputedStyle(el);
+                            const frame = el.closest('[data-ui~=time-input]');
+                            const r = el.getBoundingClientRect();
+                            const box = frame.getBoundingClientRect();
+                            return {padding: s.padding, margin: s.margin, border: s.borderWidth,
+                                contained: r.left >= box.left && r.right <= box.right &&
+                                    r.top >= box.top && r.bottom <= box.bottom,
+                                hit: document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === el};
+                        }""")
+                        assert metrics == {
+                            "padding": "0px", "margin": "0px", "border": "0px",
+                            "contained": True, "hit": True,
+                        }, metrics
                     assert page.locator("[data-ui~=fields-pair]").evaluate("""el => {
                         const pair = el.getBoundingClientRect();
-                        const fields = [...el.querySelectorAll('input')].map(x => x.getBoundingClientRect());
+                        const fields = [...el.querySelectorAll('[data-ui~=time-input]')].map(x => x.getBoundingClientRect());
                         return fields.length === 2 && fields[0].left >= pair.left &&
                             fields[0].right + 11 <= fields[1].left && fields[1].right <= pair.right + 1 &&
                             pair.right <= innerWidth && fields.every(r => r.width > 0 && r.height >= 44);

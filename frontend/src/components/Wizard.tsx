@@ -845,32 +845,36 @@ export function Wizard({
                     </summary>
                     <div
                       data-ui="fields-pair"
-                      className="grid grid-cols-2 gap-3 [&_>_label]:min-w-0 mobile:[&_input]:p-2.5 mobile:[&_input]:min-w-0
+                      className="grid grid-cols-2 gap-3 [&_>_label]:min-w-0 mobile:[&_input]:min-w-0
                         mobile:[&_input]:text-[16px]"
                     >
                       <label data-ui="field-label" className={fieldLabelStyles}>
                         Выезд не раньше
-                        <input
-                          name="departure_after"
-                          type="time"
-                          required
-                          value={draft.departure_after}
-                          onChange={(event) =>
-                            update({ departure_after: event.target.value })
-                          }
-                        />
+                        <span data-ui="time-input">
+                          <input
+                            name="departure_after"
+                            type="time"
+                            required
+                            value={draft.departure_after}
+                            onChange={(event) =>
+                              update({ departure_after: event.target.value })
+                            }
+                          />
+                        </span>
                       </label>
                       <label data-ui="field-label" className={fieldLabelStyles}>
                         Обратно не раньше
-                        <input
-                          name="return_after"
-                          type="time"
-                          required
-                          value={draft.return_after}
-                          onChange={(event) =>
-                            update({ return_after: event.target.value })
-                          }
-                        />
+                        <span data-ui="time-input">
+                          <input
+                            name="return_after"
+                            type="time"
+                            required
+                            value={draft.return_after}
+                            onChange={(event) =>
+                              update({ return_after: event.target.value })
+                            }
+                          />
+                        </span>
                       </label>
                     </div>
                     <label

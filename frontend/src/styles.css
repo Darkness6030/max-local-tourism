@@ -58,11 +58,10 @@
     color-scheme: light;
     font-optical-sizing: auto;
   }
-  /* The MAX iOS container needs only the panels' normal bottom padding.
-     Adding the device inset here leaves an empty strip below the controls.
-     Standalone browsers retain their system safe area. */
+  /* Keep a compact gesture-area gap in MAX iOS: half the device inset.
+     Standalone browsers retain their full system safe area. */
   :root[data-max-ios] {
-    --app-safe-bottom: 0px;
+    --app-safe-bottom: calc(env(safe-area-inset-bottom, 0px) / 2);
   }
   * {
     box-sizing: border-box;
@@ -174,6 +173,40 @@
 
 #trip-form input::-webkit-datetime-edit {
   padding: 0;
+}
+
+/* iOS miscalculates 100%-wide temporal inputs with padding (WebKit 301648).
+   Put the decoration on a bounded wrapper; the native input has no padding. */
+#trip-form [data-ui~="time-input"] {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  height: 54px;
+  margin-top: 9px;
+  padding: 0 10px;
+  border: 1px solid #e6e9f0;
+  border-radius: 13px;
+  background: #fff;
+  overflow: hidden;
+}
+
+#trip-form [data-ui~="time-input"]:focus-within {
+  outline: 2px solid #a3b1ff;
+  outline-offset: 2px;
+}
+
+#trip-form [data-ui~="time-input"] input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  outline: none;
 }
 
 /* Keep the actions in document flow while the keyboard covers the viewport. */
