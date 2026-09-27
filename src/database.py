@@ -100,3 +100,18 @@ class Database:
             self._worker_connection = None
 
         await self.engine.dispose()
+
+
+class TransportReminderRecord(SQLModel, table=True):
+    __tablename__ = "transport_reminders"
+    __table_args__ = (Index("ix_transport_reminders_due", "next_attempt_at"),)
+    trip_id: UUID = Field(sa_column=Column(
+        Uuid, ForeignKey("trips.id", ondelete="CASCADE"), primary_key=True))
+    direction: str = Field(sa_column=Column(String(16), primary_key=True))
+    minutes_before: int = Field(primary_key=True)
+    owner_id: str = Field(sa_column=Column(String(80), nullable=False))
+    option_index: int
+    option: dict = Field(sa_column=Column(JSONB, nullable=False))
+    due_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
+    next_attempt_at: datetime | None = Field(default=None, sa_column=Column(DateTime(timezone=True)))
+    sent_at: datetime | None = Field(default=None, sa_column=Column(DateTime(timezone=True)))

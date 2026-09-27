@@ -477,6 +477,125 @@
         }
       }
     },
+    "/api/v1/trips/{trip_id}/reminders": {
+      "get": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Get Reminders",
+        "operationId": "get_reminders_api_v1_trips__trip_id__reminders_get",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trips/{trip_id}/reminders/{direction}": {
+      "put": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Set Reminder",
+        "operationId": "set_reminder_api_v1_trips__trip_id__reminders__direction__put",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "outbound",
+                "return_trip"
+              ],
+              "type": "string",
+              "title": "Direction"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReminderUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/trips/{trip_id}/share": {
       "get": {
         "tags": [
@@ -512,6 +631,104 @@
                     "type": "string"
                   },
                   "title": "Response Share Trip Api V1 Trips  Trip Id  Share Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Publish Trip Share",
+        "operationId": "publish_trip_share_api_v1_trips__trip_id__share_post",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Trip Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Publish Trip Share Api V1 Trips  Trip Id  Share Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shared-trips/{token}/import": {
+      "post": {
+        "tags": [
+          "trips"
+        ],
+        "summary": "Import Shared Trip",
+        "operationId": "import_shared_trip_api_v1_shared_trips__token__import_post",
+        "security": [
+          {
+            "MaxInitData": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripPlan"
                 }
               }
             }
@@ -1466,6 +1683,63 @@
           "message"
         ],
         "title": "ProgressEvent"
+      },
+      "ReminderState": {
+        "properties": {
+          "outbound": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outbound"
+          },
+          "return_trip": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Return Trip"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "available"
+        ],
+        "title": "ReminderState"
+      },
+      "ReminderUpdate": {
+        "properties": {
+          "option_index": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Option Index"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "option_index"
+        ],
+        "title": "ReminderUpdate"
       },
       "SettlementRef": {
         "properties": {

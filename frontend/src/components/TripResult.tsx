@@ -41,6 +41,7 @@ import { api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib"
 import { AccommodationCard } from "./AccommodationCard";
 import { Notice } from "./UI";
 import { shareTrip } from "../trip-share";
+import { useTransportReminders, type ReminderDirection } from "../useTransportReminders";
 
 const RESULT_TABS = [
   { value: "program", label: "Программа", Icon: Footprints },
@@ -62,6 +63,7 @@ export function TripResult({
   onPlanChange: (plan: TripPlan) => void;
 }) {
   const [tab, setTab] = useState<Tab>("program");
+  const reminders = useTransportReminders(plan.id, initData);
   const [dayIndex, setDayIndex] = useState(0);
   const [message, setMessage] = useState("");
   const [shareText, setShareText] = useState("");
@@ -500,7 +502,7 @@ export function TripResult({
                   data-ui="transport-panel"
                   className="[&_>_h2]:text-[20px] [&_>_h2]:tracking-[-0.6px] [&_>_h2]:font-[750]
                     [&_>_h2]:mb-2.5 mobile:[&_>_h2]:text-[20px] mobile:[&_>_h2]:leading-[1.4]
-                    [&_>_p]:text-[11px] [&_>_p]:leading-[1.9] [&_>_p]:mb-5 mobile:[&_>_p]:text-[11px]
+                    [&_>_p]:text-[11px] [&_>_p]:leading-[1.7] [&_>_p]:mb-5 mobile:[&_>_p]:text-[11px]
                     mobile-type:[&_>_p]:text-[14px]"
                 >
                   <h2>Дорога — часть путешествия</h2>
@@ -511,6 +513,16 @@ export function TripResult({
                     Время рейсов из расписаний. Перед отправлением проверьте
                     изменения у перевозчика.
                   </p>
+                  {reminders.error && (
+                    <div role="alert" className="text-[13px] text-muted mb-4">
+                      {reminders.error}
+                      {!reminders.state && <button type="button" className={textButtonStyles}
+                        onClick={reminders.retry}>Повторить</button>}
+                    </div>
+                  )}
+                  {reminders.state && !reminders.state.available && (
+                    <p className="text-muted">Напоминания доступны при открытии из MAX.</p>
+                  )}
                   {plan.request.has_car && (
                     <Notice>
                       Вы выбрали автомобиль. Пробки не учтены; найденные рейсы
@@ -546,10 +558,10 @@ export function TripResult({
                     <>
                       {(
                         [
-                          ["Туда", plan.transport.outbound],
-                          ["Обратно", plan.transport.return_trip],
-                        ] as [string, TransportOption[]][]
-                      ).map(([title, options]) => (
+                          ["Туда", "outbound", plan.transport.outbound],
+                          ["Обратно", "return_trip", plan.transport.return_trip],
+                        ] as [string, ReminderDirection, TransportOption[]][]
+                      ).map(([title, direction, options]) => (
                         <div
                           key={title}
                           data-ui="transport-direction"
@@ -643,11 +655,22 @@ export function TripResult({
                                     : `от ${money(option.price_rub)}`}
                                 </span>
                                 <button
-                                  data-ui="text-button"
-                                  className={textButtonStyles}
-                                  onClick={() => external(option.buy_url)}
+                                  type="button"
+                                  role="switch"
+                                  aria-label={`Напомнить: ${title}, ${timeLabel(option.departure)}, вариант ${i + 1}`}
+                                  aria-checked={reminders.state?.[direction] === i}
+                                  disabled={reminders.saving || !reminders.state?.available
+                                    || (Date.parse(option.departure) <= Date.now() && reminders.state[direction] !== i)}
+                                  className="inline-flex items-center gap-2 bg-transparent text-brand text-[12px]
+                                    font-bold py-2 px-0 min-h-11 disabled:opacity-45"
+                                  onClick={() => void reminders.toggle(direction, i)}
                                 >
-                                  Расписание <ArrowUpRight size={15} />
+                                  Напомнить
+                                  <span aria-hidden="true" className={`relative inline-block w-9 h-5 shrink-0 rounded-full
+                                    transition-colors ${reminders.state?.[direction] === i ? "bg-brand" : "bg-[#dce2ef]"}`}>
+                                    <span className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm
+                                      transition-transform ${reminders.state?.[direction] === i ? "translate-x-4" : ""}`} />
+                                  </span>
                                 </button>
                               </div>
                             </div>

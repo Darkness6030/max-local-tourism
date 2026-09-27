@@ -9,6 +9,7 @@ from src.database import (
     JobRecord,
     SharedTripImportRecord,
     SharedTripRecord,
+    TransportReminderRecord,
     TripRecord,
     UserProfileRecord,
 )
@@ -66,6 +67,8 @@ class TripStore:
 
         existing = TripPlan.model_validate(row.payload).model_dump(mode="json", exclude={"packed_items"})
         if existing != payload:
+            # Changed routes invalidate the old departure selections.
+            await session.execute(delete(TransportReminderRecord).where(TransportReminderRecord.trip_id == plan.id))
             # Any change to the plan invalidates the previous checklist.
             row.payload = {**payload, "packed_items": []}
             row.created_at = plan.created_at

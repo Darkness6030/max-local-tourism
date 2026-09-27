@@ -75,6 +75,9 @@ def main():
         context.route("**/api/v1/trips/*/share", lambda r: r.fulfill(json={
             "text": plan["share_text"] + "\nhttps://max.ru/test_bot?startapp=trip_" + "a" * 32,
         }))
+        context.route("**/api/v1/trips/*/reminders", lambda r: r.fulfill(json={
+            "outbound": None, "return_trip": None, "available": True,
+        }))
         page = context.new_page()
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))

@@ -27,6 +27,7 @@ from src.models import (
 )
 from src.services.destinations import RECENT_DESTINATION_LIMIT
 from src.services.planner import validate_destination
+from src.services.reminders import Direction, ReminderState, ReminderUpdate
 
 router = APIRouter(prefix="/api/v1")
 development_router = APIRouter(prefix="/api/v1")
@@ -256,6 +257,32 @@ async def update_packing(
         raise HTTPException(status_code=404, detail="Поездка не найдена")
 
     return trip
+
+
+@router.get("/trips/{trip_id}/reminders", response_model=ReminderState, tags=["trips"])
+async def get_reminders(
+    trip_id: UUID, container: ContainerDep, identity: IdentityDep,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> ReminderState:
+    selection = await container.reminders.get(trip_id, identity.owner_id)
+    if selection is None:
+        raise HTTPException(status_code=404, detail="Поездка не найдена")
+    return ReminderState(**selection.model_dump(), available=identity.mode == "max" and bool(settings.max_bot_token))
+
+
+@router.put("/trips/{trip_id}/reminders/{direction}", response_model=ReminderState, tags=["trips"])
+async def set_reminder(
+    trip_id: UUID, direction: Direction, payload: ReminderUpdate,
+    container: ContainerDep, identity: IdentityDep,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> ReminderState:
+    available = identity.mode == "max" and bool(settings.max_bot_token)
+    if payload.option_index is not None and not available:
+        raise HTTPException(status_code=403, detail="Напоминания доступны при открытии из MAX")
+    selection = await container.reminders.set(trip_id, identity.owner_id, direction, payload.option_index)
+    if selection is None:
+        raise HTTPException(status_code=404, detail="Поездка не найдена")
+    return ReminderState(**selection.model_dump(), available=available)
 
 
 @router.get("/trips/{trip_id}/share", tags=["trips"])

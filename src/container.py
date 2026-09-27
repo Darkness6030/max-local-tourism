@@ -11,6 +11,7 @@ from src.services.geocoding import GeocodingService
 from src.services.gigachat_ai import GigaChatService
 from src.services.hotels import HotelService
 from src.services.planner import TripPlanner
+from src.services.reminders import ReminderStore, ReminderWorker
 from src.services.weather import WeatherService
 from src.services.yandex_schedule import YandexScheduleService
 from src.store import TripStore
@@ -27,6 +28,8 @@ class Container:
     store: TripStore
     planner: TripPlanner
     jobs: TripJobManager
+    reminders: ReminderStore
+    reminder_worker: ReminderWorker
 
     @classmethod
     def build(cls, settings: Settings) -> "Container":
@@ -77,6 +80,7 @@ class Container:
         )
 
         jobs = TripJobManager(planner, store, max_active=settings.max_job_concurrency)
+        reminders = ReminderStore(database.sessions)
         return cls(
             database=database,
             http=http,
@@ -87,14 +91,18 @@ class Container:
             store=store,
             planner=planner,
             jobs=jobs,
+            reminders=reminders,
+            reminder_worker=ReminderWorker(reminders, settings),
         )
 
     async def start(self) -> None:
         await self.database.initialize()
         await self.database.acquire_worker()
         await self.store.recover_interrupted_jobs()
+        self.reminder_worker.start()
 
     async def close(self) -> None:
+        await self.reminder_worker.close()
         await self.jobs.close()
         await self.gigachat.close()
         await self.http.aclose()
