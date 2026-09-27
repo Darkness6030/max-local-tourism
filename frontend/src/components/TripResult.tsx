@@ -621,7 +621,7 @@ export function TripResult({
                               </div>
                               <div
                                 data-ui="train-times"
-                                className="flex justify-between gap-[15px] items-start my-4.5 mx-0
+                                className="flex justify-between gap-[15px] items-start my-4 mx-0
                                   [&_>_div]:flex-1 [&_>_div]:min-w-0 [&_>_div:last-child]:text-right
                                   [&_strong]:text-[23px] [&_strong]:font-[650]
                                   [&_strong]:tracking-[-0.5px] mobile:[&_strong]:text-[23px]
@@ -667,7 +667,7 @@ export function TripResult({
                               <div
                                 data-ui="train-bottom"
                                 className="flex justify-between items-center [border-top:1px_dashed_#e5e9f2]
-                                  py-2 px-0 gap-2.5 [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6]
+                                  py-4 px-0 gap-2.5 [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6]
                                   mobile:[&_>_span]:text-[11px] mobile-type:[&_>_span]:text-[12px]"
                               >
                                 <span>
@@ -676,7 +676,7 @@ export function TripResult({
                                     : `от ${money(option.price_rub)}`}
                                 </span>
                                 {Date.parse(option.departure) <= transportNow ? (
-                                  <span data-ui="departed-flight" className="inline-flex items-center min-h-11 text-right">
+                                  <span data-ui="departed-flight" className="inline-flex items-center text-right">
                                     Рейс уже отправился
                                   </span>
                                 ) : (
