@@ -27,6 +27,7 @@ def main():
         "from_station": "Москва", "to_station": "Коломна", "price_rub": 450,
         "has_transfers": False, "buy_url": "https://rasp.yandex.ru/",
     } for i in range(2)]
+    options.append({**options[0], "departure": (now - timedelta(minutes=1)).isoformat()})
     plan["transport"] = {"outbound": options, "return_trip": options}
     token = "a" * 32
     state = {"outbound": None, "return_trip": None, "available": True}
@@ -79,6 +80,7 @@ def main():
         page = context.new_page()
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
+        page.clock.install(time=now)
         page.goto(f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{token}")
         page.get_by_role("tab", name="Дорога").click()
         panel = page.locator('[data-ui="transport-panel"]')
@@ -86,6 +88,7 @@ def main():
         panel.get_by_role("button", name="Повторить", exact=True).click()
         switches = panel.get_by_role("switch")
         expect(switches).to_have_count(4)
+        expect(panel.get_by_text("Рейс уже отправился", exact=True)).to_have_count(2)
         expect(switches.nth(0)).to_be_enabled()
         expect(panel.get_by_role("button", name="Расписание")).to_have_count(0)
         intro = panel.get_by_text("Время рейсов из расписаний.", exact=False)
@@ -128,6 +131,16 @@ def main():
         switches.nth(0).scroll_into_view_if_needed()
         Path("tmp").mkdir(exist_ok=True)
         page.screenshot(path=f"tmp/reminders-{args.browser}.png")
+        # Crossing departure time replaces both selected and unselected switches without reload.
+        before = len(writes)
+        page.clock.fast_forward(2 * 60 * 60 * 1000)
+        expect(switches).to_have_count(2)
+        expect(panel.get_by_text("Рейс уже отправился", exact=True)).to_have_count(4)
+        page.clock.fast_forward(10 * 60 * 1000)
+        expect(switches).to_have_count(0)
+        expect(panel.get_by_text("Рейс уже отправился", exact=True)).to_have_count(6)
+        assert len(writes) == before  # Rendering a departed flight must not cancel its final notification.
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         assert not errors, errors
         browser.close()
     print(f"Reminders UI passed ({args.browser}): exclusive choices, both directions, reload, errors, 320/390 px, leading 1.7")

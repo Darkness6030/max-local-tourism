@@ -64,6 +64,27 @@ export function TripResult({
 }) {
   const [tab, setTab] = useState<Tab>("program");
   const reminders = useTransportReminders(plan.id, initData);
+  const [transportNow, setTransportNow] = useState(Date.now);
+  useEffect(() => {
+    const departures = [...(plan.transport?.outbound ?? []), ...(plan.transport?.return_trip ?? [])]
+      .map((option) => Date.parse(option.departure)).filter(Number.isFinite).sort((a, b) => a - b);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const syncTime = () => {
+      clearTimeout(timer);
+      const now = Date.now();
+      setTransportNow(now);
+      const next = departures.find((departure) => departure > now);
+      if (next !== undefined) timer = setTimeout(syncTime, Math.min(next - now, 2_147_483_647));
+    };
+    syncTime();
+    window.addEventListener("focus", syncTime);
+    document.addEventListener("visibilitychange", syncTime);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("focus", syncTime);
+      document.removeEventListener("visibilitychange", syncTime);
+    };
+  }, [plan.transport]);
   const [dayIndex, setDayIndex] = useState(0);
   const [message, setMessage] = useState("");
   const [shareText, setShareText] = useState("");
@@ -654,24 +675,29 @@ export function TripResult({
                                     ? "Цена у перевозчика"
                                     : `от ${money(option.price_rub)}`}
                                 </span>
-                                <button
-                                  type="button"
-                                  role="switch"
-                                  aria-label={`Напомнить: ${title}, ${timeLabel(option.departure)}, вариант ${i + 1}`}
-                                  aria-checked={reminders.state?.[direction] === i}
-                                  disabled={reminders.saving || !reminders.state?.available
-                                    || (Date.parse(option.departure) <= Date.now() && reminders.state[direction] !== i)}
-                                  className="inline-flex items-center gap-2 bg-transparent text-brand text-[12px]
-                                    font-bold py-2 px-0 min-h-11 disabled:opacity-45"
-                                  onClick={() => void reminders.toggle(direction, i)}
-                                >
-                                  Напомнить
-                                  <span aria-hidden="true" className={`relative inline-block w-9 h-5 shrink-0 rounded-full
-                                    transition-colors ${reminders.state?.[direction] === i ? "bg-brand" : "bg-[#dce2ef]"}`}>
-                                    <span className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm
-                                      transition-transform ${reminders.state?.[direction] === i ? "translate-x-4" : ""}`} />
+                                {Date.parse(option.departure) <= transportNow ? (
+                                  <span data-ui="departed-flight" className="inline-flex items-center min-h-11 text-right">
+                                    Рейс уже отправился
                                   </span>
-                                </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    role="switch"
+                                    aria-label={`Напомнить: ${title}, ${timeLabel(option.departure)}, вариант ${i + 1}`}
+                                    aria-checked={reminders.state?.[direction] === i}
+                                    disabled={reminders.saving || !reminders.state?.available}
+                                    className="inline-flex items-center gap-2 bg-transparent text-brand text-[12px]
+                                      font-bold py-2 px-0 min-h-11 disabled:opacity-45"
+                                    onClick={() => void reminders.toggle(direction, i)}
+                                  >
+                                    Напомнить
+                                    <span aria-hidden="true" className={`relative inline-block w-9 h-5 shrink-0 rounded-full
+                                      transition-colors ${reminders.state?.[direction] === i ? "bg-brand" : "bg-[#dce2ef]"}`}>
+                                      <span className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm
+                                        transition-transform ${reminders.state?.[direction] === i ? "translate-x-4" : ""}`} />
+                                    </span>
+                                  </button>
+                                )}
                               </div>
                             </div>
                           ))}
