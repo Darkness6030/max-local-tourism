@@ -45,6 +45,13 @@ def main():
     plan["title"] = 'Маршрут <img src=x onerror="window.injected=true">'
     plan["summary"] = "GigaChat подготовил AI-программу."
     plan["share_text"] = "GigaChat: AI-программа. https://example.com/AI"
+    train = {
+        "transport_type": "suburban", "departure": "2026-09-27T09:00:00+03:00",
+        "arrival": "2026-09-27T11:00:00+03:00", "duration_minutes": 120,
+        "from_station": "Москва", "to_station": "Коломна", "has_transfers": False,
+        "price_rub": 450, "buy_url": "https://rasp.yandex.ru/",
+    }
+    plan["transport"] = {"outbound": [train, {**train, "transport_type": "bus"}], "return_trip": []}
     screenshots = Path("tmp/ui-check")
     screenshots.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
@@ -292,6 +299,8 @@ def main():
         expect(page.locator("#budget")).to_contain_text("7 600")
         screenshot("result-budget-mobile")
         page.get_by_role("tab", name="Дорога").click()
+        expect(page.get_by_role("img", name="Автобус", exact=True)).to_be_visible()
+        assert page.get_by_role("img", name="Электричка", exact=True).count() >= 1
         page.locator("#map-link").click()
         assert page.evaluate(
             "window.WebApp.calls.some(x => typeof x === 'string' && x.startsWith('https://yandex.ru/maps/'))"

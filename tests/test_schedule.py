@@ -181,3 +181,88 @@ def _point(title: str, latitude: float, longitude: float) -> GeoPoint:
         latitude=latitude,
         longitude=longitude,
     )
+
+
+def _segment(kind: str, hour: int, price: float | None) -> dict:
+    return {
+        "departure": f"2026-08-22T{hour:02}:00:00+03:00",
+        "arrival": f"2026-08-22T{hour + 1:02}:00:00+03:00",
+        "thread": {"transport_type": kind},
+        "tickets_info": {"places": [{"price": {"whole": price}}]},
+    }
+
+
+def _normalize(segments: list[dict], limit: int = 5):
+    from src.models import SettlementRef
+
+    return YandexScheduleService(None, api_key=None)._normalize_options(
+        {"segments": segments}, after=time(8), travel_date=date(2026, 8, 22),
+        origin=SettlementRef(code="c213", title="Москва"),
+        destination=SettlementRef(code="c10734", title="Коломна"),
+        limit=limit, station_coordinates={},
+    )
+
+
+@pytest.mark.parametrize("cheaper,other", [("suburban", "bus"), ("bus", "suburban")])
+def test_mixed_modes_keep_three_cheapest_of_cheaper_type_and_two_of_other(cheaper, other):
+    options = _normalize([
+        *[_segment(cheaper, hour, price) for hour, price in [(8, 800), (9, 150), (10, 100), (11, 200)]],
+        *[_segment(other, hour, price) for hour, price in [(12, 900), (13, 400), (14, 350)]],
+        _segment(other, 7, 1),  # Before the requested departure time.
+        _segment("plane", 15, 1),
+    ])
+    assert [option.price_rub for option in options] == [150, 100, 200, 400, 350]
+    assert [option.transport_type for option in options].count(cheaper) == 3
+    assert [option.transport_type for option in options].count(other) == 2
+
+
+@pytest.mark.parametrize("kind", ["suburban", "bus", "train"])
+def test_single_mode_keeps_first_five_departures_even_when_later_is_cheaper(kind):
+    options = _normalize([_segment(kind, hour, 1000 - hour * 10) for hour in range(8, 15)])
+    assert [option.departure.hour for option in options] == [8, 9, 10, 11, 12]
+
+
+def test_unknown_prices_remain_available_but_are_not_treated_as_free():
+    options = _normalize([
+        *[_segment("suburban", hour, None) for hour in range(8, 12)],
+        *[_segment("bus", hour, 100) for hour in range(12, 16)],
+    ])
+    assert [option.transport_type for option in options] == ["suburban", "suburban", "bus", "bus", "bus"]
+    assert options[0].price_rub is None
+
+
+@pytest.mark.parametrize("train_count,bus_count,expected", [(1, 6, 5), (6, 1, 5), (1, 1, 2)])
+def test_short_mode_group_does_not_drop_the_other_mode_or_pad_with_duplicates(train_count, bus_count, expected):
+    options = _normalize([
+        *[_segment("suburban", 8 + i, 100) for i in range(train_count)],
+        *[_segment("bus", 14 + i, 200) for i in range(bus_count)],
+    ])
+    assert len(options) == expected
+    assert {option.transport_type for option in options} == {"suburban", "bus"}
+    assert len({(option.transport_type, option.departure) for option in options}) == expected
+
+
+@pytest.mark.asyncio
+async def test_second_mode_on_later_search_page_is_included_in_both_directions():
+    offsets = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("nearest_settlement/"):
+            return httpx.Response(200, json={"code": "c213" if float(request.url.params["lng"]) < 38 else "c10734"})
+        offset = int(request.url.params.get("offset", 0))
+        offsets.append((request.url.params["from"], offset))
+        kind = "suburban" if offset == 0 else "bus"
+        return httpx.Response(200, json={
+            "pagination": {"total": 8, "limit": 4, "offset": offset},
+            "segments": [_segment(kind, 8 + i + offset, 100 + offset * 100) for i in range(4)],
+        })
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await YandexScheduleService(client, api_key="secret").find_round_trip(
+            _point("Москва", 55.75, 37.61), _point("Коломна", 55.09, 38.76),
+            outbound_date=date(2026, 8, 22), return_date=date(2026, 8, 22),
+            departure_after=time(8), return_after=time(8),
+        )
+    assert sorted(offsets) == [("c10734", 0), ("c10734", 4), ("c213", 0), ("c213", 4)]
+    for options in (result.outbound, result.return_trip):
+        assert [option.transport_type for option in options] == ["suburban"] * 3 + ["bus"] * 2

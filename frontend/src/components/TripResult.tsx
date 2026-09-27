@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   Backpack,
+  Bus,
   CalendarDays,
   Check,
   ChevronDown,
@@ -29,6 +30,8 @@ import {
   Info,
   MapPin,
   Share2,
+  Route,
+  TramFront,
   TrainFront,
   Users,
   Wallet,
@@ -575,7 +578,7 @@ export function TripResult({
                                   mobile:text-[11px] mobile-type:gap-2 [&_small]:ml-auto
                                   [&_small]:text-[11px] [&_svg]:text-[#8295bf]"
                               >
-                                <TrainFront size={18} />
+                                <TransportIcon type={option.transport_type} />
                                 <span>
                                   {option.has_transfers
                                     ? "С пересадкой"
@@ -929,6 +932,16 @@ export function TripResult({
       </div>
     </div>
   );
+}
+
+function TransportIcon({ type }: { type: string }) {
+  const Icon = type === "bus" || type === "trolleybus" ? Bus
+    : type === "tram" ? TramFront
+    : type === "suburban" || type === "train" ? TrainFront : Route;
+  const label = type === "bus" ? "Автобус" : type === "trolleybus" ? "Троллейбус"
+    : type === "tram" ? "Трамвай" : type === "suburban" ? "Электричка"
+    : type === "train" ? "Поезд" : "Маршрут с пересадками";
+  return <Icon size={18} role="img" aria-label={label} />;
 }
 
 function DestinationPhoto({

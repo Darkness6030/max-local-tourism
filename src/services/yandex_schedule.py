@@ -129,16 +129,24 @@ class YandexScheduleService:
         destination: SettlementRef,
         travel_date: date,
     ) -> dict[str, Any]:
-        return await self._get_json(
-            "/search/",
-            params={
-                "from": origin.code,
-                "to": destination.code,
-                "date": travel_date.isoformat(),
-                "transfers": "true",
-                "limit": YANDEX_SEARCH_LIMIT,
-            },
-        )
+        params = {
+            "from": origin.code,
+            "to": destination.code,
+            "date": travel_date.isoformat(),
+            "transfers": "true",
+            "limit": YANDEX_SEARCH_LIMIT,
+        }
+        payload = await self._get_json("/search/", params=params)
+        segments = list(payload.get("segments") or [])
+        # A second transport type (or its cheapest fare) can be on a later page.
+        pagination = payload.get("pagination") or {}
+        total = pagination.get("total", len(segments))
+        offset = pagination.get("limit") or YANDEX_SEARCH_LIMIT
+        while offset < total:
+            page = await self._get_json("/search/", params={**params, "offset": offset})
+            segments.extend(page.get("segments") or [])
+            offset += (page.get("pagination") or {}).get("limit") or YANDEX_SEARCH_LIMIT
+        return {**payload, "segments": segments}
 
     async def _station_coordinates(
         self,
@@ -302,7 +310,30 @@ class YandexScheduleService:
             )
 
         result.sort(key=lambda option: option.departure)
-        return result[:limit]
+        return _select_options(result, limit)
+
+
+def _select_options(options: list[TransportOption], limit: int) -> list[TransportOption]:
+    """Keep chronological single-mode results; balance suburban trains and buses."""
+    trains = [option for option in options if option.transport_type == "suburban"]
+    buses = [option for option in options if option.transport_type == "bus"]
+    if not trains or not buses or limit < 2:
+        return options[:limit]
+
+    def price_key(option: TransportOption) -> tuple[float, datetime]:
+        # Unknown fares are not free: retain them only after known prices.
+        return (option.price_rub if option.price_rub is not None else float("inf"), option.departure)
+
+    trains.sort(key=price_key)
+    buses.sort(key=price_key)
+    primary, secondary = (trains, buses) if price_key(trains[0]) <= price_key(buses[0]) else (buses, trains)
+    primary_count = (limit + 1) // 2
+    selected = primary[:primary_count] + secondary[:limit - primary_count]
+    selected_ids = {id(option) for option in selected}
+    remaining = sorted((option for option in options if id(option) not in selected_ids), key=price_key)
+    selected.extend(remaining[:limit - len(selected)])
+    # The planner uses the first outbound/return option to bound the day's program.
+    return sorted(selected, key=lambda option: option.departure)
 
 
 def _endpoint_stations(payload: dict[str, Any]) -> list[dict[str, Any]]:
