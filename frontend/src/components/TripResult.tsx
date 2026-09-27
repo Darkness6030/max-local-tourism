@@ -37,7 +37,7 @@ import type { TransportOption, TripPlan } from "../types";
 import { api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
 import { AccommodationCard } from "./AccommodationCard";
 import { Notice } from "./UI";
-import { shareLabels, useTripShare } from "../useTripShare";
+import { shareTrip } from "../trip-share";
 
 const RESULT_TABS = [
   { value: "program", label: "Программа", Icon: Footprints },
@@ -62,8 +62,6 @@ export function TripResult({
   const [dayIndex, setDayIndex] = useState(0);
   const [message, setMessage] = useState("");
   const [shareText, setShareText] = useState("");
-  const [shareUrl, setShareUrl] = useState("");
-  const sharingMenu = useTripShare(shareText, shareUrl, initData);
   const [sharing, setSharing] = useState(true);
   const [shareRetry, setShareRetry] = useState(0);
   const [manualCopy, setManualCopy] = useState(false);
@@ -143,16 +141,14 @@ export function TripResult({
     const controller = new AbortController();
     setSharing(true);
     setShareText("");
-    setShareUrl("");
     setShareFeedback(null);
     // Prepare before the click: MAX requires a live user gesture to open sharing.
-    api<{ text: string; url?: string }>(`/trips/${plan.id}/share`, initData, {
+    api<{ text: string }>(`/trips/${plan.id}/share`, initData, {
       method: "POST",
       signal: controller.signal,
     }).then((result) => {
       if (!controller.signal.aborted) {
         setShareText(result.text);
-        setShareUrl(result.url ? safeUrl(result.url) ?? "" : "");
       }
     }).catch(() => {
       if (!controller.signal.aborted) {
@@ -173,10 +169,9 @@ export function TripResult({
       return;
     }
     setShareFeedback(null);
-    sharingMenu.share();
+    shareTrip(shareText, initData);
   };
   const copy = async () => {
-    sharingMenu.close();
     try {
       await navigator.clipboard.writeText(shareText || plan.share_text);
       setShareFeedback({ text: "План скопирован." });
@@ -880,30 +875,6 @@ export function TripResult({
           mobile:[border-bottom:0] mobile:gap-[9px] mobile:[box-shadow:0_-4px_24px_#34437107]
           narrow:px-[17px] narrow-spacing:px-5 mobile:[&_svg]:size-[17px]"
       >
-        {sharingMenu.open && (
-          <div data-ui="share-diagnostics"
-            className="absolute bottom-[calc(100%_+_10px)] left-3 right-3 max-h-[55dvh] overflow-y-auto
-              rounded-2xl border border-solid border-[#e0e5f2] bg-white p-3 text-[12px] shadow-lg">
-            <div className="flex items-center justify-between gap-2">
-              <strong>Диагностика отправки (временно)</strong>
-              <button type="button" className="bg-transparent text-muted" onClick={sharingMenu.close}>Закрыть</button>
-            </div>
-            <p>MAX {window.WebApp?.version ?? "?"} · {window.WebApp?.platform ?? "браузер"}</p>
-            <div role="log" className="flex max-h-28 overflow-y-auto flex-col gap-2 break-words">
-              {sharingMenu.logs.slice().reverse().map((entry) => (
-                <p key={entry.id}><b>{shareLabels[entry.method]}</b><br />{entry.status}</p>
-              ))}
-            </div>
-            <div className="grid grid-cols-2 gap-2 my-2">
-              {sharingMenu.methods.map((method) => (
-                <button key={method} type="button" data-share-method={method}
-                  className="rounded-lg bg-[#eff1fb] text-brand px-2 py-2 font-bold"
-                  onClick={() => sharingMenu.share(method)}>{shareLabels[method]}</button>
-              ))}
-            </div>
-            {!sharingMenu.methods.length && <p>Отправка недоступна. Используйте «Копировать».</p>}
-          </div>
-        )}
         {shareFeedback && (
           <div
             data-ui="share-feedback"

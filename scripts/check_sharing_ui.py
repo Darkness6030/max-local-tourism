@@ -27,7 +27,7 @@ def main():
         browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
         for mode in ["max-new", "max-retry", "ios", "ios-reject", "ios-throw", "ios-hang",
                      "ios-cancel", "ios-error-response", "ios-no-native", "ios-no-initdata",
-                     "ios-no-deeplink", "ios-deeplink-throw", "ios-string", "ios-no-max", "ios-no-url", "ios-no-methods", "ios-late", "browser"]:
+                     "ios-no-deeplink", "ios-deeplink-throw", "ios-string", "ios-no-max", "ios-no-url", "ios-no-methods", "browser"]:
             completed = mode != "max-new"
             context = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce",
                                           is_mobile=True, has_touch=True)
@@ -51,15 +51,13 @@ def main():
                     if (mode === 'ios-error-response') return Promise.resolve({error: {code: 'not_supported'}});
                     if (mode === 'ios-hang') return new Promise(() => {});
                     if (mode === 'ios-cancel') return Promise.reject(new DOMException('Cancelled', 'AbortError'));
-                    if (mode === 'ios-late') return new Promise((_, reject) => {
-                        window.rejectShare = () => reject({error: {code: 'late_error'}});
-                    });
                     return Promise.resolve();
                 };
                 window.WebApp.shareMaxContent = function(data) { record('max', data); return response(); };
                 window.WebApp.openMaxLink = function(url) {
                     record('deeplink', {url});
                     if (mode === 'ios-deeplink-throw') throw Error('Deep link unavailable');
+                    if (['ios-reject', 'ios-throw', 'ios-string', 'ios-error-response', 'ios-hang', 'ios-cancel'].includes(mode)) return response();
                 };
                 window.WebApp.version = '26.20.0';
                 Object.defineProperty(navigator, 'share', { configurable: true,
@@ -134,75 +132,23 @@ def main():
             page.locator("#share-trip").click()
             expect(page.get_by_role("dialog")).to_have_count(0)
             assert len(preparations) == before_click
-            feedback = page.locator("[data-ui~=share-diagnostics]")
-            expect(feedback).to_be_visible()
             calls = page.evaluate("window.shareCalls")
             if mode == "ios-no-methods":
                 assert calls == []
-                expect(feedback).to_contain_text("Отправка недоступна")
             elif mode == "browser":
                 assert calls == [{"method": "browser", "text": shared_text}]
             elif mode.startswith("ios") and mode != "ios-no-deeplink":
-                assert calls[0]["method"] == "deeplink"
+                assert len(calls) == 1 and calls[0]["method"] == "deeplink"
                 parsed = urlparse(calls[0]["url"])
                 assert parsed.netloc == "max.ru" and parsed.path == "/:share"
-                expected_text = shared_text if mode == "ios-no-url" else "Поехали со мной!\n" + link
-                assert parse_qs(parsed.query)["text"] == [expected_text]
-                expect(feedback).to_contain_text(
-                    "Deep link unavailable" if mode == "ios-deeplink-throw" else "SDK не подтверждает открытие")
-            elif mode == "ios-no-deeplink":
-                assert calls == [{"method": "max", "link": link}]
+                assert parse_qs(parsed.query)["text"] == [shared_text]
             else:
                 assert calls == [{"method": "max", "text": shared_text}]
-
-            expected_payloads = {
-                "link": {"method": "max", "link": link},
-                "text-link": {"method": "max", "text": "Поехали со мной!", "link": link},
-                "text": {"method": "max", "text": "Поехали со мной!\n" + link},
-                "full": {"method": "max", "text": shared_text},
-                "native": {"method": "native", "text": shared_text},
-                "browser": {"method": "browser", "text": shared_text},
-            }
-            for method, payload in expected_payloads.items():
-                button = page.locator(f'[data-share-method="{method}"]')
-                if not button.count():
-                    continue
-                button.click()
-                assert page.evaluate("window.shareCalls.at(-1)") == payload
-                if method != "browser":
-                    if mode == "ios-reject":
-                        expect(feedback).to_contain_text("client.web_app_max_share.not_supported")
-                    elif mode == "ios-string":
-                        expect(feedback).to_contain_text("native_unavailable")
-                    elif mode == "ios-throw":
-                        expect(feedback).to_contain_text("Error · Unavailable")
-                    elif mode == "ios-error-response":
-                        expect(feedback).to_contain_text("not_supported")
-                    elif mode == "ios-cancel":
-                        expect(feedback).to_contain_text("AbortError")
-                    elif mode == "ios-hang" and method == "full":
-                        expect(feedback).to_contain_text("нет ответа 8 с", timeout=10000)
-                assert len(preparations) == before_click
-            if mode == "ios-late":
-                # Late SDK failures must update their own row, not erase the next attempt.
-                page.evaluate("window.rejectShare()")
-                expect(feedback).to_contain_text("late_error")
-                expect(feedback.locator('[role="log"] p').first).to_contain_text("без ошибки")
-            log_text = feedback.inner_text()
-            assert "PRIVATE_DATA" not in log_text and "trip_private" not in log_text
-            assert link not in log_text and "test-launch-data" not in log_text
-            assert feedback.evaluate("""el => {
-                const r = el.getBoundingClientRect();
-                return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth;
-            }""")
-            if mode == "ios-reject":
-                page.set_viewport_size({"width": 320, "height": 568})
-                assert feedback.evaluate("el => el.scrollWidth <= el.clientWidth")
-                screenshot = Path("tmp") / f"share-diagnostics-{args.browser}.png"
-                screenshot.parent.mkdir(exist_ok=True)
-                page.screenshot(path=str(screenshot))
-            feedback.get_by_role("button", name="Закрыть", exact=True).click()
-            expect(feedback).to_have_count(0)
+            expect(page.locator("[data-ui~=share-diagnostics]")).to_have_count(0)
+            expect(page.locator("[data-ui~=share-feedback]")).to_have_count(0)
+            expect(page.locator("[data-share-method]")).to_have_count(0)
+            expect(page.locator("#share-trip")).to_be_enabled()
+            assert len(preparations) == before_click
             assert not errors, errors
             print(f"Sharing passed: {args.browser}, {mode}", flush=True)
             context.close()
