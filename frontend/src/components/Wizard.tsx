@@ -18,6 +18,7 @@ import {
   CalendarDays,
   CarFront,
   Check,
+  ChevronDown,
   Clock3,
   Coffee,
   Footprints,
@@ -879,10 +880,11 @@ export function Wizard({
                     </div>
                     <label
                       data-ui="field-label spaced"
-                      className={wizardFieldLabelStyles}
+                      className={`${wizardFieldLabelStyles} relative`}
                     >
                       Дорога в одну сторону
                       <select
+                        className="appearance-none !pr-9"
                         name="max_travel_minutes"
                         value={draft.max_travel_minutes}
                         onChange={(event) =>
@@ -895,6 +897,7 @@ export function Wizard({
                         <option value={240}>До 4 часов</option>
                         <option value={360}>До 6 часов</option>
                       </select>
+                      <ChevronDown size={18} aria-hidden="true" className="absolute right-3.5 bottom-[17px] pointer-events-none text-muted" />
                     </label>
                   </details>
                   <div data-ui="inline-note" className={inlineNoteStyles}>

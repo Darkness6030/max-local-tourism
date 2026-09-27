@@ -59,6 +59,7 @@ import { TripResult } from "./components/TripResult";
 import { PresetCards, PresetDetail } from "./components/Presets";
 import type { TripPreset } from "./presets";
 import { useMobileViewport } from "./useMobileViewport";
+import { useProfileAutosave } from "./useProfileAutosave";
 import journey from "./assets/journey.webp";
 import journeySpb from "./assets/journey-spb.webp";
 
@@ -132,6 +133,7 @@ export default function App() {
   const prefix = useRef("");
   const pendingShare = useRef(sharedLaunch());
   const submitLock = useRef(false);
+  const profileAutosave = useProfileAutosave(initData.current, setProfile);
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [screen, onboarded, homeRevision]);
@@ -565,14 +567,14 @@ export default function App() {
                       <label
                         data-ui="origin-pill"
                         className="relative flex items-center gap-[7px] [border:1px_solid_#e5e8f0] bg-white
-                          rounded-[30px] py-0 px-[13px] text-[#5f6577] w-[fit-content] max-w-full
-                          min-h-10 shrink-0 mobile:py-0 mobile:px-3 mobile:m-0 mobile:min-h-9
-                          mobile:gap-[7px] [&_>_span]:text-[12px] [&_>_span]:font-[650]
+                          rounded-[30px] py-0 px-3 text-[#5f6577] w-[fit-content] max-w-full
+                          min-h-[38px] shrink-0 mobile:py-0 mobile:px-[11px] mobile:m-0 mobile:min-h-[34px]
+                          mobile:gap-[7px] [&_>_span]:text-[11px] [&_>_span]:font-[500]
                           [&_>_span]:whitespace-nowrap [&:focus-within]:[outline:2px_solid_#a3b1ff]
                           [&:focus-within]:outline-offset-2 [&_select]:absolute [&_select]:top-0
                           [&_select]:right-0 [&_select]:bottom-0 [&_select]:left-0
                           [&_select]:size-full [&_select]:min-h-0 [&_select]:opacity-0
-                          [&_select]:cursor-pointer [&_select]:text-[16px] mobile:[&_svg]:w-[13px]"
+                          [&_select]:cursor-pointer [&_select]:font-[500] [&_select]:text-[16px] mobile:[&_svg]:w-[13px]"
                       >
                         <MapPin size={15} aria-hidden="true" />
                         <span aria-hidden="true">{draft.origin}</span>
@@ -1023,8 +1025,10 @@ export default function App() {
                 )}
                 {screen === "profile" && profile && (
                   <Profile user={identity.user} profile={profile} config={config}
-                    initData={initData.current} onBack={back} onSave={(next) => {
+                    onBack={back} error={profileAutosave.error} onLeave={profileAutosave.flush} onChange={(preferences) => {
+                      const next = { ...profile, preferences };
                       setProfile(next);
+                      profileAutosave.change(preferences);
                       if (next.preferences) update({ origin: next.preferences.origin,
                         pace: next.preferences.pace, interests: next.preferences.interests,
                         max_distance_km: next.preferences.max_distance_km,

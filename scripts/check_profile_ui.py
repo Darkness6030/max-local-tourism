@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import time
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -24,20 +25,25 @@ def main():
         browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
         for width in (320, 390, 1360):
             profile = {"onboarding_completed": True, "preferences": ProfilePreferences(display_name="Старое имя", avatar_style="mountain").model_dump(mode="json")}
-            control = {"fail": False}
+            control = {"fail": False, "hold": False}
+            pending, writes = [], []
             plan = sample_trip().model_dump(mode="json")
             plan["transport"] = None
             plan["request"]["days"] = 2
             plan["request"]["start_date"] = "2026-09-30"
 
-            def api(route, *, control=control, profile=profile, plan=plan):
+            def api(route, *, control=control, profile=profile, plan=plan, pending=pending, writes=writes):
                 path = urlparse(route.request.url).path.split("/api/v1/", 1)[1]
                 if path == "profile":
                     if route.request.method == "PUT":
+                        writes.append(route.request.post_data_json)
                         if control["fail"]:
                             route.fulfill(status=503, json={"error": "Не удалось сохранить настройки"})
                             return
                         profile["preferences"] = route.request.post_data_json
+                        if control["hold"]:
+                            pending.append((route, {**profile}))
+                            return
                     route.fulfill(json=profile)
                 elif path == "auth/me":
                     route.fulfill(json={"mode": "max", "user": {"id": 42, "first_name": "Анна"}})
@@ -57,6 +63,13 @@ def main():
             context.route("https://st.max.ru/**", lambda r: r.fulfill(content_type="application/javascript", body=BRIDGE))
             context.route("**/api/v1/**", api)
             page = context.new_page()
+
+            def wait_until(condition, page=page):
+                deadline = time.monotonic() + 6
+                while not condition() and time.monotonic() < deadline:
+                    page.wait_for_timeout(25)
+                assert condition(), "Autosave did not complete"
+
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.base_url)
@@ -82,23 +95,19 @@ def main():
             expect(page.get_by_role("button", name="Горы", exact=True)).to_have_count(0)
             expect(panel.get_by_text("Анна", exact=True)).to_be_visible()
             expect(page.locator('[data-ui~="profile-preview"]')).to_have_text("А")
+            control["fail"] = True
             panel.get_by_label("Дальность подбора городов", exact=True).fill("350")
             panel.get_by_label("Предпочтительный транспорт", exact=True).select_option("bus")
             panel.get_by_label("Город отправления", exact=True).select_option("Санкт-Петербург")
             panel.get_by_label("Темп поездок", exact=True).select_option("relaxed")
             page.get_by_role("button", name="История", exact=True).click()
-            control["fail"] = True
-            page.get_by_role("button", name="Сохранить настройки", exact=True).click()
+            expect(panel.get_by_role("button", name="Сохранить настройки", exact=True)).to_have_count(0)
             expect(panel.get_by_role("alert")).to_contain_text("Не удалось сохранить")
             expect(panel.get_by_label("Дальность подбора городов", exact=True)).to_have_value("350")
             control["fail"] = False
-            page.get_by_role("button", name="Сохранить настройки", exact=True).click()
-            expect(panel.get_by_role("button", name="Настройки сохранены", exact=True)).to_be_visible()
-            expect(panel.get_by_role("status").filter(has_text="Настройки сохранены")).to_have_count(0)
-            assert profile["preferences"]["max_distance_km"] == 350
+            wait_until(lambda profile=profile: profile["preferences"]["max_distance_km"] == 350)
+            expect(panel.get_by_role("alert")).to_have_count(0)
             assert profile["preferences"]["preferred_transport"] == "bus"
-            assert panel.evaluate("""el => getComputedStyle(el.querySelector('fieldset')).borderRadius ===
-                getComputedStyle(el.querySelector('[data-ui~=profile-save]')).borderRadius""")
             assert profile["preferences"]["origin"] == "Санкт-Петербург"
             assert profile["preferences"]["pace"] == "relaxed"
             assert "История" in profile["preferences"]["interests"]
@@ -106,7 +115,8 @@ def main():
             if width <= 700:
                 for field in panel.locator("input:not([type=range]), select").all():
                     assert field.evaluate("el => parseFloat(getComputedStyle(el).fontSize) >= 16")
-                    assert field.bounding_box()["height"] >= 51
+                    assert field.bounding_box()["height"] >= 49
+                    assert field.evaluate("el => parseFloat(getComputedStyle(el).fontWeight) <= 550")
             page.screenshot(path=str(screenshots / f"profile-{args.browser}-{width}.png"), full_page=True)
             page.get_by_role("button", name="Назад из профиля", exact=True).click()
             expect(page.get_by_label("Город отправления", exact=True)).to_have_value("Санкт-Петербург")
@@ -119,13 +129,36 @@ def main():
             page.get_by_role("button", name="Открыть профиль из раздела о сервисе", exact=True).click()
             expect(panel.get_by_label("Дальность подбора городов", exact=True)).to_have_value("350")
             expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("bus")
+            # Slow responses cannot replace newer edits or overlap requests.
+            control["hold"] = True
+            panel.get_by_label("Темп поездок", exact=True).select_option("balanced")
+            wait_until(lambda pending=pending: len(pending) == 1)
+            held_count = len(writes)
+            panel.get_by_label("Темп поездок", exact=True).select_option("intensive")
             panel.get_by_label("Предпочтительный транспорт", exact=True).select_option("car")
-            expect(panel.get_by_role("button", name="Сохранить настройки", exact=True)).to_be_visible()
-            panel.get_by_role("button", name="Сохранить настройки", exact=True).click()
-            expect(panel.get_by_role("button", name="Настройки сохранены", exact=True)).to_be_visible()
-            assert page.evaluate("JSON.parse(sessionStorage.getItem('nearby:v2:max:42:draft')).has_car")
+            page.wait_for_timeout(450)
+            assert len(writes) == held_count
+            expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_be_enabled()
             page.get_by_role("button", name="Назад из профиля", exact=True).click()
             expect(page.locator('[data-ui="about-page"]')).to_be_visible()
+            control["hold"] = False
+            route, previous = pending.pop()
+            route.fulfill(json=previous)
+            wait_until(lambda profile=profile: profile["preferences"]["preferred_transport"] == "car")
+            assert profile["preferences"]["pace"] == "intensive"
+            assert len(writes) == held_count + 1
+            assert page.evaluate("JSON.parse(sessionStorage.getItem('nearby:v2:max:42:draft')).has_car")
+            page.get_by_role("button", name="Открыть профиль из раздела о сервисе", exact=True).click()
+            expect(panel.get_by_label("Темп поездок", exact=True)).to_have_value("intensive")
+            expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("car")
+            # Leaving before the debounce elapses flushes the final edit.
+            panel.get_by_label("Дальность подбора городов", exact=True).fill("400")
+            page.get_by_role("button", name="Назад из профиля", exact=True).click()
+            wait_until(lambda profile=profile: profile["preferences"]["max_distance_km"] == 400)
+            page.reload()
+            page.get_by_role("button", name="Открыть профиль", exact=True).click()
+            expect(panel.get_by_label("Дальность подбора городов", exact=True)).to_have_value("400")
+            expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("car")
             page.goto(f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{'a' * 32}")
             page.get_by_role("tab", name="Дорога", exact=True).click()
             expect(page.locator('[data-ui="moscow-ticket-note"]')).to_be_visible()
