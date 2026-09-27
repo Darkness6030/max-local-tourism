@@ -145,13 +145,15 @@ export type Screen =
   "home" | "wizard" | "loading" | "result" | "preset" | "trips" | "about";
 export interface Bridge {
   platform?: "ios" | "android" | "desktop" | "web";
+  version?: string;
   initData?: string;
   initDataUnsafe?: { start_param?: string };
   ready?: () => void;
   enableClosingConfirmation?: () => void;
   disableClosingConfirmation?: () => void;
-  shareMaxContent?: (data: { text: string }) => Promise<unknown> | void;
-  shareContent?: (data: { text: string }) => Promise<unknown> | void;
+  shareMaxContent?: (data: { text?: string; link?: string }) => Promise<unknown> | void;
+  shareContent?: (data: { text?: string; link?: string }) => Promise<unknown> | void;
+  openMaxLink?: (url: string) => Promise<unknown> | void;
   openLink?: (url: string) => Promise<unknown> | void;
   BackButton?: {
     show?: () => void;
