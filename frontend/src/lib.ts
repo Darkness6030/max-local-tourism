@@ -171,6 +171,8 @@ export function initialDraft(config: AppConfig): Draft {
     interests: ["Прогулки", "Местная кухня"],
     pace: "balanced",
     has_car: false,
+    max_distance_km: 500,
+    preferred_transport: "suburban",
     departure_after: "08:00",
     return_after: "18:00",
     max_travel_minutes: 240,
@@ -179,8 +181,9 @@ export function initialDraft(config: AppConfig): Draft {
 export function restoreDraft(
   raw: Partial<Draft> | null,
   config: AppConfig,
+  defaults?: Partial<Draft>,
 ): Draft {
-  const base = initialDraft(config);
+  const base = { ...initialDraft(config), ...defaults };
   if (!raw || typeof raw !== "object") return base;
   const draft = { ...base, ...raw };
   if (!config.origins.includes(draft.origin)) draft.origin = base.origin;
@@ -197,6 +200,14 @@ export function restoreDraft(
   )
     draft.start_date = config.default_date;
   if (!Array.isArray(draft.interests)) draft.interests = base.interests;
+  if (!Number.isInteger(draft.max_distance_km) || draft.max_distance_km! < 300 || draft.max_distance_km! > 600)
+    draft.max_distance_km = base.max_distance_km;
+  if (!["bus", "suburban", "car"].includes(draft.preferred_transport ?? ""))
+    draft.preferred_transport = draft.has_car ? "car" : "suburban";
+  // Old drafts may only have has_car; keep that explicit choice on restore.
+  if (raw.preferred_transport == null && raw.has_car != null)
+    draft.preferred_transport = raw.has_car ? "car" : "suburban";
+  draft.has_car = draft.preferred_transport === "car";
   return draft;
 }
 export function validateStep(

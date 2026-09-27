@@ -50,7 +50,6 @@ import type {
 } from "./types";
 import { ProfileAvatar } from "./components/ProfileAvatar";
 import { Profile } from "./components/Profile";
-import { profileColors } from "./profile";
 import { Brand, Notice, Primary } from "./components/UI";
 import { Onboarding } from "./components/Onboarding";
 import { Wizard } from "./components/Wizard";
@@ -215,15 +214,16 @@ export default function App() {
         setConfig(settings);
         setDraft(
           restoreDraft(
-            {
-              ...(userProfile.preferences && {
-                origin: userProfile.preferences.origin,
-                pace: userProfile.preferences.pace,
-                interests: userProfile.preferences.interests,
-              }),
-              ...readStorage<Partial<Draft> | null>(prefix.current + "draft", null),
-            },
+            readStorage<Partial<Draft> | null>(prefix.current + "draft", null),
             settings,
+            userProfile.preferences && {
+              origin: userProfile.preferences.origin,
+              pace: userProfile.preferences.pace,
+              interests: userProfile.preferences.interests,
+              max_distance_km: userProfile.preferences.max_distance_km,
+              preferred_transport: userProfile.preferences.preferred_transport,
+              has_car: userProfile.preferences.preferred_transport === "car",
+            },
           ),
         );
         const savedStep = readStorage<number>(prefix.current + "step", 0);
@@ -416,8 +416,6 @@ export default function App() {
     );
   }
   const navVisible = ["home", "trips", "about"].includes(screen);
-  const avatarColor = profileColors[profile?.preferences?.avatar_color ?? "lavender"];
-  const avatarColorStyle = { background: avatarColor.background, color: avatarColor.color };
   return (
     <>
       {!booting && !onboarded ? (
@@ -471,11 +469,10 @@ export default function App() {
               <button
                 data-ui="avatar"
                 className={avatarStyles}
-                style={avatarColorStyle}
                 aria-label="Открыть профиль"
                 onClick={openProfile}
               >
-                <ProfileAvatar user={identity?.user} preferences={profile?.preferences} />
+                <ProfileAvatar user={identity?.user} />
               </button>
             </div>
           </header>
@@ -598,7 +595,7 @@ export default function App() {
                     >
                       <section
                         data-ui="adventure-card"
-                        className="rounded-[28px] relative overflow-hidden bg-[#dae6df] min-h-[427px]
+                        className="flex flex-col rounded-[28px] relative overflow-hidden bg-[#dae6df] min-h-[427px]
                           text-white mobile:min-h-[355px] mobile:rounded-3xl short:min-h-0
                           [&_>_img]:size-full [&_>_img]:object-cover [&_>_img]:absolute
                           [&_>_img]:top-0 [&_>_img]:right-0 [&_>_img]:bottom-0 [&_>_img]:left-0
@@ -650,8 +647,8 @@ export default function App() {
                         </div>
                         <div
                           data-ui="adventure-copy"
-                          className="relative pt-[175px] px-7.5 pb-[21px] tablet:px-[23px] mobile:pt-36.5
-                            mobile:px-[21px] mobile:pb-4.5 narrow:px-4.5 short:pt-25
+                          className="relative flex flex-1 flex-col pt-[175px] px-7.5 tablet:px-[23px] mobile:pt-36.5
+                            mobile:px-[21px] narrow:px-4.5 short:pt-25
                             short-narrow:pt-21 [&_h2]:text-[37px] [&_h2]:tracking-[-1.6px]
                             [&_h2]:leading-[1.16] [&_h2]:font-extrabold tablet:[&_h2]:text-[32px]
                             mobile:[&_h2]:text-[30px] mobile:[&_h2]:tracking-[-1.15px]
@@ -683,8 +680,8 @@ export default function App() {
                           </Primary>
                           <span
                             data-ui="adventure-caption"
-                            className="text-[11px] block text-center text-[#e0e9e7b8] mt-3 mobile:text-[11px]
-                              mobile:mt-[11px] short-mobile:mt-2"
+                            className="text-[11px] flex flex-1 items-center justify-center text-center text-[#e0e9e7b8] py-[16.5px] mobile:text-[11px]
+                              mobile:py-[14.5px] short-mobile:py-[13px]"
                           >
                             5 простых шагов · ваш темп и бюджет
                           </span>
@@ -1029,7 +1026,10 @@ export default function App() {
                     initData={initData.current} onBack={back} onSave={(next) => {
                       setProfile(next);
                       if (next.preferences) update({ origin: next.preferences.origin,
-                        pace: next.preferences.pace, interests: next.preferences.interests });
+                        pace: next.preferences.pace, interests: next.preferences.interests,
+                        max_distance_km: next.preferences.max_distance_km,
+                        preferred_transport: next.preferences.preferred_transport,
+                        has_car: next.preferences.preferred_transport === "car" });
                     }} />
                 )}
                 {screen === "about" && (
@@ -1039,7 +1039,7 @@ export default function App() {
                     </span>
                     <h1 className="mb-3">
                       {identity.mode === "max"
-                        ? `${profile?.preferences?.display_name || identity.user.first_name}, поехали?`
+                        ? `${identity.user.first_name}, поехали?`
                         : "Большие открытия рядом."}
                     </h1>
                     <p
@@ -1061,12 +1061,12 @@ export default function App() {
                         [&_#session-label]:leading-[1.55] [&_#session-label]:text-muted
                         [&_#session-label]:block [&_#session-label]:mt-[5px] [&_>_svg]:text-[#88a189]"
                     >
-                      <span data-ui="avatar" className={avatarStyles} style={avatarColorStyle}>
-                        <ProfileAvatar user={identity.user} preferences={profile?.preferences} />
+                      <span data-ui="avatar" className={avatarStyles}>
+                        <ProfileAvatar user={identity.user} />
                       </span>
                       <div>
                         <strong>
-                          {profile?.preferences?.display_name || [identity.user.first_name, identity.user.last_name]
+                          {[identity.user.first_name, identity.user.last_name]
                             .filter(Boolean)
                             .join(" ")}
                         </strong>

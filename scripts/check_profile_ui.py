@@ -23,7 +23,7 @@ def main():
     with sync_playwright() as p:
         browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
         for width in (320, 390, 1360):
-            profile = {"onboarding_completed": True, "preferences": ProfilePreferences().model_dump(mode="json")}
+            profile = {"onboarding_completed": True, "preferences": ProfilePreferences(display_name="Старое имя", avatar_style="mountain").model_dump(mode="json")}
             control = {"fail": False}
             plan = sample_trip().model_dump(mode="json")
             plan["transport"] = None
@@ -61,6 +61,13 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.base_url)
             expect(page.locator('[data-ui~="mood-card"]')).to_have_count(4)
+            assert page.locator('[data-ui="adventure-caption"]').evaluate("""el => {
+                const range = document.createRange(); range.selectNodeContents(el);
+                const text = range.getBoundingClientRect();
+                const button = el.previousElementSibling.getBoundingClientRect();
+                const card = el.closest('[data-ui=adventure-card]').getBoundingClientRect();
+                return Math.abs((text.top - button.bottom) - (card.bottom - text.bottom)) <= 2;
+            }"""), "The caption must sit halfway between the button and the card bottom"
             page.screenshot(path=str(screenshots / f"home-moods-{args.browser}-{width}.png"), full_page=True)
             for title, interests in [("За местным вкусом", ["Местная кухня", "Прогулки"]),
                                      ("Больше движения", ["Активный отдых", "Природа"])]:
@@ -71,25 +78,33 @@ def main():
             page.get_by_role("button", name="Открыть профиль", exact=True).click()
             panel = page.locator('[data-ui="profile-page"]')
             expect(panel.get_by_role("heading", name="Профиль", exact=True)).to_be_visible()
-            page.get_by_label("Имя в приложении", exact=True).fill("Аня Путешественница")
-            page.get_by_role("button", name="Горы", exact=True).click()
-            page.get_by_role("button", name="Шалфей", exact=True).click()
+            expect(page.get_by_label("Имя в приложении", exact=True)).to_have_count(0)
+            expect(page.get_by_role("button", name="Горы", exact=True)).to_have_count(0)
+            expect(panel.get_by_text("Анна", exact=True)).to_be_visible()
+            expect(page.locator('[data-ui~="profile-preview"]')).to_have_text("А")
+            panel.get_by_label("Дальность подбора городов", exact=True).fill("350")
+            panel.get_by_label("Предпочтительный транспорт", exact=True).select_option("bus")
             panel.get_by_label("Город отправления", exact=True).select_option("Санкт-Петербург")
             panel.get_by_label("Темп поездок", exact=True).select_option("relaxed")
             page.get_by_role("button", name="История", exact=True).click()
             control["fail"] = True
             page.get_by_role("button", name="Сохранить настройки", exact=True).click()
             expect(panel.get_by_role("alert")).to_contain_text("Не удалось сохранить")
-            expect(page.get_by_label("Имя в приложении", exact=True)).to_have_value("Аня Путешественница")
+            expect(panel.get_by_label("Дальность подбора городов", exact=True)).to_have_value("350")
             control["fail"] = False
             page.get_by_role("button", name="Сохранить настройки", exact=True).click()
-            expect(panel.get_by_role("status")).to_have_text("Настройки сохранены.")
+            expect(panel.get_by_role("button", name="Настройки сохранены", exact=True)).to_be_visible()
+            expect(panel.get_by_role("status").filter(has_text="Настройки сохранены")).to_have_count(0)
+            assert profile["preferences"]["max_distance_km"] == 350
+            assert profile["preferences"]["preferred_transport"] == "bus"
+            assert panel.evaluate("""el => getComputedStyle(el.querySelector('fieldset')).borderRadius ===
+                getComputedStyle(el.querySelector('[data-ui~=profile-save]')).borderRadius""")
             assert profile["preferences"]["origin"] == "Санкт-Петербург"
             assert profile["preferences"]["pace"] == "relaxed"
             assert "История" in profile["preferences"]["interests"]
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
             if width <= 700:
-                for field in panel.locator("input, select").all():
+                for field in panel.locator("input:not([type=range]), select").all():
                     assert field.evaluate("el => parseFloat(getComputedStyle(el).fontSize) >= 16")
                     assert field.bounding_box()["height"] >= 51
             page.screenshot(path=str(screenshots / f"profile-{args.browser}-{width}.png"), full_page=True)
@@ -100,10 +115,15 @@ def main():
             page.reload()
             expect(page.get_by_label("Город отправления", exact=True)).to_have_value("Санкт-Петербург")
             page.get_by_role("button", name="О сервисе", exact=True).click()
-            expect(page.get_by_role("heading", name="Аня Путешественница, поехали?")).to_be_visible()
+            expect(page.get_by_role("heading", name="Анна, поехали?")).to_be_visible()
             page.get_by_role("button", name="Открыть профиль из раздела о сервисе", exact=True).click()
-            expect(page.get_by_role("button", name="Горы", exact=True)).to_have_attribute("aria-pressed", "true")
-            expect(page.get_by_role("button", name="Шалфей", exact=True)).to_have_attribute("aria-pressed", "true")
+            expect(panel.get_by_label("Дальность подбора городов", exact=True)).to_have_value("350")
+            expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("bus")
+            panel.get_by_label("Предпочтительный транспорт", exact=True).select_option("car")
+            expect(panel.get_by_role("button", name="Сохранить настройки", exact=True)).to_be_visible()
+            panel.get_by_role("button", name="Сохранить настройки", exact=True).click()
+            expect(panel.get_by_role("button", name="Настройки сохранены", exact=True)).to_be_visible()
+            assert page.evaluate("JSON.parse(sessionStorage.getItem('nearby:v2:max:42:draft')).has_car")
             page.get_by_role("button", name="Назад из профиля", exact=True).click()
             expect(page.locator('[data-ui="about-page"]')).to_be_visible()
             page.goto(f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{'a' * 32}")

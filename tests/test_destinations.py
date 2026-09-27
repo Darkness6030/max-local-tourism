@@ -54,11 +54,13 @@ def test_origin_hints_are_broad_and_unique():
 async def test_prompt_contains_preferences_history_and_origin_specific_options():
     service = GigaChatService(credentials=None, scope="", model="", verify_ssl_certs=True, ca_bundle_file=None, timeout=10)
     service._structured = AsyncMock(return_value=candidates(("Приозерск", 95)))
-    request = TripRequest(origin="Санкт-Петербург", preferences="Хочу увидеть крепость и озеро", has_car=True)
+    request = TripRequest(origin="Санкт-Петербург", preferences="Хочу увидеть крепость и озеро", preferred_transport="bus", max_distance_km=350)
     result = await service.suggest_destination(request, ["Выборг"])
     assert result.name == "Приозерск"
     call = service._structured.call_args.kwargs
     assert request.preferences in call["prompt"]
+    assert "350 км" in call["prompt"]
+    assert '"preferred_transport": "bus"' in call["prompt"]
     assert '"Выборг"' in call["prompt"] and '"Гатчина"' in call["prompt"]
     assert '"Таруса"' not in call["prompt"]
     assert call["temperature"] == destinations.DESTINATION_TEMPERATURE

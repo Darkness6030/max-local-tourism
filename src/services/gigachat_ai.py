@@ -8,7 +8,7 @@ from typing import TypeVar
 from gigachat import GigaChat
 from pydantic import BaseModel
 
-from src.constants import BUDGET_RESERVE_PERCENT, SUGGESTED_CITY_DISTANCE_KM
+from src.constants import BUDGET_RESERVE_PERCENT
 from src.errors import ServiceError
 from src.models import (
     DestinationSuggestion,
@@ -74,7 +74,7 @@ class GigaChatService:
             request_json=request.model_dump_json(indent=2),
             hints_json=json.dumps(hints, ensure_ascii=False),
             recent_json=json.dumps(recent, ensure_ascii=False),
-            distance_km=SUGGESTED_CITY_DISTANCE_KM,
+            distance_km=request.max_distance_km,
             origin=request.origin.value,
             max_travel_minutes=request.max_travel_minutes,
         )

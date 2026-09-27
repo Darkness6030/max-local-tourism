@@ -816,14 +816,14 @@ export function Wizard({
                   >
                     <Choice
                       selected={!draft.has_car}
-                      onClick={() => update({ has_car: false })}
+                      onClick={() => update({ has_car: false, preferred_transport: draft.preferred_transport === "bus" ? "bus" : "suburban" })}
                       icon={<TrainFront size={24} />}
                       title="Транспорт"
                       subtitle="Поезда и автобусы"
                     />
                     <Choice
                       selected={draft.has_car}
-                      onClick={() => update({ has_car: true })}
+                      onClick={() => update({ has_car: true, preferred_transport: "car" })}
                       icon={<CarFront size={24} />}
                       title="На машине"
                       subtitle="За рулём сами"

@@ -74,7 +74,7 @@ async def test_profile_api_uses_verified_owner(store):
 @pytest.mark.asyncio
 async def test_profile_preferences_persist_without_completing_onboarding(store):
     preferences = ProfilePreferences(display_name="  Анна  ", avatar_style="mountain", avatar_color="sage",
-                                     origin="Санкт-Петербург", pace="relaxed", interests=["Природа", "Природа"])
+                                     origin="Санкт-Петербург", pace="relaxed", max_distance_km=350, preferred_transport="bus", interests=["Природа", "Природа"])
     saved = await store.update_profile("max:42", preferences)
     assert saved.preferences.display_name == "Анна"
     assert saved.preferences.interests == ["Природа"]
@@ -105,6 +105,7 @@ async def test_profile_update_api_validation_and_ownership(store):
             assert response.status_code == 200
             assert response.json()["preferences"] == payload
             for bad in [{"owner_id": "max:43"}, {"display_name": "x" * 61}, {"avatar_style": "unknown"},
+                        {"max_distance_km": 299}, {"max_distance_km": 601}, {"preferred_transport": "plane"},
                         {"origin": "Париж"}, {"pace": "fast"}, {"interests": ["unknown"]}, {"display_name": "A\x00B"}]:
                 assert (await client.put("/api/v1/profile", json={**payload, **bad}, headers=owner)).status_code == 422
             assert (await client.get("/api/v1/profile", headers=owner)).json()["preferences"] == payload

@@ -192,14 +192,14 @@ def _segment(kind: str, hour: int, price: float | None) -> dict:
     }
 
 
-def _normalize(segments: list[dict], limit: int = 5):
+def _normalize(segments: list[dict], limit: int = 5, preferred_transport=None):
     from src.models import SettlementRef
 
     return YandexScheduleService(None, api_key=None)._normalize_options(
         {"segments": segments}, after=time(8), travel_date=date(2026, 8, 22),
         origin=SettlementRef(code="c213", title="Москва"),
         destination=SettlementRef(code="c10734", title="Коломна"),
-        limit=limit, station_coordinates={},
+        limit=limit, station_coordinates={}, preferred_transport=preferred_transport,
     )
 
 
@@ -266,3 +266,23 @@ async def test_second_mode_on_later_search_page_is_included_in_both_directions()
     assert sorted(offsets) == [("c10734", 0), ("c10734", 4), ("c213", 0), ("c213", 4)]
     for options in (result.outbound, result.return_trip):
         assert [option.transport_type for option in options] == ["suburban"] * 3 + ["bus"] * 2
+
+
+@pytest.mark.parametrize("preferred", ["bus", "suburban", "car", None])
+def test_transport_preference_orders_existing_mixed_results_without_dropping_alternatives(preferred):
+    segments = [*[_segment("suburban", hour, 100) for hour in range(8, 12)],
+                *[_segment("bus", hour, 200) for hour in range(12, 16)]]
+    baseline = _normalize(segments)
+    options = _normalize(segments, preferred_transport=preferred)
+    assert {o.model_dump_json() for o in options} == {o.model_dump_json() for o in baseline}
+    if preferred in {"bus", "suburban"}:
+        assert options[0].transport_type == preferred
+    else:
+        assert options == baseline
+
+
+@pytest.mark.parametrize("preferred", ["bus", "suburban"])
+def test_unavailable_preference_keeps_available_transport(preferred):
+    other = "bus" if preferred == "suburban" else "suburban"
+    segments = [_segment(other, hour, 100) for hour in range(8, 15)]
+    assert _normalize(segments, preferred_transport=preferred) == _normalize(segments)

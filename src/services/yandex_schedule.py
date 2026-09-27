@@ -41,6 +41,7 @@ class YandexScheduleService:
         departure_after: time,
         return_after: time,
         limit: int = DEFAULT_TRANSPORT_LIMIT,
+        preferred_transport: str | None = None,
     ) -> TransportOptions:
         if not self.api_key:
             raise ServiceError(
@@ -81,6 +82,7 @@ class YandexScheduleService:
                 travel_date=outbound_date,
                 limit=limit,
                 station_coordinates=station_coordinates,
+                preferred_transport=preferred_transport,
             ),
             return_trip=self._normalize_options(
                 return_raw,
@@ -90,6 +92,7 @@ class YandexScheduleService:
                 travel_date=return_date,
                 limit=limit,
                 station_coordinates=station_coordinates,
+                preferred_transport=preferred_transport,
             ),
         )
 
@@ -239,6 +242,7 @@ class YandexScheduleService:
         travel_date: date,
         limit: int,
         station_coordinates: dict[str, Coordinates],
+        preferred_transport: str | None = None,
     ) -> list[TransportOption]:
         result: list[TransportOption] = []
         for segment in payload.get("segments") or []:
@@ -310,7 +314,11 @@ class YandexScheduleService:
             )
 
         result.sort(key=lambda option: option.departure)
-        return _select_options(result, limit)
+        selected = _select_options(result, limit)
+        if preferred_transport in {"bus", "suburban"}:
+            # Keep both modes and the existing cheapest 3+2 mix; plan around the preferred mode first.
+            selected.sort(key=lambda option: (option.transport_type != preferred_transport, option.departure))
+        return selected
 
 
 def _select_options(options: list[TransportOption], limit: int) -> list[TransportOption]:

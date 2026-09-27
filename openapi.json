@@ -1734,6 +1734,23 @@
             "title": "Avatar Color",
             "default": "lavender"
           },
+          "max_distance_km": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 300.0,
+            "title": "Max Distance Km",
+            "default": 500
+          },
+          "preferred_transport": {
+            "type": "string",
+            "enum": [
+              "bus",
+              "suburban",
+              "car"
+            ],
+            "title": "Preferred Transport",
+            "default": "suburban"
+          },
           "origin": {
             "$ref": "#/components/schemas/OriginCity",
             "default": "Москва"
@@ -2329,6 +2346,29 @@
             "title": "Has Car",
             "default": false
           },
+          "max_distance_km": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 300.0,
+            "title": "Max Distance Km",
+            "default": 500
+          },
+          "preferred_transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "bus",
+                  "suburban",
+                  "car"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Transport"
+          },
           "departure_after": {
             "type": "string",
             "format": "time",
@@ -2607,6 +2647,29 @@
             "type": "boolean",
             "title": "Has Car",
             "default": false
+          },
+          "max_distance_km": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 300.0,
+            "title": "Max Distance Km",
+            "default": 500
+          },
+          "preferred_transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "bus",
+                  "suburban",
+                  "car"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Transport"
           },
           "departure_after": {
             "type": "string",

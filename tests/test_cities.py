@@ -123,3 +123,29 @@ async def test_planner_checks_radius_before_external_planning(manual):
             TripRequest(destination="Владивосток" if manual else None)
         )
     weather.forecast.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("manual", [True, False])
+async def test_profile_radius_limits_suggestions_but_not_manual_destinations(monkeypatch, manual):
+    from src.models import DestinationSuggestion
+    from src.services import planner as planner_module
+    from tests.test_planner import FailingSchedule, FakeAI, FakeGeocoding, FakeWeather
+
+    monkeypatch.setattr(planner_module, "distance_km", lambda a, b: 350)
+    ai = FakeAI()
+    ai.suggest_destination = AsyncMock(return_value=DestinationSuggestion(
+        name="Коломна", region="Московская область", reason="Подходит под интересы путешественника"))
+    weather = FakeWeather()
+    weather.forecast = AsyncMock(wraps=weather.forecast)
+    planner = planner_module.TripPlanner(geocoding=FakeGeocoding(), weather=weather,
+                                         schedule=FailingSchedule(), gigachat=ai)
+    request = TripRequest(destination="Коломна" if manual else None, max_distance_km=300)
+    if manual:
+        result = await planner.generate(request)
+        assert result.request.max_distance_km == 300
+        weather.forecast.assert_awaited_once()
+    else:
+        with pytest.raises(ServiceError, match="дальше выбранного расстояния"):
+            await planner.generate(request)
+        weather.forecast.assert_not_awaited()

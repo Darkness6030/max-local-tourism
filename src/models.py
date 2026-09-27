@@ -20,6 +20,7 @@ from src.constants import (
     MSK_TIMEZONE,
     SOURCE_NOMINATIM,
     SOURCE_YANDEX,
+    SUGGESTED_CITY_DISTANCE_KM,
     YANDEX_SCHEDULE_SITE_URL,
 )
 
@@ -55,6 +56,9 @@ class ProfilePreferences(BaseModel):
     display_name: str = Field(default="", max_length=60)
     avatar_style: Literal["max", "initials", "compass", "mountain", "sun"] = "max"
     avatar_color: Literal["lavender", "sage", "peach", "sky"] = "lavender"
+    # Legacy appearance fields remain readable for older clients; current UI uses MAX identity.
+    max_distance_km: int = Field(default=SUGGESTED_CITY_DISTANCE_KM, ge=300, le=600)
+    preferred_transport: Literal["bus", "suburban", "car"] = "suburban"
     origin: OriginCity = OriginCity.MOSCOW
     pace: Pace = Pace.BALANCED
     interests: list[Literal["Природа", "История", "Местная кухня", "Прогулки", "Активный отдых", "Музеи"]] = Field(
@@ -106,12 +110,16 @@ class TripParameters(BaseModel):
 
     pace: Pace = Pace.BALANCED
     has_car: bool = False
+    max_distance_km: int = Field(default=SUGGESTED_CITY_DISTANCE_KM, ge=300, le=600)
+    preferred_transport: Literal["bus", "suburban", "car"] | None = None
     departure_after: time = time(7, 0)
     return_after: time = time(17, 0)
     max_travel_minutes: int = Field(default=240, ge=30, le=720)
 
     @model_validator(mode="after")
     def validate_group(self) -> TripParameters:
+        if self.preferred_transport is not None:
+            self.has_car = self.preferred_transport == "car"
         if any(age < 0 or age > 17 for age in self.children_ages):
             raise ValueError("возраст ребёнка должен быть от 0 до 17 лет")
 

@@ -4,9 +4,8 @@ export interface UserProfile {
 }
 
 export interface ProfilePreferences {
-  display_name: string;
-  avatar_style: "max" | "initials" | "compass" | "mountain" | "sun";
-  avatar_color: "lavender" | "sage" | "peach" | "sky";
+  max_distance_km: number;
+  preferred_transport: "bus" | "suburban" | "car";
   origin: string;
   pace: "relaxed" | "balanced" | "intensive";
   interests: string[];
@@ -42,6 +41,8 @@ export interface TripRequest {
   preferences: string;
   pace: "relaxed" | "balanced" | "intensive";
   has_car: boolean;
+  max_distance_km?: number;
+  preferred_transport?: "bus" | "suburban" | "car" | null;
   departure_after: string;
   return_after: string;
   max_travel_minutes: number;

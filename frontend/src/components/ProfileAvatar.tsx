@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { Compass, Mountain, Sun } from "lucide-react";
-import type { Identity, ProfilePreferences } from "../types";
+import { Compass } from "lucide-react";
+import type { Identity } from "../types";
 
-export function ProfileAvatar({ user, preferences }: { user?: Identity["user"]; preferences?: ProfilePreferences }) {
+export function ProfileAvatar({ user }: { user?: Identity["user"] }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const style = preferences?.avatar_style ?? "max";
-  const Icon = style === "compass" ? Compass : style === "mountain" ? Mountain : style === "sun" ? Sun : null;
-  if (Icon) return <Icon size={24} aria-hidden="true" />;
-  const photo = style === "max" ? user?.photo_url : null;
+  const photo = user?.photo_url;
   if (photo?.startsWith("https://") && photo !== failedUrl) {
     return (
       <img
@@ -20,7 +17,7 @@ export function ProfileAvatar({ user, preferences }: { user?: Identity["user"]; 
   }
   return user ? (
     <>
-      {(preferences?.display_name ? preferences.display_name.split(/\s+/).slice(0, 2) : [user.first_name, user.last_name])
+      {[user.first_name, user.last_name]
         .filter(Boolean)
         .map((value) => value!.slice(0, 1))
         .join("")}

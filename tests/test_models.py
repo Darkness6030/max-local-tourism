@@ -38,3 +38,15 @@ def test_gigachat_time_with_seconds_is_normalized() -> None:
 
     assert item.start_time == "09:25"
     assert item.end_time == "11:15"
+
+
+@pytest.mark.parametrize("transport,car", [("bus", False), ("suburban", False), ("car", True)])
+def test_preferred_transport_sets_car_planning_mode(transport, car):
+    assert TripRequest(preferred_transport=transport, has_car=not car).has_car is car
+    assert TripRequest(has_car=car).has_car is car
+
+
+@pytest.mark.parametrize("distance", [299, 601])
+def test_rejects_unsupported_city_radius(distance):
+    with pytest.raises(ValidationError):
+        TripRequest(max_distance_km=distance)

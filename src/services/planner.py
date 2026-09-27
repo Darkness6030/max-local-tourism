@@ -87,7 +87,13 @@ class TripPlanner:
             )
 
         await report(35, f"Маршрут: {origin.title} → {destination.title}")
-        distance_km = round(validate_city_distance(origin, destination))
+        distance = validate_city_distance(origin, destination)
+        distance_km = round(distance)
+        if not request.destination and distance > request.max_distance_km:
+            raise ServiceError(
+                "planner", "Подобранный город дальше выбранного расстояния. Попробуйте ещё раз или увеличьте дальность в профиле.",
+                status_code=422,
+            )
 
         await report(42, "Загружаем погоду и расписание")
         weather_result, transport_result, photo, catalog = await asyncio.gather(
@@ -99,6 +105,7 @@ class TripPlanner:
                 return_date=request.start_date + timedelta(days=request.days - 1),
                 departure_after=request.departure_after,
                 return_after=request.return_after,
+                preferred_transport=request.preferred_transport,
             ),
             self.photos.for_city(destination)
             if self.photos
