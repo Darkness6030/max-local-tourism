@@ -54,8 +54,15 @@
     --paper: #fff;
     --lavender: #f0eeff;
     --radius: 24px;
+    --app-safe-bottom: env(safe-area-inset-bottom, 0px);
     color-scheme: light;
     font-optical-sizing: auto;
+  }
+  /* The MAX iOS container needs only the panels' normal bottom padding.
+     Adding the device inset here leaves an empty strip below the controls.
+     Standalone browsers retain their system safe area. */
+  :root[data-max-ios] {
+    --app-safe-bottom: 0px;
   }
   * {
     box-sizing: border-box;

@@ -907,11 +907,11 @@ export function Wizard({
             data-ui="wizard-actions"
             className="py-4 px-6 [border-top:1px_solid_#f0f2f7] bg-white tablet:px-6 mobile:sticky
               mobile:bottom-0 mobile:pt-3 mobile:px-6
-              mobile:pb-[max(12px,_env(safe-area-inset-bottom))]
+              mobile:pb-[max(12px,_var(--app-safe-bottom))]
               mobile:[border-top:1px_solid_#e9edf6] mobile:bg-[#f8f9fcf5]
               mobile:[backdrop-filter:blur(16px)] mobile:z-[15] narrow:px-[21px] narrow-spacing:px-5
               short:sticky short:bottom-0 short:z-[15] short:pt-3
-              short:pb-[max(12px,_env(safe-area-inset-bottom))]"
+              short:pb-[max(12px,_var(--app-safe-bottom))]"
           >
             {(error || serverError) && (
               <Notice error>{error || serverError}</Notice>

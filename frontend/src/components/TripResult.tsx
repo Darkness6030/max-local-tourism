@@ -875,7 +875,7 @@ export function TripResult({
           bg-[#ffffffef] [backdrop-filter:blur(15px)] [border:1px_solid_var(--line)] rounded-[23px]
           p-[9px] [box-shadow:0_8px_30px_#3443710e] max-w-[calc(100%_-_24px)] w-106 mobile:left-0
           mobile:right-0 mobile:bottom-0 mobile:[transform:none] mobile:max-w-none mobile:w-full
-          mobile:bg-[#f8f9fc] mobile:pt-3 mobile:px-6 mobile:pb-[max(12px,_env(safe-area-inset-bottom))]
+          mobile:bg-[#f8f9fc] mobile:pt-3 mobile:px-6 mobile:pb-[max(12px,_var(--app-safe-bottom))]
           mobile:rounded-[20px_20px_0_0] mobile:[border-left:0] mobile:[border-right:0]
           mobile:[border-bottom:0] mobile:gap-[9px] mobile:[box-shadow:0_-4px_24px_#34437107]
           narrow:px-[17px] narrow-spacing:px-5 mobile:[&_svg]:size-[17px]"

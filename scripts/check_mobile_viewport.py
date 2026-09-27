@@ -18,7 +18,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:5173")
     parser.add_argument("--browser", choices=["chrome", "webkit"], default="chrome")
+    parser.add_argument("--max-platform", choices=["ios", "android", "web"], default="web")
+    parser.add_argument("--safe-bottom", type=int, default=0)
     args = parser.parse_args()
+    if args.safe_bottom and args.browser != "chrome":
+        parser.error("Nonzero safe-area emulation requires Chrome/CDP")
     with sync_playwright() as p:
         browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
         for width in (320, 390):
@@ -28,7 +32,8 @@ def main():
             )
             mock_profile(context, completed=True)
             context.route("https://st.max.ru/**", lambda r: r.fulfill(
-                content_type="application/javascript", body=BRIDGE,
+                content_type="application/javascript",
+                body=BRIDGE + f"window.WebApp.platform = '{args.max_platform}';",
             ))
             context.route("**/api/v1/auth/me", lambda r: r.fulfill(
                 json={"mode": "max", "user": {"id": 42, "first_name": "Анна"}},
@@ -54,6 +59,10 @@ def main():
             }))
             context.route("**/api/v1/trips/*/share", lambda r: r.fulfill(json={"text": "Тест"}))
             page = context.new_page()
+            if args.browser == "chrome":
+                context.new_cdp_session(page).send("Emulation.setSafeAreaInsetsOverride", {
+                    "insets": {"bottom": args.safe_bottom},
+                })
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.base_url, wait_until="networkidle")
@@ -66,8 +75,17 @@ def main():
                     return Math.abs(r.bottom - innerHeight) < 1 &&
                         getComputedStyle(el).backgroundColor === getComputedStyle(document.body).backgroundColor;
                 }"""), selector
+                base_padding = {
+                    "[data-ui~=bottom-nav]": 6,
+                    "[data-ui~=preset-actions]": 10,
+                }.get(selector, 12)
+                inset = 0 if args.max_platform == "ios" else args.safe_bottom
+                assert bar.evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)") == max(base_padding, inset), selector
 
             check_bar("[data-ui~=bottom-nav]")
+            page.get_by_role("button", name="Открыть маршрут: Коломна", exact=True).click()
+            check_bar("[data-ui~=preset-actions]")
+            page.get_by_role("button", name="На главную", exact=True).click()
             # A click must replace the screen within the next two render frames.
             page.get_by_role("button", name="Спланировать поездку").evaluate("""async el => {
                 el.click();
@@ -113,6 +131,10 @@ def main():
             destination.fill("Коломна")
             for step in range(5):
                 expect(page.get_by_label(f"Шаг {step + 1} из 5", exact=True)).to_be_visible()
+                inset = 0 if args.max_platform == "ios" else args.safe_bottom
+                assert page.locator("[data-ui~=wizard-actions]").evaluate(
+                    "el => parseFloat(getComputedStyle(el).paddingBottom)"
+                ) == max(12, inset)
                 for control in page.locator("[data-ui~=step-content] input, [data-ui~=step-content] select, [data-ui~=step-content] textarea").all():
                     if control.is_visible():
                         assert control.evaluate("el => parseFloat(getComputedStyle(el).fontSize) >= 16")
@@ -129,7 +151,7 @@ def main():
             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             check_bar("[data-ui~=result-sticky]")
             assert not errors, errors
-            print(f"Mobile viewport passed: {args.browser}, {width}px", flush=True)
+            print(f"Mobile viewport passed: {args.browser}, {width}px, MAX {args.max_platform}, safe bottom {args.safe_bottom}px", flush=True)
             context.close()
         browser.close()
 

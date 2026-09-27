@@ -144,6 +144,7 @@ export interface Job {
 export type Screen =
   "home" | "wizard" | "loading" | "result" | "preset" | "trips" | "about";
 export interface Bridge {
+  platform?: "ios" | "android" | "desktop" | "web";
   initData?: string;
   initDataUnsafe?: { start_param?: string };
   ready?: () => void;

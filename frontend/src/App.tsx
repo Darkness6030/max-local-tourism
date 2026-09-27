@@ -466,7 +466,7 @@ export default function App() {
               appMainStyles +
               " " +
               (navVisible
-                ? "[[data-ui~=app-main]&]:pb-26 mobile:[[data-ui~=app-main]&]:pb-[calc(78px_+_env(safe-area-inset-bottom))]"
+                ? "[[data-ui~=app-main]&]:pb-26 mobile:[[data-ui~=app-main]&]:pb-[calc(78px_+_var(--app-safe-bottom))]"
                 : "")
             }
           >
@@ -1092,7 +1092,7 @@ export default function App() {
                 bg-[#fffffff2] [border:1px_solid_#e7eaf4] [box-shadow:0_8px_35px_#25305212]
                 [backdrop-filter:blur(20px)] rounded-3xl py-2.5 px-[15px] mobile:left-0 mobile:right-0
                 mobile:bottom-0 mobile:[transform:none] mobile:w-auto mobile:rounded-[23px_23px_0_0]
-                mobile:bg-[#f8f9fc] mobile:pt-1.5 mobile:px-5 mobile:pb-[max(6px,_env(safe-area-inset-bottom))]
+                mobile:bg-[#f8f9fc] mobile:pt-1.5 mobile:px-5 mobile:pb-[max(6px,_var(--app-safe-bottom))]
                 mobile:[border-bottom:0] mobile:[border-left:0] mobile:[border-right:0]
                 mobile:[box-shadow:0_-4px_25px_#30426b05] [&_button]:flex [&_button]:flex-col
                 [&_button]:items-center [&_button]:justify-center [&_button]:gap-[5px]

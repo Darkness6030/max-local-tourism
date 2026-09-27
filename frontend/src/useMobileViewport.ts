@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 // A software keyboard can shrink the visual viewport without resizing the page.
 // Let the browser do its normal focus scroll, then reveal only the obscured part.
 export function useMobileViewport() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const viewport = window.visualViewport;
     const root = document.documentElement;
+    root.toggleAttribute("data-max-ios", window.WebApp?.platform === "ios");
     let frame = 0;
     let settled = 0;
     let fullHeight = window.innerHeight;
@@ -63,6 +64,7 @@ export function useMobileViewport() {
       window.removeEventListener("resize", schedule);
       viewport?.removeEventListener("resize", schedule);
       root.removeAttribute("data-keyboard-open");
+      root.removeAttribute("data-max-ios");
       root.style.removeProperty("--keyboard-inset");
     };
   }, []);

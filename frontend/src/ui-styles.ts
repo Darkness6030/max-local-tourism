@@ -17,16 +17,16 @@ export const appMainStyles = [
   "mobile:px-6 mobile:pb-6 narrow:px-[17px] narrow-spacing:px-5 short:pt-4",
   "mobile:[[data-ui~=screen-wizard]_&]:p-0 narrow-spacing:[[data-ui~=screen-wizard]_&]:p-0",
   "mobile:[[data-ui~=screen-result]_&]:pt-0 mobile:[[data-ui~=screen-result]_&]:px-6",
-  "mobile:[[data-ui~=screen-result]_&]:pb-[calc(92px_+_env(safe-area-inset-bottom))]",
+  "mobile:[[data-ui~=screen-result]_&]:pb-[calc(92px_+_var(--app-safe-bottom))]",
   "narrow:[[data-ui~=screen-result]_&]:px-[17px] desktop-result:[[data-ui~=screen-result]_&]:pb-26",
   "narrow-spacing:[[data-ui~=screen-result]_&]:px-5 [[data-ui~=screen-preset]_&]:pt-0",
-  "[[data-ui~=screen-preset]_&]:pb-[calc(136px_+_env(safe-area-inset-bottom))]",
-  "preset-mobile:[[data-ui~=screen-preset]_&]:pb-[calc(110px_+_env(safe-area-inset-bottom))]",
+  "[[data-ui~=screen-preset]_&]:pb-[calc(136px_+_var(--app-safe-bottom))]",
+  "preset-mobile:[[data-ui~=screen-preset]_&]:pb-[calc(110px_+_var(--app-safe-bottom))]",
   "[[data-ui~=screen-loading]_&]:flex-1 [[data-ui~=screen-loading]_&]:flex",
   "[[data-ui~=screen-loading]_&]:items-center [[data-ui~=screen-loading]_&]:w-full",
   "[[data-ui~=screen-loading]_&]:my-0 [[data-ui~=screen-loading]_&]:mx-auto",
   "[[data-ui~=screen-loading]_&]:pt-2",
-  "[[data-ui~=screen-loading]_&]:pb-[max(12px,_env(safe-area-inset-bottom))]",
+  "[[data-ui~=screen-loading]_&]:pb-[max(12px,_var(--app-safe-bottom))]",
 ].join(" ");
 
 export const emptyStateStyles = [

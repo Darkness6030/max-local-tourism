@@ -90,9 +90,9 @@ export function Onboarding({
   return (
     <div
       data-ui="onboarding"
-      className="max-w-265 h-[100dvh] m-auto pt-0 px-0 pb-[max(12px,_env(safe-area-inset-bottom))] flex
+      className="max-w-265 h-[100dvh] m-auto pt-0 px-0 pb-[max(12px,_var(--app-safe-bottom))] flex
         flex-col desktop-fit:mx-[35px] mobile:m-0 mobile:pt-0 mobile:px-5.5
-        mobile:pb-[max(12px,_env(safe-area-inset-bottom))] narrow:px-4.5"
+        mobile:pb-[max(12px,_var(--app-safe-bottom))] narrow:px-4.5"
       onKeyDown={(event) => {
         if (event.key === "ArrowRight") change(index + 1);
         if (event.key === "ArrowLeft") change(index - 1);

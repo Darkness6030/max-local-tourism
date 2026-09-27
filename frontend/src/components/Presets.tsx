@@ -428,7 +428,7 @@ export function PresetDetail({
           preset-mobile:left-0 preset-mobile:right-0 preset-mobile:bottom-0
           preset-mobile:[transform:none] preset-mobile:w-auto preset-mobile:rounded-[22px_22px_0_0]
           preset-mobile:bg-[#f8f9fc] preset-mobile:pt-3 preset-mobile:px-6
-          preset-mobile:pb-[max(10px,_env(safe-area-inset-bottom))] [&_>_span]:block
+          preset-mobile:pb-[max(10px,_var(--app-safe-bottom))] [&_>_span]:block
           [&_>_span]:text-center [&_>_span]:text-[10px] [&_>_span]:text-muted [&_>_span]:leading-[1.6]
           [&_>_span]:mt-2"
       >
