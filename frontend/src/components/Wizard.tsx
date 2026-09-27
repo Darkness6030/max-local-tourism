@@ -845,7 +845,7 @@ export function Wizard({
                     </summary>
                     <div
                       data-ui="fields-pair"
-                      className="grid grid-cols-[1fr_1fr] gap-3 mobile:[&_input]:p-2.5 mobile:[&_input]:min-w-0
+                      className="grid grid-cols-2 gap-3 [&_>_label]:min-w-0 mobile:[&_input]:p-2.5 mobile:[&_input]:min-w-0
                         mobile:[&_input]:text-[16px]"
                     >
                       <label data-ui="field-label" className={fieldLabelStyles}>

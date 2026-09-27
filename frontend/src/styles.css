@@ -152,6 +152,30 @@
   }
 }
 
+/* WebKit centers native date/time values using inline-flex. The generic field
+   utilities use block, which moves the value up on iOS. Keep these overrides
+   outside the utility layer so the native layout wins for temporal fields. */
+#trip-form input:is([type="date"], [type="time"]) {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  height: 54px;
+  padding-block: 0;
+  line-height: 1.5;
+  text-align: left;
+}
+
+#trip-form input::-webkit-date-and-time-value {
+  min-width: 0;
+  margin: 0;
+  text-align: inherit;
+}
+
+#trip-form input::-webkit-datetime-edit {
+  padding: 0;
+}
+
 /* Keep the actions in document flow while the keyboard covers the viewport. */
 html[data-keyboard-open] [data-ui~="wizard"] {
   padding-bottom: var(--keyboard-inset, 0px);

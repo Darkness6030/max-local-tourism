@@ -23,6 +23,8 @@ def main():
     args = parser.parse_args()
     if args.safe_bottom and args.browser != "chrome":
         parser.error("Nonzero safe-area emulation requires Chrome/CDP")
+    screenshots = Path("tmp/ui-check")
+    screenshots.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
         browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
         for width in (320, 390):
@@ -140,6 +142,42 @@ def main():
                         assert control.evaluate("el => parseFloat(getComputedStyle(el).fontSize) >= 16")
                 if step == 3:
                     keyboard_check(page.locator("textarea[name=preferences]"))
+                if step == 1:
+                    date = page.locator("input[name=start_date]")
+                    initial_date = date.input_value()
+                    initial_height = date.bounding_box()["height"]
+                    date.fill("")
+                    assert date.bounding_box()["height"] == initial_height
+                    date.fill(initial_date)
+                    assert date.evaluate("""el => {
+                        const s = getComputedStyle(el);
+                        const r = el.getBoundingClientRect();
+                        const icon = el.parentElement.querySelector('svg').getBoundingClientRect();
+                        return ['flex', 'inline-flex'].includes(s.display) && s.alignItems === 'center' &&
+                            s.paddingTop === '0px' && s.paddingBottom === '0px' &&
+                            Math.abs(r.y + r.height / 2 - icon.y - icon.height / 2) < 1;
+                    }"""), "Date text must use WebKit's centered flex layout"
+                    page.locator("[data-ui~=date-input]").screenshot(
+                        path=str(screenshots / f"date-{args.browser}-{width}.png")
+                    )
+                if step == 4:
+                    page.locator("summary").filter(has_text="Время в дороге").click()
+                    for name, value in (("departure_after", "09:45"), ("return_after", "19:30")):
+                        field = page.locator(f"input[name={name}]")
+                        field.fill(value)
+                        field.blur()
+                        expect(field).to_have_value(value)
+                    assert page.locator("[data-ui~=fields-pair]").evaluate("""el => {
+                        const pair = el.getBoundingClientRect();
+                        const fields = [...el.querySelectorAll('input')].map(x => x.getBoundingClientRect());
+                        return fields.length === 2 && fields[0].left >= pair.left &&
+                            fields[0].right + 11 <= fields[1].left && fields[1].right <= pair.right + 1 &&
+                            pair.right <= innerWidth && fields.every(r => r.width > 0 && r.height >= 44);
+                    }"""), "Time inputs must fit in separate columns"
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                    page.locator("[data-ui~=fields-pair]").screenshot(
+                        path=str(screenshots / f"times-{args.browser}-{width}.png")
+                    )
                 if step < 4:
                     page.locator("#next-step").click()
             page.get_by_role("button", name="Закрыть анкету").click()
