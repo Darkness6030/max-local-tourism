@@ -151,6 +151,7 @@ export interface Bridge {
   enableClosingConfirmation?: () => void;
   disableClosingConfirmation?: () => void;
   shareMaxContent?: (data: { text: string }) => Promise<unknown> | void;
+  shareContent?: (data: { text: string }) => Promise<unknown> | void;
   openLink?: (url: string) => Promise<unknown> | void;
   BackButton?: {
     show?: () => void;

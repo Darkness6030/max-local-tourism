@@ -1,5 +1,7 @@
 """Shared launch and onboarding regression; MAX sending and API are mocked."""
 
+import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -12,18 +14,54 @@ from src.sample import sample_trip
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base-url", default="http://127.0.0.1:8769")
+    parser.add_argument("--browser", choices=["chrome", "webkit"], default="chrome")
+    args = parser.parse_args()
     plan = sample_trip().model_dump(mode="json")
     token = "a" * 32
     link = f"https://max.ru/test_bot?startapp=trip_{token}"
     shared_text = plan["share_text"] + "\n\nСохранить и открыть маршрут:\n" + link
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="chrome")
-        for completed in [False, True]:
-            context = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
-            context.route("**/static/**", lambda r: r.fulfill(
-                path=str(Path("src/static") / r.request.url.split("/static/", 1)[1])))
-            context.route("https://st.max.ru/**", lambda r: r.fulfill(
-                content_type="application/javascript", body=BRIDGE))
+        browser = p.webkit.launch() if args.browser == "webkit" else p.chromium.launch(channel="chrome")
+        for mode in ["max-new", "max-retry", "ios", "ios-reject", "ios-throw", "ios-hang",
+                     "ios-cancel", "ios-error-response", "ios-no-native", "ios-no-initdata", "browser"]:
+            completed = mode != "max-new"
+            context = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce",
+                                          is_mobile=True, has_touch=True)
+            if args.base_url == "http://127.0.0.1:8769":
+                context.route("**/static/**", lambda r: r.fulfill(
+                    path=str(Path("src/static") / r.request.url.split("/static/", 1)[1])))
+            bridge_script = BRIDGE + """
+                window.shareCalls = [];
+                const record = (method, data) => {
+                    if (!navigator.userActivation.isActive) throw Error('Lost user activation');
+                    window.shareCalls.push({method, ...data});
+                };
+                window.WebApp.shareMaxContent = function(data) { record('max', data); return Promise.resolve(); };
+                Object.defineProperty(navigator, 'share', { configurable: true,
+                    value(data) { record('browser', data); return Promise.resolve(); } });
+            """
+            bridge_script += f"const mode = {json.dumps(mode)};"
+            bridge_script += """
+                if (mode.startsWith('ios')) {
+                    window.WebApp.platform = 'ios';
+                    window.WebApp.shareContent = function(data) {
+                        record('native', data);
+                        if (mode === 'ios-throw') throw Error('Unavailable');
+                        if (mode === 'ios-reject') return Promise.reject({error: {code: 'not_supported'}});
+                        if (mode === 'ios-error-response') return Promise.resolve({error: {code: 'not_supported'}});
+                        if (mode === 'ios-hang') return new Promise(() => {});
+                        if (mode === 'ios-cancel') return Promise.reject({error: {code: 'user_cancelled'}});
+                        return Promise.resolve();
+                    };
+                }
+                if (mode === 'ios-no-native') delete window.WebApp.shareContent;
+                if (mode === 'ios-no-initdata') window.WebApp.initData = '';
+                if (mode === 'browser') delete window.WebApp;
+            """
+            context.route("https://st.max.ru/**", lambda r, *, script=bridge_script: r.fulfill(
+                content_type="application/javascript", body=script))
             context.route("**/api/v1/auth/me", lambda r: r.fulfill(
                 json={"mode": "max", "user": {"id": 43, "first_name": "Анна"}}))
             context.route("**/api/v1/app-config", lambda r: r.fulfill(json={
@@ -54,7 +92,7 @@ def main():
             page = context.new_page()
             errors = []
             page.on("pageerror", lambda e, captured=errors: captured.append(str(e)))
-            await_url = f"http://127.0.0.1:8769/?WebAppStartParam=trip_{token}"
+            await_url = f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{token}#WebAppData=test-launch-data"
             page.goto(await_url)
             if not completed:
                 expect(page.locator('[data-ui="onboarding"]')).to_be_visible()
@@ -68,12 +106,33 @@ def main():
             expect(page.locator("#share-trip")).to_be_enabled()
             assert len(preparations) == (2 if completed else 1)
             before_click = len(preparations)
-            assert page.evaluate("window.WebApp.calls.filter(x => x && x.text).length") == 0
+            assert page.evaluate("window.shareCalls.length") == 0
             page.locator("#share-trip").click()
             expect(page.get_by_role("dialog")).to_have_count(0)
             assert len(preparations) == before_click
-            assert page.evaluate("window.WebApp.calls.filter(x => x && x.text).at(-1).text") == shared_text
+            expected_method = "browser" if mode == "browser" else (
+                "native" if mode.startswith("ios") and mode != "ios-no-native" else "max"
+            )
+            assert page.evaluate("window.shareCalls") == [{"method": expected_method, "text": shared_text}]
+            feedback = page.locator("[data-ui~=share-feedback]")
+            if mode == "ios-cancel":
+                expect(feedback).to_have_count(0)
+            else:
+                expect(feedback).to_be_visible()
+                assert feedback.evaluate("""el => {
+                    const r = el.getBoundingClientRect();
+                    return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth;
+                }""")
+                if mode in ("ios-reject", "ios-throw", "ios-error-response"):
+                    expect(feedback).to_contain_text("Не удалось открыть отправку")
+                if mode.startswith("ios") and mode != "ios-no-native":
+                    page.get_by_role("button", name="Другой способ", exact=True).click()
+                    assert page.evaluate("window.shareCalls.at(-1)") == {"method": "max", "text": shared_text}
+                    assert len(preparations) == before_click
+                    page.get_by_role("button", name="Другой способ", exact=True).click()
+                    assert page.evaluate("window.shareCalls.at(-1)") == {"method": "browser", "text": shared_text}
             assert not errors, errors
+            print(f"Sharing passed: {args.browser}, {mode}", flush=True)
             context.close()
         browser.close()
     print("Shared launch, onboarding and MAX share text passed")

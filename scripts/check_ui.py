@@ -299,7 +299,7 @@ def main():
         page.locator("#share-trip").click()
         assert page.evaluate("window.WebApp.calls.some(x => x.text?.startsWith('ИИ:'))")
         page.locator("#copy-trip").click()
-        expect(page.locator("[data-ui~=result-page] > [data-ui~=notice]")).to_be_visible()
+        expect(page.locator("[data-ui~=share-feedback]")).to_be_visible()
         page.get_by_role("tab", name="Программа").click()
         expect(page.get_by_role("checkbox").first).to_be_checked()
         page.set_viewport_size({"width": 320, "height": 650})

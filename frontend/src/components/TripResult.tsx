@@ -44,6 +44,7 @@ const RESULT_TABS = [
   { value: "budget", label: "Бюджет", Icon: Wallet },
 ] as const;
 type Tab = (typeof RESULT_TABS)[number]["value"];
+type ShareMethod = "native" | "max" | "browser";
 export function TripResult({
   plan,
   onBack,
@@ -64,6 +65,18 @@ export function TripResult({
   const [sharing, setSharing] = useState(true);
   const [shareRetry, setShareRetry] = useState(0);
   const [manualCopy, setManualCopy] = useState(false);
+  const copyField = useRef<HTMLTextAreaElement>(null);
+  const [shareFeedback, setShareFeedback] = useState<{
+    text: string;
+    next?: ShareMethod;
+  } | null>(null);
+  const shareAttempt = useRef(0);
+  useEffect(() => {
+    if (manualCopy) {
+      copyField.current?.focus();
+      copyField.current?.select();
+    }
+  }, [manualCopy]);
   const packed = plan.packed_items ?? [];
   const packing = useRef({
     confirmed: plan,
@@ -130,6 +143,7 @@ export function TripResult({
     const controller = new AbortController();
     setSharing(true);
     setShareText("");
+    setShareFeedback(null);
     // Prepare before the click: MAX requires a live user gesture to open sharing.
     api<{ text: string }>(`/trips/${plan.id}/share`, initData, {
       method: "POST",
@@ -143,47 +157,77 @@ export function TripResult({
     }).finally(() => {
       if (!controller.signal.aborted) setSharing(false);
     });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      shareAttempt.current += 1;
+    };
   }, [plan.id, initData, shareRetry]);
 
-  const share = () => {
+  const share = (preferred?: ShareMethod) => {
     if (!shareText) {
       setMessage("");
       setShareRetry((value) => value + 1);
       return;
     }
-    // Keep this synchronous until the Bridge call to retain the user gesture.
+    // No await before opening: each native menu needs the current user gesture.
     const bridge = window.WebApp;
-    if (bridge?.initData && bridge.shareMaxContent) {
-      try {
-        Promise.resolve(
-          bridge.shareMaxContent({ text: shareText }),
-        ).catch(() =>
-          setMessage(
-            "Шеринг недоступен в этом клиенте. Скопируйте план и отправьте его в чат.",
-          ),
-        );
-      } catch {
-        setMessage("Не удалось открыть шеринг. Попробуйте скопировать план.");
+    const methods: ShareMethod[] = [];
+    const inMax = Boolean(initData || bridge?.initData);
+    const nativeAvailable = inMax && (bridge?.platform === "ios" || bridge?.platform === "android")
+      && typeof bridge.shareContent === "function";
+    if (bridge?.platform === "ios" && nativeAvailable) methods.push("native");
+    if (inMax && typeof bridge?.shareMaxContent === "function") methods.push("max");
+    if (nativeAvailable && !methods.includes("native")) methods.push("native");
+    if (typeof navigator.share === "function") methods.push("browser");
+    const method = preferred && methods.includes(preferred) ? preferred : methods[0];
+    const next = methods.length > 1 ? methods[(methods.indexOf(method) + 1) % methods.length] : undefined;
+    const attempt = ++shareAttempt.current;
+    if (!method) {
+      setShareFeedback({ text: "Отправка недоступна. Нажмите «Копировать» и вставьте план в чат MAX." });
+      return;
+    }
+    // Keep a visible escape hatch even if the client never answers its request.
+    setShareFeedback({
+      text: method === "max"
+        ? "Выберите чат в MAX. Если меню не открылось, попробуйте другой способ или скопируйте план."
+        : "Выберите MAX и получателя в меню отправки. Если меню не открылось, попробуйте другой способ или скопируйте план.",
+      next,
+    });
+    const failed = (error: unknown) => {
+      if (attempt !== shareAttempt.current) return;
+      const failure = error as { name?: string; error?: { code?: string }; code?: string } | null;
+      const code = failure?.error?.code || failure?.code || "";
+      if (failure?.name === "AbortError" || /cancel|user_refused/i.test(code)) {
+        setShareFeedback(null);
+        return;
       }
-    } else {
-      window.open(
-        `https://max.ru/:share?text=${encodeURIComponent(shareText)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      setMessage(
-        "Выберите чат в MAX. Если окно не открылось, скопируйте план.",
-      );
+      setShareFeedback({
+        text: next
+          ? "Не удалось открыть отправку. Попробуйте другой способ или нажмите «Копировать» и вставьте план в чат MAX."
+          : "Не удалось открыть отправку. Нажмите «Копировать» и вставьте план в чат MAX.",
+        next,
+      });
+    };
+    try {
+      const result = method === "native" ? bridge!.shareContent!({ text: shareText })
+        : method === "max" ? bridge!.shareMaxContent!({ text: shareText })
+        : navigator.share({ text: shareText });
+      Promise.resolve(result).then((response) => {
+        if (response && typeof response === "object" && "error" in response) failed(response);
+      }, failed);
+    } catch (error) {
+      failed(error);
     }
   };
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(shareText || plan.share_text);
-      setMessage("План скопирован. Отправьте его тем, кого берёте с собой.");
+      shareAttempt.current += 1;
+      setShareFeedback({ text: "План скопирован. Вставьте его в чат MAX с теми, кого берёте с собой." });
     } catch {
       setManualCopy(true);
-      setMessage("Автоматическое копирование недоступно. Выделите текст ниже.");
+      shareAttempt.current += 1;
+      setShareFeedback({ text: "Автоматическое копирование недоступно. Скопируйте выделенный текст поездки." });
     }
   };
   return (
@@ -280,6 +324,7 @@ export function TripResult({
         <label data-ui="field-label" className={fieldLabelStyles}>
           Текст поездки
           <textarea
+            ref={copyField}
             readOnly
             rows={5}
             value={shareText || plan.share_text}
@@ -880,6 +925,33 @@ export function TripResult({
           mobile:[border-bottom:0] mobile:gap-[9px] mobile:[box-shadow:0_-4px_24px_#34437107]
           narrow:px-[17px] narrow-spacing:px-5 mobile:[&_svg]:size-[17px]"
       >
+        {shareFeedback && (
+          <div
+            data-ui="share-feedback"
+            className="absolute bottom-[calc(100%_+_10px)] left-3 right-3 rounded-2xl border border-solid
+              border-[#e0e5f2] bg-white p-3 text-[13px] leading-relaxed shadow-lg"
+          >
+            <p role="status">{shareFeedback.text}</p>
+            <div className="flex flex-wrap items-center justify-between gap-2 mt-1">
+              {shareFeedback.next && (
+                <button
+                  type="button"
+                  className="bg-transparent text-brand font-bold px-0"
+                  onClick={() => share(shareFeedback.next)}
+                >
+                  Другой способ
+                </button>
+              )}
+              <button
+                type="button"
+                className="bg-transparent text-muted ml-auto px-0"
+                onClick={() => { shareAttempt.current += 1; setShareFeedback(null); }}
+              >
+                Закрыть подсказку
+              </button>
+            </div>
+          </div>
+        )}
         <button
           id="copy-trip"
           data-ui="button secondary"
@@ -907,7 +979,7 @@ export function TripResult({
           id="share-trip"
           data-ui="button primary"
           className={primaryButtonStyles}
-          onClick={share}
+          onClick={() => share()}
           disabled={sharing}
         >
           <Share2 size={18} />
