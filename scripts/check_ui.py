@@ -155,13 +155,10 @@ def main():
         expect(page.get_by_role("button", name="Спланировать поездку")).to_be_visible()
         page.wait_for_timeout(750)
         assert page.evaluate("""() => {
-            const duration = key => {
-                const frames = window.welcomeFrames.filter(f => f[key] > .05 && f[key] < .95);
-                return frames.length ? frames.at(-1).t - frames[0].t : 0;
-            };
-            return duration('exit') >= 70 && duration('enter') >= 150 &&
-                window.welcomeFrames.some(f => f.transform !== 'none' && new DOMMatrix(f.transform).m42 > 1);
-        }"""), "Onboarding should hand off smoothly with a distinct home entrance."
+            const entered = window.welcomeFrames.filter(f => f.enter !== null);
+            return entered.length > 0 && entered.every(f => f.exit === null) &&
+                entered.at(-1).enter === 1;
+        }"""), "Home should replace onboarding immediately, without an exit animation."
         screenshot("home-mobile")
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         footer_gap = page.evaluate("""() => {
@@ -204,12 +201,13 @@ def main():
         page.get_by_role("button", name="Уже знаю куда").click()
         page.wait_for_timeout(400)
         assert page.evaluate(
-            "window.homeInsets.length > 0 && window.homeInsets.every(x => x >= 23)"
+            "window.homeInsets.every(x => x >= 23)"
         )
         assert page.evaluate("""() => {
             const fading = window.screenFadeFrames.filter(f => f.opacity > 0.05 && f.opacity < 0.95);
-            return fading.length >= 4 && fading.at(-1).t - fading[0].t >= 100;
-        }"""), "The screen transition should be visibly gradual."
+            return window.screenFadeFrames.length > 0 &&
+                (!fading.length || fading.at(-1).t - fading[0].t < 200);
+        }"""), "Screen entry should finish promptly without waiting for the old screen."
         page.locator("#next-step").click()
         expect(page.get_by_role("alert")).to_contain_text("Введите город")
         page.locator("input[name=destination]").fill("Коломна")

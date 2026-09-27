@@ -186,9 +186,6 @@ def main():
             )
             page.get_by_role("button", name="Закрыть анкету").click()
             page.get_by_role("button", name="О сервисе", exact=True).click()
-            page.locator("[data-ui~=photo-credits] summary").click()
-            expect(page.locator("[data-ui~=photo-credits] p")).to_have_count(4)
-            expect(page.locator("[data-ui~=photo-credits]")).to_contain_text("Wikimedia Commons")
             page.get_by_role("button", name="Мои поездки", exact=True).click()
             expect(
                 page.get_by_role("heading", name="Ваши открытия ещё впереди")

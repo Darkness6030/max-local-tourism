@@ -95,7 +95,7 @@ export function Primary({
       className={primaryButtonStyles}
       onClick={onClick}
       disabled={disabled || busy}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ opacity: 0.8 }}
     >
       <span>{children}</span>
       {busy ? (
@@ -165,7 +165,7 @@ export function Choice({
       data-ui={`choice ${selected ? "selected" : ""}`}
       className={`${choiceStyles} ${selected ? selectedChoiceStyles : ""} ${className}`}
       onClick={onClick}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ opacity: 0.8 }}
     >
       {icon && (
         <span

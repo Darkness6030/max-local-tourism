@@ -15,8 +15,6 @@ export interface TripPreset {
   photoAlt: string;
   photoAuthor: string;
   photoSource: string;
-  photoLicense: string;
-  photoLicenseUrl: string;
   interests: string[];
   pace: Draft["pace"];
   maxTravelMinutes: number;
@@ -38,10 +36,6 @@ export interface TripPreset {
 }
 
 const commons = "https://commons.wikimedia.org/wiki/File:";
-const cc4 = {
-  photoLicense: "CC BY-SA 4.0",
-  photoLicenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
-};
 
 // Editorial routes, independent of dates, provider responses and private user trips.
 // Times describe a suggested day, not museum opening hours or booked sessions.
@@ -58,7 +52,6 @@ export const tripPresets: TripPreset[] = [
     photoAlt: "Соборы и колокольня Коломенского кремля",
     photoAuthor: "AntonMardvinau",
     photoSource: commons + "Kolomna_Kremlin_Ensemble.jpg",
-    ...cc4,
     interests: ["История", "Местная кухня", "Прогулки"],
     pace: "relaxed",
     maxTravelMinutes: 180,
@@ -139,7 +132,6 @@ export const tripPresets: TripPreset[] = [
     photoAlt: "Панорама Суздальского кремля с берега Каменки",
     photoAuthor: "Ludvig14",
     photoSource: commons + "Suzdal_Panorama_1281.jpg",
-    ...cc4,
     interests: ["История", "Природа", "Местная кухня"],
     pace: "relaxed",
     maxTravelMinutes: 300,
@@ -245,7 +237,6 @@ export const tripPresets: TripPreset[] = [
     photoAlt: "Выборгский замок на острове у воды",
     photoAuthor: "Reda Kerbouche",
     photoSource: commons + "Vyborg_Castle_in_Russia.jpg",
-    ...cc4,
     interests: ["История", "Природа", "Прогулки"],
     pace: "balanced",
     maxTravelMinutes: 180,
@@ -318,8 +309,6 @@ export const tripPresets: TripPreset[] = [
     photoAlt: "Новгородский кремль со стороны реки Волхов",
     photoAuthor: "А.Савин, Википедия",
     photoSource: commons + "Novgorod_Kremlin_08_View_from_Volkhov.jpg",
-    photoLicense: "CC BY-SA 3.0",
-    photoLicenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
     interests: ["История", "Прогулки", "Музеи"],
     pace: "balanced",
     maxTravelMinutes: 240,

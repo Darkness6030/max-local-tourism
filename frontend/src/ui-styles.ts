@@ -181,7 +181,7 @@ const fieldStyles = [
   "[&_textarea]:w-full [&_textarea]:[border:1px_solid_#e6e9f0] [&_textarea]:bg-[#fafbfe]",
   "[&_textarea]:rounded-[13px] [&_textarea]:p-3.5 [&_textarea]:text-[13px] [&_textarea]:text-ink",
   "[&_textarea]:resize-y [&_textarea]:min-h-23 [&_textarea]:leading-[1.7]",
-  "mobile:[&_textarea]:bg-white mobile:[&_textarea]:p-3.5 mobile:[&_textarea]:text-[14px]",
+  "mobile:[&_textarea]:bg-white mobile:[&_textarea]:p-3.5 mobile:[&_textarea]:text-[16px]",
   "mobile:[&_textarea]:min-h-25 [&_select]:mt-[9px] [&_select]:block [&_select]:w-full",
   "[&_select]:[border:1px_solid_#e6e9f0] [&_select]:[background:#fafbfe] [&_select]:rounded-[13px]",
   "[&_select]:p-3.5 [&_select]:text-[13px] [&_select]:text-ink [&_select]:min-h-[51px]",
@@ -192,7 +192,7 @@ const fieldStyles = [
   "[[data-ui~=fields-pair]_&]:text-[11px] mobile:[[data-ui~=fields-pair]_&]:text-[11px]",
 ].join(" ");
 
-export const fieldLabelStyles = `${fieldStyles} mobile:[&_select]:text-[14px]`;
+export const fieldLabelStyles = `${fieldStyles} mobile:[&_select]:text-[16px]`;
 
 export const inlineNoteStyles = [
   "flex gap-2.5 items-start text-[11px] leading-[1.8] text-[#929bae] bg-[#f8f9fc]",
@@ -212,7 +212,7 @@ export const inputWithIconStyles = [
   "[&_select]:min-h-[51px] [&_select]:pl-11 [&_select]:appearance-none",
   "[&_select]:[background-image:url(\"data:image/svg+xml,%3Csvg_xmlns='http://www.w3.org/2000/svg'_width='12'_height='12'_viewBox='0_0_24_24'_fill='none'_stroke='%237c8293'_stroke-width='2'%3E%3Cpath_d='m6_9_6_6_6-6'/%3E%3C/svg%3E\")]",
   "[&_select]:[background-repeat:no-repeat] [&_select]:[background-position:calc(100%_-_18px)_center]",
-  "mobile:[&_select]:text-[14px] mobile:[&_select]:min-h-13.5 mobile:[&_select]:[background:#fff]",
+  "mobile:[&_select]:text-[16px] mobile:[&_select]:min-h-13.5 mobile:[&_select]:[background:#fff]",
   "mobile:[&_select]:py-0 [&_select]:h-13.5 [&_select]:leading-[20px] mobile:[&_select]:pr-3.5 mobile:[&_select]:pl-11 flex items-center",
   "relative mt-[9px] [&_>_svg]:absolute [&_>_svg]:left-[15px] [&_>_svg]:text-[#7b88b4]",
   "[&_>_svg]:pointer-events-none",

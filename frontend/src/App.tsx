@@ -11,8 +11,8 @@ import {
   textButtonStyles,
   tripsPageStyles,
 } from "./ui-styles";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -56,6 +56,7 @@ import { MaxEntry } from "./components/MaxEntry";
 import { TripResult } from "./components/TripResult";
 import { PresetCards, PresetDetail } from "./components/Presets";
 import type { TripPreset } from "./presets";
+import { useMobileViewport } from "./useMobileViewport";
 import journey from "./assets/journey.webp";
 import journeySpb from "./assets/journey-spb.webp";
 
@@ -99,6 +100,7 @@ const sharedLaunch = () => {
 };
 
 export default function App() {
+  useMobileViewport();
   const reducedMotion = useReducedMotion();
   const [onboarded, setOnboarded] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -127,6 +129,9 @@ export default function App() {
   const prefix = useRef("");
   const pendingShare = useRef(sharedLaunch());
   const submitLock = useRef(false);
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [screen, onboarded, homeRevision]);
   const navigate = useCallback((next: Screen) => {
     setWelcomeEntry(false);
     setScreen(next);
@@ -396,21 +401,12 @@ export default function App() {
   }
   const navVisible = ["home", "trips", "about"].includes(screen);
   return (
-    <AnimatePresence
-      mode="wait"
-      initial={false}
-      onExitComplete={() => window.scrollTo({ top: 0, behavior: "instant" })}
-    >
+    <>
       {!booting && !onboarded ? (
         <motion.div
           key="onboarding"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{
-            opacity: 0,
-            y: reducedMotion ? 0 : -8,
-            scale: reducedMotion ? 1 : 0.985,
-          }}
           transition={{
             duration: reducedMotion ? 0 : 0.24,
             ease: "easeInOut",
@@ -429,12 +425,8 @@ export default function App() {
           className="min-h-[100dvh] [&[data-ui~=screen-loading]]:flex [&[data-ui~=screen-loading]]:flex-col"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{
-            opacity: 0,
-            transition: { duration: reducedMotion ? 0 : 0.18 },
-          }}
           transition={{
-            duration: reducedMotion ? 0 : welcomeEntry ? 0.42 : 0.3,
+            duration: reducedMotion ? 0 : 0.12,
             ease: "easeInOut",
           }}
         >
@@ -1100,7 +1092,7 @@ export default function App() {
                 bg-[#fffffff2] [border:1px_solid_#e7eaf4] [box-shadow:0_8px_35px_#25305212]
                 [backdrop-filter:blur(20px)] rounded-3xl py-2.5 px-[15px] mobile:left-0 mobile:right-0
                 mobile:bottom-0 mobile:[transform:none] mobile:w-auto mobile:rounded-[23px_23px_0_0]
-                mobile:pt-1.5 mobile:px-5 mobile:pb-[max(6px,_env(safe-area-inset-bottom))]
+                mobile:bg-[#f8f9fc] mobile:pt-1.5 mobile:px-5 mobile:pb-[max(6px,_env(safe-area-inset-bottom))]
                 mobile:[border-bottom:0] mobile:[border-left:0] mobile:[border-right:0]
                 mobile:[box-shadow:0_-4px_25px_#30426b05] [&_button]:flex [&_button]:flex-col
                 [&_button]:items-center [&_button]:justify-center [&_button]:gap-[5px]
@@ -1145,7 +1137,7 @@ export default function App() {
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 
@@ -1317,7 +1309,7 @@ function Loading({
         Пока вернуться на главную <ArrowRight size={16} />
       </button>
       <small>
-        Обычно несколько минут. Можно обновить страницу —<br />
+        Обычно занимает несколько минут. Можно обновить страницу —<br />
         мы постараемся восстановить статус.
       </small>
     </div>

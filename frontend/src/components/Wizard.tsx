@@ -10,8 +10,8 @@ import {
   inputWithIconStyles,
   selectedChoiceStyles,
 } from "../ui-styles";
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import {
   ArrowLeft,
   Baby,
@@ -117,20 +117,14 @@ export function Wizard({
     setCityError(null);
     return () => cityRequest.current?.abort();
   }, [draft.origin, draft.destination, draft.destinationMode]);
-  const [direction, setDirection] = useState(1);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     setError(null);
     setCityError(null);
-    window.scrollTo({ top: 0 });
-    const timer = setTimeout(
-      () => headingRef.current?.focus({ preventScroll: true }),
-      300,
-    );
-    return () => clearTimeout(timer);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    headingRef.current?.focus({ preventScroll: true });
   }, [step]);
   const move = (next: number) => {
-    setDirection(next > step ? 1 : -1);
     setStep(next);
   };
   const next = async () => {
@@ -295,16 +289,14 @@ export function Wizard({
             void next();
           }}
         >
-          <AnimatePresence mode="wait">
             <motion.div
               key={step}
               data-ui="step-content"
               className="pt-6 px-6 pb-4 tablet:px-6 mobile:pt-6 mobile:px-6 mobile:pb-4 narrow:px-[21px]
                 narrow-spacing:px-5 short:pt-5"
-              initial={{ opacity: 0, x: direction * 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -18 }}
-              transition={{ duration: 0.26, ease: "easeInOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.12 }}
             >
               <div
                 data-ui="step-heading"
@@ -380,18 +372,16 @@ export function Wizard({
                     />
                   </div>
                   {draft.destinationMode === "manual" && (
-                    <motion.label
+                    <label
                       data-ui="field-label spaced"
                       className="block mt-6 text-[13px] font-semibold leading-[20px]"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
                     >
                       Город назначения
                       <input
                         autoFocus
                         name="destination"
                         className="mt-[9px] block h-13.5 w-full rounded-[13px] border border-solid
-                          border-[#e6e9f0] bg-white px-3.5 py-0 text-[13px] mobile:text-[14px]
+                          border-[#e6e9f0] bg-white px-3.5 py-0 text-[13px] mobile:text-[16px]
                           font-medium leading-[20px] text-ink placeholder:text-[length:inherit]
                           placeholder:leading-[20px] placeholder:text-[#a3a9b8]
                           placeholder:opacity-100 aria-invalid:border-[#d86868]
@@ -416,7 +406,7 @@ export function Wizard({
                           {cityError}
                         </span>
                       )}
-                    </motion.label>
+                    </label>
                   )}
                   <div data-ui="inline-note" className={inlineNoteStyles}>
                     <MapPin size={16} />
@@ -913,16 +903,15 @@ export function Wizard({
                 </>
               )}
             </motion.div>
-          </AnimatePresence>
           <div
             data-ui="wizard-actions"
             className="py-4 px-6 [border-top:1px_solid_#f0f2f7] bg-white tablet:px-6 mobile:sticky
               mobile:bottom-0 mobile:pt-3 mobile:px-6
-              mobile:pb-[calc(12px_+_env(safe-area-inset-bottom))]
+              mobile:pb-[max(12px,_env(safe-area-inset-bottom))]
               mobile:[border-top:1px_solid_#e9edf6] mobile:bg-[#f8f9fcf5]
               mobile:[backdrop-filter:blur(16px)] mobile:z-[15] narrow:px-[21px] narrow-spacing:px-5
               short:sticky short:bottom-0 short:z-[15] short:pt-3
-              short:pb-[calc(12px_+_env(safe-area-inset-bottom))]"
+              short:pb-[max(12px,_env(safe-area-inset-bottom))]"
           >
             {(error || serverError) && (
               <Notice error>{error || serverError}</Notice>

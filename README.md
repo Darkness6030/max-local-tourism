@@ -224,10 +224,16 @@ python scripts/check_ui.py --base-url http://127.0.0.1:8001
 python scripts/check_ui.py --base-url http://127.0.0.1:8001 --height 633
 python scripts/check_presets.py --base-url http://127.0.0.1:8001
 python scripts/check_compact_ui.py --base-url http://127.0.0.1:8001
+python scripts/check_mobile_viewport.py --base-url http://127.0.0.1:8001
+# Дополнительная проверка движка Safari:
+python -m playwright install webkit
+python scripts/check_mobile_viewport.py --base-url http://127.0.0.1:8001 --browser webkit
 ruff check src tests scripts
 ```
 
 Без Chrome: установить `python -m playwright install chromium`, передать `--browser chromium`. Скрипт проверяет экраны 320/390/1360 px, онбординг, все пять шагов, черновик, валидацию, ошибки, повтор polling без новой генерации, вкладки, безопасный текст и эмулированный Bridge. Реальная генерация/отправка сообщений не выполняются. Скриншоты — `tmp/ui-check/`, вне Git.
+
+`check_mobile_viewport.py` проверяет размер шрифта полей, быстрые переходы, положение нижних панелей и прокрутку при эмулированном уменьшении VisualViewport клавиатурой. API полностью замокан. Реальную системную клавиатуру и встроенный WebView MAX этот тест не воспроизводит — их проверяют отдельно на телефоне.
 
 ## Рабочая среда MAX
 

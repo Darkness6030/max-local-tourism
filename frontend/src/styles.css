@@ -34,6 +34,8 @@
 
 @layer base {
   :root {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     font-family:
       "Manrope Variable",
       Manrope,
@@ -60,6 +62,7 @@
   }
   body {
     margin: 0;
+    background: #f8f9fc;
   }
   button, input, select, textarea {
     font: inherit;
@@ -140,6 +143,15 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Keep the actions in document flow while the keyboard covers the viewport. */
+html[data-keyboard-open] [data-ui~="wizard"] {
+  padding-bottom: var(--keyboard-inset, 0px);
+}
+html[data-keyboard-open] [data-ui~="wizard-actions"] {
+  position: static;
+  padding-bottom: 12px;
 }
 
 /* Keyframes are shared by Tailwind animation utilities and Motion. */

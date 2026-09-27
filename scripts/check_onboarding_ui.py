@@ -25,14 +25,14 @@ async def check(base):
             errors = []
             await context.route("https://st.max.ru/**", lambda r: r.fulfill(
                 content_type="application/javascript", body=BRIDGE))
-            await context.route("**/api/v1/auth/me", lambda r: r.fulfill(
+            await context.route("**/api/v1/auth/me", lambda r, *, user_id=user_id: r.fulfill(
                 json={"mode": "max", "user": {"id": user_id, "first_name": "Анна"}}))
 
-            async def profile(route):
+            async def profile(route, *, ready=ready, user_id=user_id):
                 await ready.wait()
                 await route.fulfill(json={"onboarding_completed": user_id in profiles})
 
-            async def complete(route):
+            async def complete(route, *, save=save, user_id=user_id):
                 nonlocal fail
                 assert route.request.method == "PUT"
                 writes.append(user_id)
@@ -47,7 +47,7 @@ async def check(base):
             await context.route("**/api/v1/profile", profile)
             await context.route("**/api/v1/profile/onboarding", complete)
             page = await context.new_page()
-            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             await page.goto(base, wait_until="domcontentloaded")
             onboarding = page.locator('[data-ui="onboarding"]')
             await expect(page.locator('[data-ui="boot-skeleton"]')).to_be_visible()
