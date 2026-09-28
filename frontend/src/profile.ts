@@ -1,7 +1,7 @@
-import type { ProfilePreferences } from "./types";
+import type { AppConfig, ProfilePreferences } from "./types";
 
-export const defaultProfilePreferences: ProfilePreferences = {
+export const defaultProfilePreferences = (config: AppConfig): ProfilePreferences => ({
   max_distance_km: 500, preferred_transport: "suburban",
-  origin: "Москва", pace: "balanced", interests: ["Прогулки", "Местная кухня"],
-};
+  origin: config.default_origin || config.origins[0], pace: "balanced", interests: ["Прогулки", "Местная кухня"],
+});
 export const profileInterests = ["Природа", "История", "Местная кухня", "Прогулки", "Активный отдых", "Музеи"];

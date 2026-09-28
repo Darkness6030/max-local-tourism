@@ -5,6 +5,7 @@ from sqlalchemy import delete, func, select, text, tuple_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from src.cities import get_city_catalog
 from src.database import (
     JobRecord,
     ProfilePreferencesRecord,
@@ -39,8 +40,12 @@ class TripStore:
         async with self.sessions() as session:
             row = await session.get(UserProfileRecord, owner_id)
             preferences = await session.get(ProfilePreferencesRecord, owner_id)
-            return UserProfile(onboarding_completed=row is not None,
-                               preferences=ProfilePreferences.model_validate(preferences.payload) if preferences else ProfilePreferences())
+            values = ProfilePreferences.model_validate(preferences.payload) if preferences else ProfilePreferences()
+            catalog = get_city_catalog()
+            city = catalog.find(values.origin)
+            if city is None or not city.enabled:
+                values.origin = catalog.default.name
+            return UserProfile(onboarding_completed=row is not None, preferences=values)
 
     async def complete_onboarding(self, owner_id: str) -> UserProfile:
         async with self.sessions.begin() as session:

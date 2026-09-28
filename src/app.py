@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from src.api.bot import router as bot_router
 from src.api.miniapp import router as miniapp_router
 from src.api.routes import development_router, router
+from src.cities import get_city_catalog
 from src.config import ROOT_DIR, get_settings
 from src.container import Container
 from src.errors import ServiceError
@@ -25,6 +26,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    get_city_catalog()  # Fail before starting services when the catalog is invalid.
     container = Container.build(settings)
     app.state.container = container
     try:

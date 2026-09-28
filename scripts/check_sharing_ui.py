@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
 from scripts.check_ui import BRIDGE
+from src.cities import get_city_catalog
 from src.sample import sample_trip
 
 
@@ -88,7 +89,7 @@ def main():
                 json={"mode": "max", "user": {"id": 43, "first_name": "Анна"}}))
             context.route("**/api/v1/app-config", lambda r: r.fulfill(json={
                 "today": "2026-09-26", "default_date": "2026-09-27", "last_trip_date": "2026-10-10",
-                "max_days": 3, "origins": ["Москва", "Санкт-Петербург"], "bot_url": "https://max.ru/test_bot?startapp",
+                "max_days": 3, **get_city_catalog().public(), "bot_url": "https://max.ru/test_bot?startapp",
             }))
             context.route("**/api/v1/profile", lambda r, *, done=completed: r.fulfill(json={"onboarding_completed": done}))
             context.route("**/api/v1/profile/onboarding", lambda r: r.fulfill(json={"onboarding_completed": True}))

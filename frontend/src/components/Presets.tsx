@@ -24,15 +24,22 @@ import {
 } from "lucide-react";
 import { tripPresets, type TripPreset } from "../presets";
 import { money, openExternal } from "../lib";
+import type { AppConfig } from "../types";
+import { cityDetails } from "../cities";
 import { Notice, Primary } from "./UI";
 
 export function PresetCards({
+  config,
   origin,
   onOpen,
 }: {
+  config: AppConfig;
   origin: string;
   onOpen: (preset: TripPreset) => void;
 }) {
+  const presets = tripPresets.filter((preset) => preset.origin === origin);
+  if (!presets.length) return null;
+  const fromLabel = cityDetails(config, origin)?.from_label || `из города «${origin}»`;
   return (
     <section
       data-ui="preset-section"
@@ -45,7 +52,7 @@ export function PresetCards({
             МОЖНО ПРОСТО ВЫБРАТЬ
           </span>
           <h2 id="preset-heading">
-            Идеи поездок {origin === "Москва" ? "из Москвы" : "из Петербурга"}
+            Идеи поездок {fromLabel}
           </h2>
         </div>
         <span>Готовые маршруты</span>
@@ -55,9 +62,7 @@ export function PresetCards({
         className="grid grid-cols-[repeat(2,_minmax(0,_1fr))] gap-4
           preset-tablet:grid-cols-[repeat(2,_minmax(0,_1fr))] preset-mobile:gap-3"
       >
-        {tripPresets
-          .filter((preset) => preset.origin === origin)
-          .map((preset) => (
+        {presets.map((preset) => (
             <button
               data-ui="preset-card"
               className="flex flex-col p-0 text-left [border:1px_solid_var(--line)] rounded-[22px] bg-white
@@ -100,7 +105,7 @@ export function PresetCards({
                   preset-mobile:[&_>_strong]:text-[17px]"
               >
                 <small>
-                  Из {preset.origin === "Москва" ? "Москвы" : "Петербурга"}
+                  {fromLabel.charAt(0).toUpperCase() + fromLabel.slice(1)}
                 </small>
                 <strong>{preset.city}</strong>
                 <span>{preset.tagline}</span>

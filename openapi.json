@@ -67,7 +67,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProfilePreferences"
+                "$ref": "#/components/schemas/ProfilePreferencesUpdate"
               }
             }
           },
@@ -146,7 +146,11 @@
             "in": "query",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/OriginCity"
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 160,
+              "description": "Город отправления из origins в GET /api/v1/app-config.",
+              "title": "Origin"
             }
           },
           {
@@ -1667,14 +1671,6 @@
         ],
         "title": "MaxUser"
       },
-      "OriginCity": {
-        "type": "string",
-        "enum": [
-          "Москва",
-          "Санкт-Петербург"
-        ],
-        "title": "OriginCity"
-      },
       "Pace": {
         "type": "string",
         "enum": [
@@ -1752,8 +1748,10 @@
             "default": "suburban"
           },
           "origin": {
-            "$ref": "#/components/schemas/OriginCity",
-            "default": "Москва"
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Origin"
           },
           "pace": {
             "$ref": "#/components/schemas/Pace",
@@ -1779,6 +1777,87 @@
         "additionalProperties": false,
         "type": "object",
         "title": "ProfilePreferences"
+      },
+      "ProfilePreferencesUpdate": {
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Display Name",
+            "default": ""
+          },
+          "avatar_style": {
+            "type": "string",
+            "enum": [
+              "max",
+              "initials",
+              "compass",
+              "mountain",
+              "sun"
+            ],
+            "title": "Avatar Style",
+            "default": "max"
+          },
+          "avatar_color": {
+            "type": "string",
+            "enum": [
+              "lavender",
+              "sage",
+              "peach",
+              "sky"
+            ],
+            "title": "Avatar Color",
+            "default": "lavender"
+          },
+          "max_distance_km": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 300.0,
+            "title": "Max Distance Km",
+            "default": 500
+          },
+          "preferred_transport": {
+            "type": "string",
+            "enum": [
+              "bus",
+              "suburban",
+              "car"
+            ],
+            "title": "Preferred Transport",
+            "default": "suburban"
+          },
+          "origin": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Origin",
+            "description": "Город отправления из origins в GET /api/v1/app-config."
+          },
+          "pace": {
+            "$ref": "#/components/schemas/Pace",
+            "default": "balanced"
+          },
+          "interests": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "Природа",
+                "История",
+                "Местная кухня",
+                "Прогулки",
+                "Активный отдых",
+                "Музеи"
+              ]
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Interests"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ProfilePreferencesUpdate",
+        "description": "Only enabled cities may be selected in new profile writes."
       },
       "ProgressEvent": {
         "properties": {
@@ -2271,8 +2350,10 @@
       "TripParameters": {
         "properties": {
           "origin": {
-            "$ref": "#/components/schemas/OriginCity",
-            "default": "Москва"
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Origin"
           },
           "destination": {
             "anyOf": [
@@ -2573,8 +2654,11 @@
       "TripRequest": {
         "properties": {
           "origin": {
-            "$ref": "#/components/schemas/OriginCity",
-            "default": "Москва"
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Origin",
+            "description": "Город отправления из origins в GET /api/v1/app-config."
           },
           "destination": {
             "anyOf": [

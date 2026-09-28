@@ -1,25 +1,23 @@
 import { useEffect } from "react";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { AppConfig, Identity, ProfilePreferences, UserProfile } from "../types";
 import { defaultProfilePreferences, profileInterests } from "../profile";
-import { avatarStyles, eyebrowStyles, fieldLabelStyles, iconButtonStyles, tripsPageStyles } from "../ui-styles";
+import { avatarStyles, eyebrowStyles, fieldLabelStyles, tripsPageStyles } from "../ui-styles";
 import { ProfileAvatar } from "./ProfileAvatar";
 
 const panel = "rounded-[22px] border border-[#e4e8f1] bg-white p-5 mobile:p-4";
 
-export function Profile({ user, profile, config, onBack, onChange, onLeave, error }: {
+export function Profile({ user, profile, config, onChange, onLeave, error }: {
   user: Identity["user"]; profile: UserProfile; config: AppConfig;
-  onBack: () => void; onChange: (preferences: ProfilePreferences) => void;
+  onChange: (preferences: ProfilePreferences) => void;
   onLeave: () => Promise<void>; error: string;
 }) {
-  const values = { ...defaultProfilePreferences, ...profile.preferences };
+  const values = { ...defaultProfilePreferences(config), ...profile.preferences };
+  if (!config.origins.includes(values.origin)) values.origin = defaultProfilePreferences(config).origin;
   const update = (patch: Partial<ProfilePreferences>) => onChange({ ...values, ...patch });
   useEffect(() => () => { void onLeave(); }, [onLeave]);
   return <div data-ui="profile-page" className={tripsPageStyles}>
-    <div className="flex items-center gap-3">
-      <button className={iconButtonStyles} onClick={onBack} aria-label="Назад из профиля"><ArrowLeft size={21} /></button>
-      <span className={eyebrowStyles}>ВАШЕ МЕСТО В «РЯДОМ»</span>
-    </div>
+    <span className={eyebrowStyles}>ВАШЕ МЕСТО В «РЯДОМ»</span>
     <h1 className="mb-3">Профиль</h1>
     <p className="text-muted text-[14px] leading-[1.7] mb-4">Немного о вас — чтобы каждая поездка была ближе.</p>
     <div className="grid gap-4">

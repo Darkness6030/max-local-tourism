@@ -18,7 +18,7 @@ def test_trip_request_rejects_past_date() -> None:
 
 def test_trip_request_rejects_unsupported_origin() -> None:
     with pytest.raises(ValidationError):
-        TripRequest(origin="Казань")
+        TripRequest(origin="Несуществующий город")
 
 
 def test_children_require_family_group() -> None:

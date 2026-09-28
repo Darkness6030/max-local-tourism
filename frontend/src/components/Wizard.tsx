@@ -412,7 +412,7 @@ export function Wizard({
                   <div data-ui="inline-note" className={inlineNoteStyles}>
                     <MapPin size={16} />
                     <span>
-                      Пока стартуем из Москвы и Петербурга.
+                      Доступные города отправления — в списке выше.
                       <br />
                       Впереди — ещё больше отправных точек.
                     </span>

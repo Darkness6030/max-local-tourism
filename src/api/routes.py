@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from src.auth import Identity, IdentityDep
+from src.cities import EnabledOrigin, get_city_catalog
 from src.config import Settings, get_settings
 from src.container import Container
 from src.models import (
@@ -13,9 +14,8 @@ from src.models import (
     GeoPoint,
     HealthResponse,
     JobState,
-    OriginCity,
     PackingUpdate,
-    ProfilePreferences,
+    ProfilePreferencesUpdate,
     TransportOptions,
     TripJobCreated,
     TripJobStatus,
@@ -53,7 +53,7 @@ async def profile(identity: IdentityDep, container: ContainerDep) -> UserProfile
 
 @router.put("/profile", response_model=UserProfile, tags=["profile"])
 async def update_profile(
-    payload: ProfilePreferences, identity: IdentityDep, container: ContainerDep,
+    payload: ProfilePreferencesUpdate, identity: IdentityDep, container: ContainerDep,
 ) -> UserProfile:
     return await container.store.update_profile(identity.owner_id, payload)
 
@@ -67,7 +67,7 @@ async def complete_onboarding(identity: IdentityDep, container: ContainerDep) ->
 async def validate_city(
     identity: IdentityDep,
     container: ContainerDep,
-    origin: OriginCity,
+    origin: EnabledOrigin,
     destination: Annotated[str, Query(min_length=2, max_length=160)],
 ) -> dict:
     city, distance = await validate_destination(container.geocoding, origin, destination)
@@ -89,7 +89,7 @@ async def health(
             "geocoder": "geopy/Nominatim (ru)",
             "hotels": "OpenStreetMap / Overpass (catalog)",
             "storage": "PostgreSQL",
-            "supported_origins": [city.value for city in OriginCity],
+            "supported_origins": [city.name for city in get_city_catalog().enabled],
             "max_configured": bool(settings.max_bot_token),
         },
     )
@@ -100,8 +100,7 @@ async def health(
 )
 async def example_request() -> TripRequest:
     return TripRequest(
-        origin="Москва",
-        destination="Коломна",
+        origin=get_city_catalog().default.name,
         start_date=current_date() + timedelta(days=2),
         days=1,
         budget_rub=12_000,

@@ -60,8 +60,7 @@ import { PresetCards, PresetDetail } from "./components/Presets";
 import type { TripPreset } from "./presets";
 import { useMobileViewport } from "./useMobileViewport";
 import { useProfileAutosave } from "./useProfileAutosave";
-import journey from "./assets/journey.webp";
-import journeySpb from "./assets/journey-spb.webp";
+import { cityDetails, cityHero } from "./cities";
 
 const ABOUT_FEATURES = [
   {
@@ -146,7 +145,11 @@ export default function App() {
     setSubmitError("");
   };
   const openProfile = () => {
-    if (screen !== "profile") profileReturn.current = screen;
+    if (screen === "profile") {
+      navigate("home");
+      return;
+    }
+    profileReturn.current = screen;
     navigate("profile");
   };
   const changeOrigin = (origin: string) => {
@@ -471,7 +474,7 @@ export default function App() {
               <button
                 data-ui="avatar"
                 className={avatarStyles}
-                aria-label="Открыть профиль"
+                aria-label={screen === "profile" ? "На главную" : "Открыть профиль"}
                 onClick={openProfile}
               >
                 <ProfileAvatar user={identity?.user} />
@@ -604,16 +607,8 @@ export default function App() {
                           [&_>_img]:object-[50%_center]"
                       >
                         <img
-                          src={
-                            draft.origin === "Санкт-Петербург"
-                              ? journeySpb
-                              : journey
-                          }
-                          alt={
-                            draft.origin === "Санкт-Петербург"
-                              ? "Северный пейзаж: сосны, озеро и старинный город"
-                              : "Город и загородный пейзаж у реки"
-                          }
+                          src={cityHero(config, draft.origin)}
+                          alt={cityDetails(config, draft.origin)?.hero_alt || "Город и загородный пейзаж"}
                         />
                         <div
                           data-ui="adventure-gradient"
@@ -889,6 +884,7 @@ export default function App() {
                       </div>
                     </div>
                     <PresetCards
+                      config={config}
                       origin={draft.origin}
                       onOpen={(selected) => {
                         setPreset(selected);
@@ -970,6 +966,7 @@ export default function App() {
                 )}
                 {screen === "result" && trip && (
                   <TripResult
+                    config={config}
                     {...trip}
                     key={trip.plan.id}
                     initData={initData.current}
@@ -1025,7 +1022,7 @@ export default function App() {
                 )}
                 {screen === "profile" && profile && (
                   <Profile user={identity.user} profile={profile} config={config}
-                    onBack={back} error={profileAutosave.error} onLeave={profileAutosave.flush} onChange={(preferences) => {
+                    error={profileAutosave.error} onLeave={profileAutosave.flush} onChange={(preferences) => {
                       const next = { ...profile, preferences };
                       setProfile(next);
                       profileAutosave.change(preferences);

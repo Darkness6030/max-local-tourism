@@ -3,7 +3,7 @@
 from datetime import timedelta
 from uuid import UUID
 
-from src.models import TripPlan, TripRequest, current_date
+from src.models import TripParameters, TripPlan, current_date
 
 
 def sample_trip() -> TripPlan:
@@ -11,7 +11,7 @@ def sample_trip() -> TripPlan:
     return TripPlan.model_validate(
         {
             "id": UUID("00000000-0000-4000-8000-000000000001"),
-            "request": TripRequest(destination="Коломна", start_date=day, has_car=True),
+            "request": TripParameters(origin="Москва", destination="Коломна", start_date=day, has_car=True),
             "title": "Коломна: замедлиться на один день",
             "summary": "Старинные улочки, прогулка у кремля и неспешный обед. Пример поездки для двоих: достаточно впечатлений, без гонки за достопримечательностями.",
             "origin": {

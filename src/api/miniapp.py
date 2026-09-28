@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from src.cities import get_city_catalog
 from src.config import Settings, get_settings
 from src.models import current_date
 
@@ -18,7 +19,7 @@ async def app_config(settings: Annotated[Settings, Depends(get_settings)]) -> di
         "last_trip_date": (today + timedelta(days=horizon - 1)).isoformat(),
         "default_date": (today + timedelta(days=1)).isoformat(),
         "max_days": 3,
-        "origins": ["Москва", "Санкт-Петербург"],
+        **get_city_catalog().public(),
         "bot_url": f"https://max.ru/{settings.max_bot_username}?startapp"
         if settings.max_bot_username
         else None,

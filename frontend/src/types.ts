@@ -21,7 +21,17 @@ export interface Identity {
     photo_url?: string | null;
   };
 }
+export interface OriginDetails {
+  id: string;
+  name: string;
+  from_label: string;
+  hero_image: string;
+  hero_alt: string;
+  ticket_note: { title: string; text: string } | null;
+}
 export interface AppConfig {
+  default_origin: string;
+  origin_details: OriginDetails[];
   bot_url?: string | null;
   today: string;
   default_date: string;

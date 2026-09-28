@@ -6,6 +6,7 @@ from datetime import timedelta
 from typing import TypeVar
 from uuid import uuid4
 
+from src.cities import origin_query
 from src.constants import (
     ESTIMATED_REGIONAL_SPEED_KMH,
     GIGACHAT_SITE_URL,
@@ -74,11 +75,11 @@ class TripPlanner:
         destination_suggestion: DestinationSuggestion | None = None
         if request.destination:
             origin, destination = await asyncio.gather(
-                self.geocoding.geocode(request.origin),
+                self.geocoding.geocode(origin_query(request.origin)),
                 self.geocoding.geocode(request.destination),
             )
         else:
-            origin = await self.geocoding.geocode(request.origin)
+            origin = await self.geocoding.geocode(origin_query(request.origin))
             await report(15, "ИИ подбирает направление")
             destination_suggestion = await self.gigachat.suggest_destination(request, recent_destinations=recent_destinations)
             await report(28, f"Выбрано направление: {destination_suggestion.name}")
@@ -237,7 +238,7 @@ async def validate_destination(
     geocoding: GeocodingService, origin: str, destination: str
 ) -> tuple[GeoPoint, float]:
     first, second = await asyncio.gather(
-        geocoding.geocode(origin), geocoding.geocode(destination)
+        geocoding.geocode(origin_query(origin)), geocoding.geocode(destination)
     )
     distance = validate_city_distance(first, second)
     return second, distance

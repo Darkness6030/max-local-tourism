@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
 from scripts.check_ui import BRIDGE
+from src.cities import get_city_catalog
 from src.sample import sample_trip
 
 
@@ -62,7 +63,7 @@ def main():
             route.fulfill(json={"onboarding_completed": True})
         elif path == "app-config":
             route.fulfill(json={"today": "2026-09-27", "default_date": "2026-09-28", "last_trip_date": "2026-10-10",
-                                "max_days": 3, "origins": ["Москва", "Санкт-Петербург"]})
+                                "max_days": 3, **get_city_catalog().public()})
         elif path.endswith("/share"):
             route.fulfill(json={"text": "Поездка"})
         elif path.endswith("/import"):

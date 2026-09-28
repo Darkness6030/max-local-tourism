@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
 from scripts.check_ui import BRIDGE
+from src.cities import get_city_catalog
 from src.models import ProfilePreferences
 from src.sample import sample_trip
 
@@ -49,7 +50,7 @@ def main():
                     route.fulfill(json={"mode": "max", "user": {"id": 42, "first_name": "Анна"}})
                 elif path == "app-config":
                     route.fulfill(json={"today": "2026-09-27", "default_date": "2026-09-28", "last_trip_date": "2026-10-10",
-                                        "max_days": 3, "origins": ["Москва", "Санкт-Петербург"]})
+                                        "max_days": 3, **get_city_catalog().public()})
                 elif path.endswith("/reminders"):
                     route.fulfill(json={"outbound": None, "return_trip": None, "available": True})
                 elif path.endswith("/share"):
@@ -118,7 +119,7 @@ def main():
                     assert field.bounding_box()["height"] >= 49
                     assert field.evaluate("el => parseFloat(getComputedStyle(el).fontWeight) <= 550")
             page.screenshot(path=str(screenshots / f"profile-{args.browser}-{width}.png"), full_page=True)
-            page.get_by_role("button", name="Назад из профиля", exact=True).click()
+            page.get_by_role("button", name="На главную", exact=True).click()
             expect(page.get_by_label("Город отправления", exact=True)).to_have_value("Санкт-Петербург")
             # With no local draft, preferences must still come from the API.
             page.evaluate("sessionStorage.clear()")
@@ -139,8 +140,8 @@ def main():
             page.wait_for_timeout(450)
             assert len(writes) == held_count
             expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_be_enabled()
-            page.get_by_role("button", name="Назад из профиля", exact=True).click()
-            expect(page.locator('[data-ui="about-page"]')).to_be_visible()
+            page.get_by_role("button", name="На главную", exact=True).click()
+            expect(page.locator('[data-ui~="screen-home"]')).to_be_visible()
             control["hold"] = False
             route, previous = pending.pop()
             route.fulfill(json=previous)
@@ -148,12 +149,12 @@ def main():
             assert profile["preferences"]["pace"] == "intensive"
             assert len(writes) == held_count + 1
             assert page.evaluate("JSON.parse(sessionStorage.getItem('nearby:v2:max:42:draft')).has_car")
-            page.get_by_role("button", name="Открыть профиль из раздела о сервисе", exact=True).click()
+            page.get_by_role("button", name="Открыть профиль", exact=True).click()
             expect(panel.get_by_label("Темп поездок", exact=True)).to_have_value("intensive")
             expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("car")
             # Leaving before the debounce elapses flushes the final edit.
             panel.get_by_label("Дальность подбора городов", exact=True).fill("400")
-            page.get_by_role("button", name="Назад из профиля", exact=True).click()
+            page.get_by_role("button", name="На главную", exact=True).click()
             wait_until(lambda profile=profile: profile["preferences"]["max_distance_km"] == 400)
             page.reload()
             page.get_by_role("button", name="Открыть профиль", exact=True).click()
@@ -161,7 +162,7 @@ def main():
             expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("car")
             page.goto(f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{'a' * 32}")
             page.get_by_role("tab", name="Дорога", exact=True).click()
-            expect(page.locator('[data-ui="moscow-ticket-note"]')).to_be_visible()
+            expect(page.locator('[data-ui="city-ticket-note"]')).to_be_visible()
             expect(page.locator('[data-ui="weather-card"]').get_by_text("Open-Meteo")).to_have_count(0)
             assert page.locator('[data-ui="weather-card"]').evaluate("""el => {
                 const advice = el.querySelector('[data-ui=weather-advice]');
@@ -179,7 +180,7 @@ def main():
             plan["request"]["origin"] = "Санкт-Петербург"
             page.reload()
             page.get_by_role("tab", name="Дорога", exact=True).click()
-            expect(page.locator('[data-ui="moscow-ticket-note"]')).to_have_count(0)
+            expect(page.locator('[data-ui="city-ticket-note"]')).to_have_count(0)
             assert not errors, errors
             context.close()
         browser.close()

@@ -6,36 +6,12 @@ import re
 from pydantic import BaseModel, Field
 
 from src.errors import ServiceError
-from src.models import DestinationSuggestion, OriginCity
+from src.models import DestinationSuggestion
 
 DESTINATION_CANDIDATE_COUNT = 5
 DESTINATION_SCORE_TOLERANCE = 10
 RECENT_DESTINATION_LIMIT = 8
 DESTINATION_TEMPERATURE = 0.7
-
-# Exploration hints, not a closed catalog or verified travel/price information.
-# See README for regional tourism sources. Geocoding/distance validation remains mandatory.
-DESTINATION_HINTS = {
-    OriginCity.MOSCOW: (
-        "Зарайск", "Дмитров", "Звенигород", "Истра", "Клин", "Серпухов",
-        "Можайск", "Волоколамск", "Руза", "Верея", "Талдом", "Дубна",
-        "Павловский Посад", "Егорьевск", "Ногинск", "Бронницы", "Чехов",
-        "Подольск", "Раменское", "Кашира", "Орехово-Зуево", "Коломна",
-        "Сергиев Посад", "Таруса", "Боровск", "Калуга", "Малоярославец",
-        "Тула", "Алексин", "Белёв", "Рязань", "Касимов",
-        "Владимир", "Суздаль", "Александров", "Юрьев-Польский", "Гороховец",
-        "Переславль-Залесский", "Ростов", "Углич", "Мышкин", "Рыбинск",
-        "Ярославль", "Тверь", "Торжок", "Старица", "Кимры", "Калязин",
-    ),
-    OriginCity.SAINT_PETERSBURG: (
-        "Гатчина", "Выборг", "Приозерск", "Шлиссельбург", "Тихвин",
-        "Волхов", "Новая Ладога", "Луга", "Кингисепп", "Всеволожск",
-        "Тосно", "Любань", "Приморск", "Высоцк", "Лодейное Поле",
-        "Подпорожье", "Великий Новгород", "Старая Русса", "Валдай",
-        "Боровичи", "Псков", "Печоры", "Гдов", "Сортавала", "Лахденпохья",
-    ),
-}
-
 
 class DestinationCandidate(DestinationSuggestion):
     fit_score: int = Field(ge=0, le=100, description="Соответствие анкете, не популярность города")

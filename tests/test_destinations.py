@@ -4,7 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from src.models import OriginCity, TripRequest
+from src.cities import get_city_catalog
+from src.models import TripRequest
 from src.sample import sample_trip
 from src.services import destinations
 from src.services.destinations import (
@@ -43,11 +44,12 @@ def test_origin_and_duplicates_are_removed_and_visited_pool_remains_usable(monke
 
 
 def test_origin_hints_are_broad_and_unique():
-    for origin in OriginCity:
-        hints = destinations.DESTINATION_HINTS[origin]
+    for name in ("Москва", "Санкт-Петербург"):
+        origin = get_city_catalog().find(name)
+        hints = origin.destination_hints
         assert len(hints) >= 20
         assert len(hints) == len(set(hints))
-        assert origin.value not in hints
+        assert origin.name not in hints
 
 
 @pytest.mark.asyncio

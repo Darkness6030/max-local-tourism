@@ -8,6 +8,7 @@ from typing import TypeVar
 from gigachat import GigaChat
 from pydantic import BaseModel
 
+from src.cities import get_city_catalog
 from src.constants import BUDGET_RESERVE_PERCENT
 from src.errors import ServiceError
 from src.models import (
@@ -24,7 +25,6 @@ from src.prompts import (
 )
 from src.services.destinations import (
     DESTINATION_CANDIDATE_COUNT,
-    DESTINATION_HINTS,
     DESTINATION_TEMPERATURE,
     DestinationCandidates,
     choose_destination,
@@ -66,7 +66,8 @@ class GigaChatService:
         self, request: TripRequest, recent_destinations: list[str] | None = None
     ) -> DestinationSuggestion:
         recent = recent_destinations or []
-        hints = list(DESTINATION_HINTS[request.origin])
+        city = get_city_catalog().find(request.origin)
+        hints = list(city.destination_hints) if city else []
 
         random.shuffle(hints)
         prompt = DESTINATION_PROMPT.format(
@@ -75,7 +76,7 @@ class GigaChatService:
             hints_json=json.dumps(hints, ensure_ascii=False),
             recent_json=json.dumps(recent, ensure_ascii=False),
             distance_km=request.max_distance_km,
-            origin=request.origin.value,
+            origin=request.origin,
             max_travel_minutes=request.max_travel_minutes,
         )
 
@@ -87,7 +88,7 @@ class GigaChatService:
             temperature=DESTINATION_TEMPERATURE,
         )
 
-        return choose_destination(candidates, request.origin.value, recent)
+        return choose_destination(candidates, request.origin, recent)
 
     async def build_trip(
         self,

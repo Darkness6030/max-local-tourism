@@ -17,12 +17,8 @@ export const dateLabel = (
         options || { day: "numeric", month: "long" },
       )
     : "Выберите дату";
-export const timeLabel = (value: string) =>
-  new Date(value).toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Moscow",
-  });
+// Provider timestamps include the station's local offset. Keep that wall time.
+export const timeLabel = (value: string) => value.match(/T(\d{2}:\d{2})/)?.[1] || "—";
 export const addDays = (value: string, days: number) => {
   const date = new Date(`${value}T12:00:00Z`);
   if (!Number.isFinite(date.getTime())) return "";
@@ -157,7 +153,7 @@ export function writeStorage(key: string, value: unknown, persistent = false) {
 }
 export function initialDraft(config: AppConfig): Draft {
   return {
-    origin: "Москва",
+    origin: config.default_origin || config.origins[0],
     destination: null,
     destinationMode: "ai",
     start_date: config.default_date,
@@ -184,6 +180,7 @@ export function restoreDraft(
   defaults?: Partial<Draft>,
 ): Draft {
   const base = { ...initialDraft(config), ...defaults };
+  if (!config.origins.includes(base.origin)) base.origin = initialDraft(config).origin;
   if (!raw || typeof raw !== "object") return base;
   const draft = { ...base, ...raw };
   if (!config.origins.includes(draft.origin)) draft.origin = base.origin;

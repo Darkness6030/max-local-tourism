@@ -36,7 +36,8 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import type { TransportOption, TripPlan } from "../types";
+import { cityDetails } from "../cities";
+import type { AppConfig, TransportOption, TripPlan } from "../types";
 import { addDays, api, dateLabel, money, openExternal, safeUrl, timeLabel } from "../lib";
 import { AccommodationCard } from "./AccommodationCard";
 import { Notice } from "./UI";
@@ -50,18 +51,21 @@ const RESULT_TABS = [
 ] as const;
 type Tab = (typeof RESULT_TABS)[number]["value"];
 export function TripResult({
+  config,
   plan,
   onBack,
   onEdit,
   initData,
   onPlanChange,
 }: {
+  config: AppConfig;
   plan: TripPlan;
   onBack: () => void;
   onEdit: () => void;
   initData: string;
   onPlanChange: (plan: TripPlan) => void;
 }) {
+  const ticketNote = cityDetails(config, plan.request.origin)?.ticket_note;
   const [tab, setTab] = useState<Tab>("program");
   const reminders = useTransportReminders(plan.id, initData);
   const [transportNow, setTransportNow] = useState(Date.now);
@@ -546,12 +550,10 @@ export function TripResult({
                       })}
                     </div>
                   </div>
-                  {plan.request.origin === "Москва" && (
-                    <div data-ui="moscow-ticket-note" className="rounded-[18px] bg-[#edf2e9] p-4 mb-5 text-[12px] leading-[1.7] text-[#63745f]">
-                      <strong className="block mb-1">Если едете на электричке из Москвы</strong>
-                      Билет можно записать на «Тройку», а льготный — на социальную карту москвича.
-                      Студентам очной формы обучения доступна скидка 50% с 1 сентября по 15 июня
-                      при подтверждённом праве на льготу. Возможность записи билета и условия для конкретного рейса уточните у перевозчика.
+                  {ticketNote && (
+                    <div data-ui="city-ticket-note" className="rounded-[18px] bg-[#edf2e9] p-4 mb-5 text-[12px] leading-[1.7] text-[#63745f]">
+                      <strong className="block mb-1">{ticketNote.title}</strong>
+                      {ticketNote.text}
                     </div>
                   )}
                   {reminders.error && (

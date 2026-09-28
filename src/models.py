@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from src.cities import CityName, EnabledOrigin, default_origin
 from src.constants import (
     MAX_FORECAST_DAYS,
     MAX_TRIP_DAYS,
@@ -46,11 +47,6 @@ class Pace(StrEnum):
     INTENSIVE = "intensive"
 
 
-class OriginCity(StrEnum):
-    MOSCOW = "Москва"
-    SAINT_PETERSBURG = "Санкт-Петербург"
-
-
 class ProfilePreferences(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     display_name: str = Field(default="", max_length=60)
@@ -59,7 +55,7 @@ class ProfilePreferences(BaseModel):
     # Legacy appearance fields remain readable for older clients; current UI uses MAX identity.
     max_distance_km: int = Field(default=SUGGESTED_CITY_DISTANCE_KM, ge=300, le=600)
     preferred_transport: Literal["bus", "suburban", "car"] = "suburban"
-    origin: OriginCity = OriginCity.MOSCOW
+    origin: CityName = Field(default_factory=default_origin)
     pace: Pace = Pace.BALANCED
     interests: list[Literal["Природа", "История", "Местная кухня", "Прогулки", "Активный отдых", "Музеи"]] = Field(
         default_factory=lambda: ["Прогулки", "Местная кухня"], max_length=6)
@@ -77,6 +73,12 @@ class ProfilePreferences(BaseModel):
         return list(dict.fromkeys(value))
 
 
+class ProfilePreferencesUpdate(ProfilePreferences):
+    """Only enabled cities may be selected in new profile writes."""
+
+    origin: EnabledOrigin = Field(default_factory=default_origin)
+
+
 class UserProfile(BaseModel):
     onboarding_completed: bool
     preferences: ProfilePreferences = Field(default_factory=ProfilePreferences)
@@ -86,7 +88,7 @@ class TripParameters(BaseModel):
     """Saved request snapshot: historical dates remain readable."""
     model_config = ConfigDict(extra="forbid")
 
-    origin: OriginCity = OriginCity.MOSCOW
+    origin: CityName = Field(default_factory=default_origin)
     destination: str | None = Field(
         default=None,
         min_length=2,
@@ -131,6 +133,8 @@ class TripParameters(BaseModel):
 
 class TripRequest(TripParameters):
     """New generation requests must fit the available forecast horizon."""
+
+    origin: EnabledOrigin = Field(default_factory=default_origin)
 
     @model_validator(mode="after")
     def validate_scenario(self) -> TripRequest:

@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import sync_playwright
 
 from scripts.check_ui import BRIDGE, mock_profile
+from src.cities import get_city_catalog
 from src.models import current_date, default_trip_date
 from src.sample import sample_trip
 
@@ -49,7 +50,7 @@ def main():
         "default_date": str(default_trip_date()),
         "last_trip_date": str(default_trip_date()),
         "max_days": 3,
-        "origins": ["Москва", "Санкт-Петербург"],
+        **get_city_catalog().public(),
         "bot_url": None,
     }
     output = Path("tmp/hotels-ui")
