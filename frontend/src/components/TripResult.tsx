@@ -555,7 +555,7 @@ export function TripResult({
                       <div className="mt-2 border-t border-[#edf0f5] pt-1">
                         <button
                           type="button"
-                          className="flex min-h-0 w-full items-center gap-2 bg-transparent px-0 pt-2 pb-1 text-left text-[12px] font-semibold leading-[1.6] text-[#63745f]"
+                          className="flex min-h-0 w-full items-center gap-2 bg-transparent px-0 pt-2 text-left text-[12px] font-semibold leading-[1.6] text-[#63745f]"
                           aria-expanded={ticketNoteOpen}
                           aria-controls="city-ticket-note"
                           onClick={() => setTicketNoteOpen((open) => !open)}
@@ -578,7 +578,7 @@ export function TripResult({
                           inert={!ticketNoteOpen}
                           aria-hidden={!ticketNoteOpen}
                         >
-                          <p className="pt-1 text-[12px] leading-[1.7] text-[#687389]">
+                          <p className="pt-2 text-[12px] leading-[1.7] text-[#687389]">
                             {ticketNote.text}
                           </p>
                         </motion.div>
