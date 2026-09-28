@@ -531,11 +531,11 @@ export function TripResult({
                     mobile-type:[&_>_p]:text-[14px]"
                 >
                   <h2>Дорога — часть путешествия</h2>
-                  <div data-ui="schedule-notice" className="rounded-[18px] border border-[#e2e7f1] bg-white p-4 mb-5">
+                  <div data-ui="schedule-notice" className="rounded-[18px] border border-[#e2e7f1] bg-white p-3 mb-4">
                     <p className="text-muted text-[12px] mobile-type:text-[14px] leading-[1.7]">
                       Время рейсов из расписаний. Перед отправлением проверьте изменения у перевозчика.
                     </p>
-                    <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3">
+                    <div className="flex items-center gap-3 narrow:gap-2 mt-1">
                       {([false, true] as const).map((returning) => {
                         const options = returning ? plan.transport?.return_trip : plan.transport?.outbound;
                         const params = new URLSearchParams({
@@ -545,8 +545,9 @@ export function TripResult({
                         });
                         const url = options?.find((option) => safeUrl(option.buy_url))?.buy_url
                           || `https://rasp.yandex.ru/search/?${params}`;
-                        return <button key={String(returning)} type="button" className={`${textButtonStyles} !text-[12px] flex items-center gap-1`}
-                          onClick={() => external(url)}>{returning ? "Расписание обратно" : "Расписание туда"}<ArrowUpRight size={15} /></button>;
+                        return <button key={String(returning)} type="button"
+                          className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap bg-transparent py-2 px-0 text-[12px] narrow:text-[11px] font-[650] text-brand"
+                          onClick={() => external(url)}>{returning ? "Расписание обратно" : "Расписание туда"}<ArrowUpRight size={13} className="shrink-0" /></button>;
                       })}
                     </div>
                   </div>

@@ -87,29 +87,29 @@ python -m uvicorn main:app --host 127.0.0.1 --port 8001 --no-proxy-headers
 
 ## Настройки и внешние сервисы
 
-| Переменная | Назначение |
-|---|---|
-| `DATABASE_URL` | PostgreSQL URL (postgresql+asyncpg); обязателен для запуска, compose задаёт автоматически |
-| `APP_ENV` | development, test, production |
-| `APP_PORT` | Порт публикации compose; по умолчанию 8000 |
-| `MAX_BOT_TOKEN` | Токен выданного бота, только backend |
-| `MAX_BOT_USERNAME` | Необязательные локальные метаданные; не меняют настройки бота |
-| `MAX_ALLOW_LOCAL_AUTH` | Разрешить локального гостя; запрещено в production |
-| `MAX_LOCAL_CLIENT_HOSTS` | JSON-список локальных peer IP; по умолчанию loopback |
-| `MAX_INIT_DATA_TTL_SECONDS` | Срок initData, по умолчанию 3600 с; допуск будущего времени 30 с |
-| `MAX_JOB_CONCURRENCY` | Активные генерации в процессе, по умолчанию 3; одна на пользователя |
-| `MAX_CA_BUNDLE_FILE` | Дополнительный CA клиента MAX; TLS-проверка всегда включена |
-| `GIGACHAT_CREDENTIALS` | Ключ GigaChat для реальной программы и выбора города |
-| `GIGACHAT_SCOPE`, `GIGACHAT_MODEL` | По умолчанию GIGACHAT_API_CORP, GigaChat-2-Max; должны соответствовать доступу |
-| `GIGACHAT_TIMEOUT_SECONDS` | Тайм-аут AI-запроса, по умолчанию 90 с |
-| `GIGACHAT_VERIFY_SSL_CERTS` | По умолчанию true; false запрещено в production при наличии ключа |
-| `GIGACHAT_CA_BUNDLE_FILE` | CA для GigaChat |
-| `YANDEX_SCHEDULE_API_KEY` | Ключ публичного API Яндекс Расписаний |
-| `WEATHER_PROVIDER` | auto, open-meteo, openweather |
-| `OPENWEATHER_API_KEY` | Необязательный ключ; в auto включает OpenWeather |
-| `HTTP_TIMEOUT_SECONDS` | Тайм-аут общих HTTP-запросов, по умолчанию 20 с |
-| `NOMINATIM_USER_AGENT` | Идентификатор клиента геокодера |
-| `APP_LOG_LEVEL` | Уровень логов; URL запросов httpx не логируются на INFO |
+| Переменная                         | Назначение                                                                                |
+|------------------------------------|-------------------------------------------------------------------------------------------|
+| `DATABASE_URL`                     | PostgreSQL URL (postgresql+asyncpg); обязателен для запуска, compose задаёт автоматически |
+| `APP_ENV`                          | development, test, production                                                             |
+| `APP_PORT`                         | Порт публикации compose; по умолчанию 8000                                                |
+| `MAX_BOT_TOKEN`                    | Токен выданного бота, только backend                                                      |
+| `MAX_BOT_USERNAME`                 | Необязательные локальные метаданные; не меняют настройки бота                             |
+| `MAX_ALLOW_LOCAL_AUTH`             | Разрешить локального гостя; запрещено в production                                        |
+| `MAX_LOCAL_CLIENT_HOSTS`           | JSON-список локальных peer IP; по умолчанию loopback                                      |
+| `MAX_INIT_DATA_TTL_SECONDS`        | Срок initData, по умолчанию 3600 с; допуск будущего времени 30 с                          |
+| `MAX_JOB_CONCURRENCY`              | Активные генерации в процессе, по умолчанию 3; одна на пользователя                       |
+| `MAX_CA_BUNDLE_FILE`               | Дополнительный CA клиента MAX; TLS-проверка всегда включена                               |
+| `GIGACHAT_CREDENTIALS`             | Ключ GigaChat для реальной программы и выбора города                                      |
+| `GIGACHAT_SCOPE`, `GIGACHAT_MODEL` | По умолчанию GIGACHAT_API_CORP, GigaChat-2-Max; должны соответствовать доступу            |
+| `GIGACHAT_TIMEOUT_SECONDS`         | Тайм-аут AI-запроса, по умолчанию 90 с                                                    |
+| `GIGACHAT_VERIFY_SSL_CERTS`        | По умолчанию true; false запрещено в production при наличии ключа                         |
+| `GIGACHAT_CA_BUNDLE_FILE`          | CA для GigaChat                                                                           |
+| `YANDEX_SCHEDULE_API_KEY`          | Ключ публичного API Яндекс Расписаний                                                     |
+| `WEATHER_PROVIDER`                 | auto, open-meteo, openweather                                                             |
+| `OPENWEATHER_API_KEY`              | Необязательный ключ; в auto включает OpenWeather                                          |
+| `HTTP_TIMEOUT_SECONDS`             | Тайм-аут общих HTTP-запросов, по умолчанию 20 с                                           |
+| `NOMINATIM_USER_AGENT`             | Идентификатор клиента геокодера                                                           |
+| `APP_LOG_LEVEL`                    | Уровень логов; URL запросов httpx не логируются на INFO                                   |
 
 Внешние сервисы требуют интернет, разрешения и квоты; их нельзя воспроизвести внутри Docker. Open-Meteo и Nominatim в текущем режиме не требуют ключей. GigaChat и Яндекс Расписания требуют действующих доступов; README и пример окружения их не содержат. Health показывает наличие настройки, а не успешность запросов.
 
@@ -159,22 +159,22 @@ docker compose exec app python -m src.services.max_bot
 
 В production пользовательские endpoints требуют `X-Max-Init-Data`. Публичны только страница, ресурсы, health и UI-конфигурация. Диагностические маршруты, Swagger и OpenAPI доступны только при локальной разработке. OpenAPI 3.1: `/openapi.json`, Swagger: `/docs` (Authorize → MaxInitData). Снимок схемы в корне обновляется командой `python scripts/export_openapi.py`.
 
-| Метод | Путь | Результат |
-|---|---|---|
-| GET | `/api/v1/health` | Версия/настройки без секретов |
-| GET | `/api/v1/app-config` | Горизонт дат, доступные города, город по умолчанию и оформление |
-| GET | `/api/v1/auth/me` | Проверенный пользователь и режим |
-| GET | `/api/v1/profile` | Статус знакомства и настройки профиля текущего пользователя |
-| PUT | `/api/v1/profile` | Сохранить предпочтения для поездок текущего пользователя |
-| PUT | `/api/v1/profile/onboarding` | Завершить или пропустить знакомство (идемпотентно) |
-| GET | `/api/v1/examples/trip-request` | Анкета с будущей датой |
-| POST | `/api/v1/trips/jobs` | 202: ID и URL статуса |
-| GET | `/api/v1/trips/jobs/{id}` | Прогресс/итог/ошибка своей задачи |
-| POST | `/api/v1/trips/generate` | Ожидание той же фоновой генерации с общими лимитами |
-| GET | `/api/v1/trips/{id}` | Свой маршрут |
-| GET | `/api/v1/trips/{id}/share` | Текст для шеринга |
-| GET | `/api/v1/geocode`, `/weather`, `/transport` | Диагностика провайдеров |
-| POST | `/api/v1/destinations/suggest` | AI-подбор направления |
+| Метод | Путь                                        | Результат                                                       |
+|-------|---------------------------------------------|-----------------------------------------------------------------|
+| GET   | `/api/v1/health`                            | Версия/настройки без секретов                                   |
+| GET   | `/api/v1/app-config`                        | Горизонт дат, доступные города, город по умолчанию и оформление |
+| GET   | `/api/v1/auth/me`                           | Проверенный пользователь и режим                                |
+| GET   | `/api/v1/profile`                           | Статус знакомства и настройки профиля текущего пользователя     |
+| PUT   | `/api/v1/profile`                           | Сохранить предпочтения для поездок текущего пользователя        |
+| PUT   | `/api/v1/profile/onboarding`                | Завершить или пропустить знакомство (идемпотентно)              |
+| GET   | `/api/v1/examples/trip-request`             | Анкета с будущей датой                                          |
+| POST  | `/api/v1/trips/jobs`                        | 202: ID и URL статуса                                           |
+| GET   | `/api/v1/trips/jobs/{id}`                   | Прогресс/итог/ошибка своей задачи                               |
+| POST  | `/api/v1/trips/generate`                    | Ожидание той же фоновой генерации с общими лимитами             |
+| GET   | `/api/v1/trips/{id}`                        | Свой маршрут                                                    |
+| GET   | `/api/v1/trips/{id}/share`                  | Текст для шеринга                                               |
+| GET   | `/api/v1/geocode`, `/weather`, `/transport` | Диагностика провайдеров                                         |
+| POST  | `/api/v1/destinations/suggest`              | AI-подбор направления                                           |
 
 Основной интерфейс — `/`. Устаревшая техническая форма `/demo` удалена. Локальные read-only проверки:
 
