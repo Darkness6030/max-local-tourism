@@ -66,6 +66,7 @@ export function TripResult({
   onPlanChange: (plan: TripPlan) => void;
 }) {
   const ticketNote = cityDetails(config, plan.request.origin)?.ticket_note;
+  const [ticketNoteOpen, setTicketNoteOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("program");
   const reminders = useTransportReminders(plan.id, initData);
   const [transportNow, setTransportNow] = useState(Date.now);
@@ -531,11 +532,11 @@ export function TripResult({
                     mobile-type:[&_>_p]:text-[14px]"
                 >
                   <h2>Дорога — часть путешествия</h2>
-                  <div data-ui="schedule-notice" className="rounded-[18px] border border-[#e2e7f1] bg-white p-3 mb-4">
-                    <p className="text-muted text-[12px] mobile-type:text-[14px] leading-[1.7]">
+                  <div data-ui="schedule-notice" className="rounded-[18px] border border-[#e2e7f1] bg-white p-3.5 mb-4">
+                    <p className="text-[#687389] text-[12px] leading-[1.7]">
                       Время рейсов из расписаний. Перед отправлением проверьте изменения у перевозчика.
                     </p>
-                    <div className="flex items-center gap-3 narrow:gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 narrow:gap-x-2 mt-2">
                       {([false, true] as const).map((returning) => {
                         const options = returning ? plan.transport?.return_trip : plan.transport?.outbound;
                         const params = new URLSearchParams({
@@ -546,17 +547,44 @@ export function TripResult({
                         const url = options?.find((option) => safeUrl(option.buy_url))?.buy_url
                           || `https://rasp.yandex.ru/search/?${params}`;
                         return <button key={String(returning)} type="button"
-                          className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap bg-transparent py-2 px-0 text-[12px] narrow:text-[11px] font-[650] text-brand"
+                          className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-md bg-transparent py-1 px-0 text-[12px] narrow:text-[11px] font-[650] text-brand transition-colors hover:text-[#3049d7]"
                           onClick={() => external(url)}>{returning ? "Расписание обратно" : "Расписание туда"}<ArrowUpRight size={13} className="shrink-0" /></button>;
                       })}
                     </div>
+                    {ticketNote && (
+                      <div className="mt-2 border-t border-[#edf0f5] pt-1">
+                        <button
+                          type="button"
+                          className="flex w-full items-center gap-2 bg-transparent px-0 py-2 text-left text-[12px] font-semibold leading-[1.6] text-[#63745f]"
+                          aria-expanded={ticketNoteOpen}
+                          aria-controls="city-ticket-note"
+                          onClick={() => setTicketNoteOpen((open) => !open)}
+                        >
+                          <Info size={15} aria-hidden="true" />
+                          <span className="flex-1">{ticketNote.title}</span>
+                          <ChevronDown
+                            size={16}
+                            aria-hidden="true"
+                            className={`transition-transform duration-300 ${ticketNoteOpen ? "rotate-180" : ""}`}
+                          />
+                        </button>
+                        <motion.div
+                          id="city-ticket-note"
+                          data-ui="city-ticket-note"
+                          className="overflow-hidden"
+                          initial={false}
+                          animate={{ height: ticketNoteOpen ? "auto" : 0, opacity: ticketNoteOpen ? 1 : 0 }}
+                          transition={{ duration: reducedMotion ? 0 : 0.28, ease: "easeInOut" }}
+                          inert={!ticketNoteOpen}
+                          aria-hidden={!ticketNoteOpen}
+                        >
+                          <p className="pt-1 pb-2 text-[12px] leading-[1.7] text-[#687389]">
+                            {ticketNote.text}
+                          </p>
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
-                  {ticketNote && (
-                    <div data-ui="city-ticket-note" className="rounded-[18px] bg-[#edf2e9] p-4 mb-5 text-[12px] leading-[1.7] text-[#63745f]">
-                      <strong className="block mb-1">{ticketNote.title}</strong>
-                      {ticketNote.text}
-                    </div>
-                  )}
                   {reminders.error && (
                     <div role="alert" className="text-[13px] text-muted mb-4">
                       {reminders.error}

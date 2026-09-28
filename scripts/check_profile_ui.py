@@ -162,7 +162,10 @@ def main():
             expect(panel.get_by_label("Предпочтительный транспорт", exact=True)).to_have_value("car")
             page.goto(f"{args.base_url.rstrip('/')}/?WebAppStartParam=trip_{'a' * 32}")
             page.get_by_role("tab", name="Дорога", exact=True).click()
-            expect(page.locator('[data-ui="city-ticket-note"]')).to_be_visible()
+            ticket_note = page.locator('[data-ui="schedule-notice"] [data-ui="city-ticket-note"]')
+            expect(ticket_note).to_be_hidden()
+            page.get_by_role("button", name="Если едете на электричке из Москвы", exact=True).click()
+            expect(ticket_note).to_be_visible()
             expect(page.locator('[data-ui="weather-card"]').get_by_text("Open-Meteo")).to_have_count(0)
             assert page.locator('[data-ui="weather-card"]').evaluate("""el => {
                 const advice = el.querySelector('[data-ui=weather-advice]');
