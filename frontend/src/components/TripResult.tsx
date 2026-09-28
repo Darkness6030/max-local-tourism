@@ -536,7 +536,7 @@ export function TripResult({
                     <p className="text-[#687389] text-[12px] leading-[1.7]">
                       Время рейсов из расписаний. Перед отправлением проверьте изменения у перевозчика.
                     </p>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 narrow:gap-x-2 mt-2">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 narrow:gap-x-2 mt-1">
                       {([false, true] as const).map((returning) => {
                         const options = returning ? plan.transport?.return_trip : plan.transport?.outbound;
                         const params = new URLSearchParams({
@@ -555,7 +555,7 @@ export function TripResult({
                       <div className="mt-2 border-t border-[#edf0f5] pt-1">
                         <button
                           type="button"
-                          className="flex w-full items-center gap-2 bg-transparent px-0 py-2 text-left text-[12px] font-semibold leading-[1.6] text-[#63745f]"
+                          className="flex min-h-0 w-full items-center gap-2 bg-transparent px-0 pt-2 pb-1 text-left text-[12px] font-semibold leading-[1.6] text-[#63745f]"
                           aria-expanded={ticketNoteOpen}
                           aria-controls="city-ticket-note"
                           onClick={() => setTicketNoteOpen((open) => !open)}
@@ -578,7 +578,7 @@ export function TripResult({
                           inert={!ticketNoteOpen}
                           aria-hidden={!ticketNoteOpen}
                         >
-                          <p className="pt-1 pb-2 text-[12px] leading-[1.7] text-[#687389]">
+                          <p className="pt-1 text-[12px] leading-[1.7] text-[#687389]">
                             {ticketNote.text}
                           </p>
                         </motion.div>
@@ -718,7 +718,7 @@ export function TripResult({
                               <div
                                 data-ui="train-bottom"
                                 className="flex justify-between items-center [border-top:1px_dashed_#e5e9f2]
-                                  py-4 px-0 gap-2.5 [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6]
+                                  min-h-16 py-2 px-0 gap-2.5 [&_>_span]:text-[11px] [&_>_span]:text-[#838ea6]
                                   mobile:[&_>_span]:text-[11px] mobile-type:[&_>_span]:text-[12px]"
                               >
                                 <span>
@@ -979,18 +979,16 @@ export function TripResult({
           <div
             data-ui="share-feedback"
             className="absolute bottom-[calc(100%_+_10px)] left-3 right-3 rounded-2xl border border-solid
-              border-[#e0e5f2] bg-white p-3 text-[13px] leading-relaxed shadow-lg"
+              border-[#e0e5f2] bg-white p-3 text-[13px] leading-relaxed shadow-lg flex items-center gap-3"
           >
-            <p role="status">{shareFeedback.text}</p>
-            <div className="flex flex-wrap items-center justify-between gap-2 mt-1">
-              <button
-                type="button"
-                className="bg-transparent text-muted ml-auto px-0"
-                onClick={() => setShareFeedback(null)}
-              >
-                Закрыть
-              </button>
-            </div>
+            <p role="status" className="min-w-0 flex-1">{shareFeedback.text}</p>
+            <button
+              type="button"
+              className="min-h-8 shrink-0 bg-transparent text-muted px-0 py-1"
+              onClick={() => setShareFeedback(null)}
+            >
+              Закрыть
+            </button>
           </div>
         )}
         <button
