@@ -99,7 +99,7 @@ def main():
             }""")
             page.get_by_role("button", name="Уже знаю куда").click()
             destination = page.locator("input[name=destination]")
-            expect(destination).to_be_focused()
+            expect(destination).not_to_be_focused()
 
             def keyboard_check(field, page=page):
                 assert field.evaluate("el => parseFloat(getComputedStyle(el).fontSize) >= 16")

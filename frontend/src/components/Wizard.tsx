@@ -21,12 +21,15 @@ import {
   ChevronDown,
   Clock3,
   Coffee,
+  Eclipse,
   Footprints,
   Heart,
   Landmark,
   MapPin,
   Mountain,
+  Sparkle,
   Sparkles,
+  Sun,
   TrainFront,
   Trees,
   Users,
@@ -77,8 +80,8 @@ const interests = [
 
 const durationCardStyles = `
   [border:1.5px_solid_#e9ecf3] bg-white rounded-[17px] py-5 px-1.5 flex items-center flex-col
-  mobile:py-5 mobile:px-1.5 mobile:min-h-33.5 [&_>_span]:text-[27px] [&_>_span]:text-[#a0aec7]
-  [&_>_span]:leading-[1.4] [&_>_span]:mb-[9px] mobile:[&_>_span]:text-[28px] [&_strong]:text-[12px]
+  mobile:py-5 mobile:px-1.5 mobile:min-h-33.5 [&_>_span]:text-[#a0aec7]
+  [&_>_span]:flex [&_>_span]:h-[39px] [&_>_span]:items-center [&_>_span]:mb-[9px] [&_strong]:text-[12px]
   [&_strong]:font-[750] mobile:[&_strong]:text-[12px] [&_small]:text-[11px] [&_small]:text-[#a0a6b6]
   [&_small]:mt-[5px] mobile:[&_small]:text-[11px]
 `;
@@ -379,7 +382,9 @@ export function Wizard({
                     >
                       Город назначения
                       <input
-                        autoFocus
+                        autoFocus={
+                          window.matchMedia("(min-width: 701px) and (pointer: fine)").matches
+                        }
                         name="destination"
                         className="mt-[9px] block h-13.5 w-full rounded-[13px] border border-solid
                           border-[#e6e9f0] bg-white px-3.5 py-0 text-[13px] mobile:text-[16px]
@@ -498,7 +503,15 @@ export function Wizard({
                           });
                         }}
                       >
-                        <span>{days === 1 ? "☀" : days === 2 ? "◒" : "✦"}</span>
+                        <span aria-hidden="true">
+                          {days === 1 ? (
+                            <Sun size={28} />
+                          ) : days === 2 ? (
+                            <Eclipse size={28} />
+                          ) : (
+                            <Sparkle size={28} />
+                          )}
+                        </span>
                         <strong>
                           {days} {days === 1 ? "день" : "дня"}
                         </strong>
