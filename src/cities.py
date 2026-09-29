@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 
-CATALOG_PATH = Path(__file__).with_name("cities.json")
+CATALOG_PATH = Path(__file__).parent / "assets" / "cities.json"
 CityName = Annotated[str, Field(min_length=2, max_length=160)]
 
 

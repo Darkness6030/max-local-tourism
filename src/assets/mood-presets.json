@@ -1,0 +1,54 @@
+[
+  {
+    "id": "nature",
+    "title": "Поближе к природе",
+    "subtitle": "Выдохнуть и замедлиться",
+    "illustration": "nature",
+    "interests": [
+      "Природа",
+      "Прогулки"
+    ],
+    "pace": "relaxed",
+    "color": "#eaf0e5",
+    "ink": "#778574"
+  },
+  {
+    "id": "history",
+    "title": "Город с историей",
+    "subtitle": "Улочки, музеи и кофе",
+    "illustration": "city",
+    "interests": [
+      "История",
+      "Местная кухня"
+    ],
+    "pace": "balanced",
+    "color": "#faede3",
+    "ink": "#ae8572"
+  },
+  {
+    "id": "food",
+    "title": "За местным вкусом",
+    "subtitle": "Уютные кафе и новые вкусы",
+    "illustration": "coffee",
+    "interests": [
+      "Местная кухня",
+      "Прогулки"
+    ],
+    "pace": "relaxed",
+    "color": "#eee9f7",
+    "ink": "#9482b0"
+  },
+  {
+    "id": "active",
+    "title": "Больше движения",
+    "subtitle": "Тропы и маленькие открытия",
+    "illustration": "route",
+    "interests": [
+      "Активный отдых",
+      "Природа"
+    ],
+    "pace": "intensive",
+    "color": "#e5eef6",
+    "ink": "#7b9bb6"
+  }
+]

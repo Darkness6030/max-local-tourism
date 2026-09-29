@@ -1,6 +1,14 @@
+import { existsSync } from "node:fs";
+import { configuredTrips } from "./src/preset-config.ts";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+
+for (const trip of configuredTrips) {
+  if (!existsSync(new URL(`./src/assets/presets/${trip.photo}`, import.meta.url))) {
+    throw new Error(`Нет фотографии для пресета ${trip.id}: ${trip.photo}`);
+  }
+}
 
 const backend = process.env.BACKEND_URL || "http://127.0.0.1:8001";
 

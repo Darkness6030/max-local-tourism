@@ -3,6 +3,7 @@ WORKDIR /build/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend/ ./
+COPY src/assets/ /build/src/assets/
 ARG APP_BASE_PATH=""
 RUN APP_BASE_PATH="$APP_BASE_PATH" npm run build
 

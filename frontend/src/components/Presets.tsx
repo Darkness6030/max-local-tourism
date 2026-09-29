@@ -93,7 +93,7 @@ export function PresetCards({
                     rounded-[20px] bg-[#fffffff2] text-[10px] font-[750]"
                 >
                   <CalendarDays size={12} />
-                  {preset.days.length === 1 ? "1 день" : "2 дня"}
+                  {`${preset.days.length} ${preset.days.length === 1 ? "день" : "дня"}`}
                 </span>
               </span>
               <span
@@ -171,7 +171,7 @@ export function PresetDetail({
           data-ui="preset-top-days"
           className="[[data-ui~=preset-top]_>_span&]:text-brand [[data-ui~=preset-top]_>_span&]:tracking-[0]"
         >
-          {preset.days.length === 1 ? "1 день" : "2 дня"}
+          {`${preset.days.length} ${preset.days.length === 1 ? "день" : "дня"}`}
         </span>
       </div>
       <img
@@ -202,7 +202,7 @@ export function PresetDetail({
         >
           <span>
             <CalendarDays size={15} />
-            {preset.days.length === 1 ? "На один день" : "С одной ночёвкой"}
+            {preset.days.length === 1 ? "На один день" : preset.days.length === 2 ? "С одной ночёвкой" : "С двумя ночёвками"}
           </span>
           <span>
             <Users size={15} />

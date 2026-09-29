@@ -1,6 +1,7 @@
 """Browser checks for curated routes. No live generation or messages."""
 
 import argparse
+from datetime import date, timedelta
 import sys
 from pathlib import Path
 
@@ -8,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from playwright.sync_api import expect, sync_playwright
 
 from scripts.check_ui import BRIDGE, mock_profile
+from src.cities import get_city_catalog
 
 
 def main():
@@ -29,6 +31,14 @@ def main():
                 viewport={"width": width, "height": height}, reduced_motion="reduce"
             )
             mock_profile(context, completed=False)
+            today = date.today()
+            context.route("**/api/v1/app-config", lambda r: r.fulfill(json={
+                "today": today.isoformat(),
+                "default_date": (today + timedelta(days=1)).isoformat(),
+                "last_trip_date": (today + timedelta(days=15)).isoformat(),
+                "max_days": 3,
+                **get_city_catalog().public(),
+            }))
             context.route(
                 "https://st.max.ru/**",
                 lambda r: r.fulfill(content_type="application/javascript", body=BRIDGE),
