@@ -157,7 +157,7 @@ docker compose exec app python -m src.services.max_bot
 
 ## API
 
-В production пользовательские endpoints требуют `X-Max-Init-Data`. Публичны только страница, ресурсы, health и UI-конфигурация. Диагностические маршруты, Swagger и OpenAPI доступны только при локальной разработке. OpenAPI 3.1: `/openapi.json`, Swagger: `/docs` (Authorize → MaxInitData). Снимок схемы в корне обновляется командой `python scripts/export_openapi.py`.
+В production пользовательские endpoints требуют `X-Max-Init-Data`. Публичны страница, ресурсы, health, UI-конфигурация и документация API для проверки организаторами: [Swagger](https://kaktut.ru/max/app/docs) и [OpenAPI 3.1](https://kaktut.ru/max/app/openapi.json). Для вызова пользовательских методов в Swagger используйте Authorize → MaxInitData с действующей строкой `window.WebApp.initData`. Диагностические маршруты и ReDoc доступны только при локальной разработке. Локальные пути документации: `/docs` и `/openapi.json`. Снимок схемы в корне обновляется командой `python scripts/export_openapi.py`.
 
 | Метод | Путь                                        | Результат                                                       |
 |-------|---------------------------------------------|-----------------------------------------------------------------|

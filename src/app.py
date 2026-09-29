@@ -45,9 +45,9 @@ app = FastAPI(
     ),
     lifespan=lifespan,
     root_path=settings.app_root_path,
-    docs_url=None if settings.app_env == "production" else "/docs",
+    docs_url="/docs",
     redoc_url=None if settings.app_env == "production" else "/redoc",
-    openapi_url=None if settings.app_env == "production" else "/openapi.json",
+    openapi_url="/openapi.json",
 )
 
 app.include_router(router)

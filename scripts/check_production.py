@@ -82,11 +82,19 @@ def main():
         assert identity.json()["user"]["id"] == 900000000042
         assert identity.json()["user"]["last_name"] == "развёртывания"
         assert "no-store" in identity.headers.get("cache-control", "")
+        docs = get("/docs")
+        assert docs.status_code == 200
+        root_path = urlsplit(base).path.rstrip("/")
+        assert f"url: '{root_path}/openapi.json'" in docs.text
+        schema_response = get("/openapi.json")
+        assert schema_response.status_code == 200
+        schema = schema_response.json()
+        assert schema["openapi"].startswith("3.1.")
+        assert {"MaxInitData": []} in schema["paths"]["/api/v1/profile"]["get"]["security"]
+        assert not any("/examples/" in path for path in schema["paths"])
         for path in (
             "/api/v1/examples/trip-plan",
             "/api/v1/examples/trip-request",
-            "/docs",
-            "/openapi.json",
             "/api/v1/geocode",
         ):
             assert get(path, headers=headers).status_code == 404, path
@@ -98,7 +106,7 @@ def main():
             == 422
         )
         print(
-            "Production: no guest access; verified profile accepted; invalid signatures rejected; development routes closed.",
+            "Production: public Swagger/OpenAPI available; no guest access; verified profile accepted; invalid signatures rejected; development routes closed.",
             flush=True,
         )
         if not args.generate:
