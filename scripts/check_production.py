@@ -60,7 +60,8 @@ def main():
 
         page = get("")
         assert page.status_code == 200
-        assets = re.findall(r'(?:src|href)="(/max/app/static/[^\"]+)"', page.text)
+        root_path = urlsplit(base).path.rstrip("/")
+        assets = re.findall(r'(?:src|href)="(' + re.escape(root_path) + r'/static/[^\"]+)"', page.text)
         assert len(assets) >= 2
         for asset in assets:
             if not urlsplit(base).path.strip("/"):
@@ -129,7 +130,7 @@ def main():
         )
         created.raise_for_status()
         job_id = created.json()["id"]
-        assert created.json()["status_url"].startswith("/max/app/api/v1/trips/jobs/")
+        assert created.json()["status_url"].startswith(root_path + "/api/v1/trips/jobs/")
         stranger = {"X-Max-Init-Data": launch_data(token, 900000000043)}
         assert get(f"/api/v1/trips/jobs/{job_id}", headers=stranger).status_code == 404
         previous = None
