@@ -1,7 +1,7 @@
 # Dental: рабочий miniapp
 
 - Зарегистрированный адрес: https://kaktut.ru/max/app (без перенаправления).
-- Бот: `t815_hakaton_max_bot`, ID `419339706`. Настройки бота не изменяются.
+- Бот: `t539_hakaton_max_bot`, ID `403790825`. Настройки бота не изменяются.
 - Compose-проект/контейнер: `max-local-tourism` / `max-local-tourism-app-1`.
 - Порт: только `127.0.0.1:18091 → 8000`; сеть Docker отдельная, без подключения к чужим сетям.
 - Git-репозиторий: `https://github.com/Darkness6030/max-local-tourism` (private), ветка `main`.

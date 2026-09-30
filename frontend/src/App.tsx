@@ -409,7 +409,7 @@ export default function App() {
   };
 
   if (!booting && !identity) {
-    const botUrl = (config?.bot_url || "https://max.ru/t815_hakaton_max_bot?startapp")
+    const botUrl = (config?.bot_url || "https://max.ru/t539_hakaton_max_bot?startapp")
       + (pendingShare.current ? `=trip_${pendingShare.current}` : "");
     return (
       <MaxEntry
